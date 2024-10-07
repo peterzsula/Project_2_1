@@ -25,7 +25,7 @@ public class GUI extends Application {
         selectionPane.setBackground(new Background(new BackgroundFill(Color.web("#FAF0E6"), CornerRadii.EMPTY, Insets.EMPTY)));
 
         // Title label (smaller, centered, and bold with a deep color) positioned higher
-        Label gameTitle = new Label("FRYSIAN DRAUGHTS");
+        Label gameTitle = new Label("FRISIAN DRAUGHTS");
         gameTitle.setStyle("-fx-font-size: 28px; -fx-font-weight: bold; -fx-text-fill: BLACK;");
         gameTitle.setFont(new Font("Arial", 28));  // Set the font to Arial, smaller size
         gameTitle.setLayoutX(75); // Centered horizontally in 400px window
