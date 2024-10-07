@@ -154,8 +154,10 @@ public class CheckersApp extends Application {
         }
 
         else {
-            //Capture logic for normal pieces
-        }
+            // Normal diagonal move for regular pieces
+        if (isMoveDiagonalNormal(x0, y0, newX, newY) && piece.getType().moveDir == (newY - y0)) {return new MoveResult(MoveType.NORMAL);}
+        
+
         // Horizontal capture logic for normal pieces
         if (newY == y0 && Math.abs(newX - x0) == 4) {
             int x1 = (newX + x0) / 2;
@@ -183,13 +185,9 @@ public class CheckersApp extends Application {
                 return new MoveResult(MoveType.CAPTURE, halfWay.getPiece());
             }
         }
+    }
 
-        // Normal diagonal move for regular pieces
-        if (isMoveDiagonalNormal(x0, y0, newX, newY) && piece.getType().moveDir == (newY - y0)) {
-            return new MoveResult(MoveType.NORMAL);
-        }
-
-        return new MoveResult(MoveType.INVALID);
+    return new MoveResult(MoveType.INVALID);
     }
 
 
