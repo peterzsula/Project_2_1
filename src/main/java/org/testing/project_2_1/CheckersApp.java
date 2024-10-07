@@ -30,7 +30,7 @@ public class CheckersApp extends Application {
     @Override
     public void start(Stage primaryStage) throws Exception {
         Scene scene = new Scene(createContent(), SIZE * TILE_SIZE + 300, SIZE * TILE_SIZE);
-        primaryStage.setTitle("FRYSIAN DRAUGHTS");
+        primaryStage.setTitle("FRISIAN DRAUGHTS");
         primaryStage.setScene(scene);
         primaryStage.show();
     }
@@ -67,7 +67,6 @@ public class CheckersApp extends Application {
         }
 
         boardPane.getChildren().addAll(tileGroup, pieceGroup);
-
 
         VBox rightPanel = new VBox(50); // Create a vertical layout with 10px spacing
         rightPanel.getChildren().addAll(timerLabel, capturedPiecesTracker.getCapturedPiecesDisplay());
@@ -132,111 +131,61 @@ public class CheckersApp extends Application {
     private MoveResult tryMove(Piece piece, int newX, int newY) {
         int x0 = toBoard(piece.getOldX());
         int y0 = toBoard(piece.getOldY());
-
         Tile tile = board[newX][newY];
-        if (tile.hasPiece()) {
-            return new MoveResult(MoveType.INVALID);
-        }
 
-        if (!tile.isBlack()) {
-            return new MoveResult(MoveType.INVALID);
-        }
+        if (tile.hasPiece()) {return new MoveResult(MoveType.INVALID);}
 
-        // Check if the piece is a king
+        if (!tile.isBlack()) {return new MoveResult(MoveType.INVALID);}
+
         boolean isKing = piece.getType() == PieceType.BLACKKING || piece.getType() == PieceType.WHITEKING;
 
         // If the piece is a king, allow multi-tile diagonal moves and captures
         if (isKing) {
             // Check for normal diagonal move (multi-tile)
             if (isMoveDiagonal(x0, y0, newX, newY) && isPathClear(x0, y0, newX, newY)) {
-                resetTimer(); // Reset the timer after a valid king move
                 return new MoveResult(MoveType.NORMAL);
             }
 
             // Check for diagonal capture for king
             if (Math.abs(newX - x0) >= 2 && Math.abs(newY - y0) >= 2 && isCapturePath(x0, y0, newX, newY)) {
                 Piece capturedPiece = getCapturedPieceOnPath(x0, y0, newX, newY);
-                resetTimer(); // Reset the timer after a valid king capture
-
-                // Update captured pieces tracker
-                if (piece.getType() == PieceType.BLACKKING) {
-                    capturedPiecesTracker.incrementWhiteCaptured();
-                } else {
-                    capturedPiecesTracker.incrementBlackCaptured();
-                }
-
                 return new MoveResult(MoveType.CAPTURE, capturedPiece);
             }
         }
 
-        // Horizontal capture logic for normal pieces (unchanged)
+        else {
+            //Capture logic for normal pieces
+        }
+        // Horizontal capture logic for normal pieces
         if (newY == y0 && Math.abs(newX - x0) == 4) {
             int x1 = (newX + x0) / 2;
-            if (board[x1][y0].isBlack() && board[x1][y0].hasPiece() && board[x1][y0].getPiece().getType() != piece.getType()) {
-                resetTimer(); // Reset the timer after a valid capture
-
-                // Update captured pieces tracker
-                if (piece.getType() == PieceType.BLACK) {
-                    capturedPiecesTracker.incrementWhiteCaptured();
-                } else {
-                    capturedPiecesTracker.incrementBlackCaptured();
-                }
-
-                return new MoveResult(MoveType.CAPTURE, board[x1][y0].getPiece());
+            Tile halfWay = board[x1][y0];
+            if (halfWay.hasPiece() && !halfWay.getPiece().getType().color.equals(piece.getType().color)) {
+                return new MoveResult(MoveType.CAPTURE, halfWay.getPiece());
             }
         }
 
-        // Vertical capture logic for normal pieces (unchanged)
+        // Vertical capture logic for normal pieces
         if (newX == x0 && Math.abs(newY - y0) == 4) {
             int y1 = (newY + y0) / 2;
-            if (board[x0][y1].isBlack() && board[x0][y1].hasPiece() && board[x0][y1].getPiece().getType() != piece.getType()) {
-                resetTimer(); // Reset the timer after a valid capture
-
-                // Update captured pieces tracker
-                if (piece.getType() == PieceType.BLACK) {
-                    capturedPiecesTracker.incrementWhiteCaptured();
-                } else {
-                    capturedPiecesTracker.incrementBlackCaptured();
-                }
-
-                return new MoveResult(MoveType.CAPTURE, board[x0][y1].getPiece());
+            Tile halfWay = board[x0][y1];
+            if (halfWay.hasPiece() && !halfWay.getPiece().getType().color.equals(piece.getType().color)) {
+                return new MoveResult(MoveType.CAPTURE, halfWay.getPiece());
             }
         }
 
-        // Diagonal capture logic for normal pieces (unchanged)
+        // Diagonal capture logic for normal pieces
         if (Math.abs(newX - x0) == 2 && Math.abs(newY - y0) == 2) {
             int x1 = (newX + x0) / 2;
             int y1 = (newY + y0) / 2;
-            if (board[x1][y1].isBlack() && board[x1][y1].hasPiece() && board[x1][y1].getPiece().getType() != piece.getType()) {
-                System.out.println("Diagonal capture at (" + x1 + "," + y1 + ")");
-                resetTimer(); // Reset the timer after a valid diagonal capture
-
-                // Update captured pieces tracker
-                if (piece.getType() == PieceType.BLACK) {
-                    capturedPiecesTracker.incrementWhiteCaptured();
-                } else {
-                    capturedPiecesTracker.incrementBlackCaptured();
-                }
-
-                return new MoveResult(MoveType.CAPTURE, board[x1][y1].getPiece());
+            Tile halfWay = board[x1][y1];
+            if (halfWay.hasPiece() && !halfWay.getPiece().getType().color.equals(piece.getType().color)) {
+                return new MoveResult(MoveType.CAPTURE, halfWay.getPiece());
             }
         }
 
-        // Normal horizontal move for regular pieces (unchanged)
-        if (newY == y0 && Math.abs(newX - x0) == 1) {
-            resetTimer(); // Reset the timer after a valid normal horizontal move
-            return new MoveResult(MoveType.NORMAL);
-        }
-
-        // Normal vertical move for regular pieces (unchanged)
-        if (newX == x0 && Math.abs(newY - y0) == 1) {
-            resetTimer(); // Reset the timer after a valid normal vertical move
-            return new MoveResult(MoveType.NORMAL);
-        }
-
-        // Normal diagonal move for regular pieces (unchanged)
-        if (Math.abs(newX - x0) == 1 && Math.abs(newY - y0) == 1) {
-            resetTimer(); // Reset the timer after a valid normal diagonal move
+        // Normal diagonal move for regular pieces
+        if (isMoveDiagonalNormal(x0, y0, newX, newY) && piece.getType().moveDir == (newY - y0)) {
             return new MoveResult(MoveType.NORMAL);
         }
 
@@ -280,6 +229,7 @@ public class CheckersApp extends Application {
                     piece.abortMove();
                     break;
                 case NORMAL:
+                    resetTimer();
                     piece.move(newX, newY);
                     board[x0][y0].setPiece(null);
                     board[newX][newY].setPiece(piece);
@@ -287,10 +237,15 @@ public class CheckersApp extends Application {
                     handleKingPromotion(piece, newY); // << ADD THIS LINE
                     break;
                 case CAPTURE:
+                    resetTimer();
+                    if (piece.getType().color.equals("black")) {
+                        capturedPiecesTracker.incrementWhiteCaptured();
+                    } else {
+                        capturedPiecesTracker.incrementBlackCaptured();
+                    }
                     piece.move(newX, newY);
                     board[x0][y0].setPiece(null);
                     board[newX][newY].setPiece(piece);
-
                     Piece otherPiece = result.getPiece();
                     board[toBoard(otherPiece.getOldX())][toBoard(otherPiece.getOldY())].setPiece(null);
                     pieceGroup.getChildren().remove(otherPiece);
@@ -304,11 +259,15 @@ public class CheckersApp extends Application {
     }
 
 
-    // Helper method to check if move is diagonal
+    // Helper method to check if move is diagonal for king
     private boolean isMoveDiagonal(int x0, int y0, int newX, int newY) {
         return Math.abs(newX - x0) == Math.abs(newY - y0);
     }
 
+    // Helper method to check if move is diagonal for normal pieces
+    private boolean isMoveDiagonalNormal(int x0, int y0, int newX, int newY) {
+        return Math.abs(newX - x0) == 1 && Math.abs(newY - y0) == 1;
+    }
 
 
     // Check if the path for king movement (diagonal, horizontal, vertical) is clear
