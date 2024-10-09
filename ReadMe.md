@@ -41,10 +41,8 @@ Now it's time to _Play It_! (Frisian's version).
 - In case its necessary, for better visualisation reasons, the Screen Size can be easily adjust by increasing/decreasing the value of the variable `int TILE_SIZE` in the CheckersApp class.
 
 <img src="src/main/resources/img2.png" alt="img2" width="500"/>  
-<br>
 Homepage screen: Game mode selection.  
 <br>
 <br>
 <img src="src/main/resources/img3.png" alt="img3" width="600"/>
-<br>
 Gameplay Screen.  
