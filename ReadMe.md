@@ -15,7 +15,7 @@ adversarial search algorithm and one machine learning (ML) algorithm.
 A game of Frisian Draughts is played by two people on a 10x10 squares board, where only the darker squares are used for the game.  
 Twenty (20) black pieces are displayed in the first 4 rows of the board, and twenty (20) white pieces are displayed in the bottom 4 rows of the boards, giving a maximum number of 40 pieces in total for a single game.  
 
-![img1.png](src/main/resources/img1.png)
+<img src="src/main/resources/img1.png" alt="img1" width="500"/>
 
 We establish the allowed moves/captures, constraints and regulations based on the Official Rules for Frisian Draughts (2011), such as:
 -   Each piece moves (forward) only one square diagonally
@@ -40,7 +40,11 @@ This should launch a Homepage window where the player is asked to select the num
 Now it's time to _Play It_! (Frisian's version).
 - In case its necessary, for better visualisation reasons, the Screen Size can be easily adjust by increasing/decreasing the value of the variable `int TILE_SIZE` in the CheckersApp class.
 
-
-![Homepage window: Game Mode selection](src\main\resources\img2.png "img2")
-
-![Gameplay screen: Board, timer and captures counter](src\main\resources\img3.png "img3")
+<img src="src/main/resources/img2.png" alt="img2" width="500"/>  
+<br>
+Homepage screen: Game mode selection.  
+<br>
+<br>
+<img src="src/main/resources/img3.png" alt="img3" width="600"/>
+<br>
+Gameplay Screen.  
