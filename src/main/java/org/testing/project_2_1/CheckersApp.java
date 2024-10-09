@@ -15,7 +15,7 @@ import javafx.util.Duration;
 
 public class CheckersApp extends Application {
     boolean whitesTurn = true;
-    public static final int TILE_SIZE = 80;
+    public static final int TILE_SIZE = 60;
     public static final int SIZE = 10;
 
     private Label timerLabel;
