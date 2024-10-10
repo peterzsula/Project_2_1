@@ -27,6 +27,11 @@ public class CheckersApp extends Application {
     private Group pieceGroup = new Group();
     private CapturedPiecesTracker capturedPiecesTracker;
 
+    private Piece selectedPiece = null; // piece selected for the current turn
+    private boolean isWhiteTurn = true; // white player starts the turn on default
+
+    private boolean DEBUG = true; // debug flag
+
     @Override
     public void start(Stage primaryStage) throws Exception {
         Scene scene = new Scene(createContent(), SIZE * TILE_SIZE + 300, SIZE * TILE_SIZE);
@@ -156,7 +161,7 @@ public class CheckersApp extends Application {
         else {
             // Normal diagonal move for regular pieces
         if (isMoveDiagonalNormal(x0, y0, newX, newY) && piece.getType().moveDir == (newY - y0)) {return new MoveResult(MoveType.NORMAL);}
-        
+
 
         // Horizontal capture logic for normal pieces
         if (newY == y0 && Math.abs(newX - x0) == 4) {
@@ -233,6 +238,7 @@ public class CheckersApp extends Application {
                     board[newX][newY].setPiece(piece);
                     // Check if the piece should be promoted to a king
                     handleKingPromotion(piece, newY); // << ADD THIS LINE
+                    handleTurn(piece, board[newX][newY]); // added to handle turn movement
                     break;
                 case CAPTURE:
                     resetTimer();
@@ -249,6 +255,7 @@ public class CheckersApp extends Application {
                     pieceGroup.getChildren().remove(otherPiece);
                     // Check if the piece should be promoted to a king after capture
                     handleKingPromotion(piece, newY); // << ADD THIS LINE
+                    handleTurn(piece, board[newX][newY]); //added to handle turn movement
                     break;
             }
         });
@@ -327,6 +334,96 @@ public class CheckersApp extends Application {
         }
 
         return null;  // No capturable piece found
+    }
+
+    public void handleTurn(Piece piece, Tile targetTile) {
+
+        // check if the piece colour matches the turn
+        if ((isWhiteTurn && piece.getType().color.equals("black")) || (!isWhiteTurn && piece.getType().color.equals("white"))) {
+            if (DEBUG) { System.out.println("incorrect turn: " + (isWhiteTurn ? "white" : "black") + "'s turn."); }
+            piece.abortMove();
+            return;
+        }
+
+        // check if a piece has been selected. if a piece has been moved one time, lock it and only allow movement for that piece
+        if (selectedPiece != null && piece != selectedPiece) {
+            if (DEBUG) { System.out.println("piece already locked: " + selectedPiece + "."); }
+            piece.abortMove();
+            return;
+        }
+
+        MoveResult result = tryMove(piece, toBoard(targetTile.getX()), toBoard(targetTile.getY()));
+
+        if (result.getType() == MoveType.INVALID) {
+            if (DEBUG) { System.out.println("invalid move type"); }
+            piece.abortMove();
+            return;
+        }
+
+        piece.move(toBoard(targetTile.getX()), toBoard(targetTile.getY()));
+
+        // after the first executed move, locks the piece in
+        if (selectedPiece == null) {
+            selectedPiece = piece;
+            if (DEBUG) { System.out.println("piece locked in: " + piece); }
+        }
+
+        // checks if more captures are possible, finishes turn if not
+        if (result.getType() == MoveType.CAPTURE) {
+            if (DEBUG) {
+                System.out.println("capture made, checking for more capture possibilities...");
+            }
+            if (!canMakeAnotherCapture(piece)) {
+                if (DEBUG) {
+                    System.out.println("no more captures possible. end of turn.");
+                }
+                finishTurn();
+            } else {
+                if (DEBUG) {
+                    System.out.println("further captures are possible. continue moving the same piece.");
+                }
+            }
+        } else {
+            // if it's a normal move, finishes the turn
+            finishTurn();
+        }
+    }
+
+
+    public boolean canMakeAnotherCapture(Piece piece) {
+        int x = toBoard(piece.getOldX());
+        int y = toBoard(piece.getOldY());
+
+        // checks in all diagonal directions for capture possibilities
+        int[][] directions = {{1, 1}, {1, -1}, {-1, 1}, {-1, -1}};
+
+        for (int[] dir : directions) {
+            int newX = x + 2 * dir[0];  // calculate the destination tile 2 steps away
+            int newY = y + 2 * dir[1];
+
+            if (isInBounds(newX, newY) && isCapturePath(x, y, newX, newY)) {
+                if(DEBUG) { System.out.println("another jump jump available from (" + x + "," + y + ") to (" + newX + "," + newY + ")"); }
+                return true;  // there is a valid capture, so the piece can make further jumps
+            }
+        }
+
+        return false; // no further jumps are possible
+    }
+
+    private boolean isInBounds(int x, int y) {
+        return x >= 0 && x < SIZE && y >= 0 && y < SIZE;
+    }
+
+    public void finishTurn() {
+        if(DEBUG) { System.out.println("turn finished"); }
+        selectedPiece = null; // reset the selected piece for the next player
+        switchTurns();        // switch the player's turn
+        resetTimer();         // reset the timer
+    }
+
+    private void switchTurns() {
+        isWhiteTurn = !isWhiteTurn; // switch between white and black players
+        if(DEBUG) { System.out.println("turn switched: " + (isWhiteTurn ? "white" : "black") + "'s turn."); }
     }
 
     public static void main(String[] args) {
