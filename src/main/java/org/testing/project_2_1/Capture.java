@@ -2,17 +2,19 @@ package org.testing.project_2_1;
 
 public class Capture {
     public Piece piece;
+    public Piece capturedPiece;
     public int toX;
     public int toY;
 
-    public Capture(Piece piece, int toX, int toY) {
+    public Capture(Piece piece, Piece capturedPiece, int toX, int toY) {
         this.piece = piece;
+        this.capturedPiece = capturedPiece;
         this.toX = toX;
         this.toY = toY;
     }
 
-    public Piece getPiece() {
-        return piece;
+    public Piece getCapturedPiece() {
+        return capturedPiece;
     }
 
     public int getToX() {
@@ -33,6 +35,11 @@ public class Capture {
                 return false;
         } else if (!piece.equals(other.piece))
             return false;
+        if (capturedPiece == null) {
+            if (other.capturedPiece != null)
+                return false;
+        } else if (!capturedPiece.equals(other.capturedPiece))
+            return false;
         if (toX != other.toX)
             return false;
         if (toY != other.toY)
@@ -42,13 +49,14 @@ public class Capture {
 
     @Override
     public String toString() {
-        return "Capture [fromX=" + piece.x + ", fromY=" + piece.y + ", toX=" + toX + ", toY=" + toY + "]";
+            return "Capture [fromX=" + piece.x + ", fromY=" + piece.y + ", toX=" + toX + ", toY=" + toY + "]";
     }
 
     public static void main(String[] args) {
         Piece piece = new Piece(PieceType.BLACK, 0, 0);
-        Capture capture = new Capture(piece, 1, 1);
-        Capture capture2 = new Capture(piece, 1, 1);
+        Piece capturedPiece = new Piece(PieceType.WHITE, 1, 1);
+        Capture capture = new Capture(piece, capturedPiece, 1, 1);
+        Capture capture2 = new Capture(piece, capturedPiece, 1, 1);
         System.out.println(capture.equals(capture2));
     }
 

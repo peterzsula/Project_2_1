@@ -9,7 +9,7 @@ public class MoveResult {
     }
 
     public Piece getPieceTaken() {
-        return capture.getPiece();
+        return capture.getCapturedPiece();
     }
 
     public Capture getCapture() {
