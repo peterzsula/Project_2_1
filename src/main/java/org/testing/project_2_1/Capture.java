@@ -39,4 +39,18 @@ public class Capture {
             return false;
         return true;
     }
+
+    @Override
+    public String toString() {
+        return "Capture [fromX=" + piece.x + ", fromY=" + piece.y + ", toX=" + toX + ", toY=" + toY + "]";
+    }
+
+    public static void main(String[] args) {
+        Piece piece = new Piece(PieceType.BLACK, 0, 0);
+        Capture capture = new Capture(piece, 1, 1);
+        Capture capture2 = new Capture(piece, 1, 1);
+        System.out.println(capture.equals(capture2));
+    }
+
+    
 }

@@ -46,11 +46,13 @@ public class GameLogic {
     }
 
     private void switchTurn() {
+        System.out.println("switch turn");
         isWhiteTurn = !isWhiteTurn;
         if (isWhiteTurn) {
             turnCounter++;    
         }
         availableCaptures = checkAvailableCaptures();
+        printAvailableCaptures();
     }
 
     public ArrayList<Capture> checkAvailableCaptures() {
@@ -69,8 +71,29 @@ public class GameLogic {
         return availableCaptures;
     }
 
+    public ArrayList<Capture> checkAvailableCaptures(Piece piece) {
+        ArrayList<Capture> availableCaptures = new ArrayList<>();
+        for (int i = 0; i < board.length; i++) {
+            for (int j = 0; j < board.length; j++) {
+                if (tryMove(piece, i, j).getType() == MoveType.CAPTURE) {
+                    availableCaptures.add(new Capture(piece, i, j));
+                    
+                }
+            }
+        }
+        return availableCaptures;
+    }
+
     public boolean hasAvailableCaptures(){
         availableCaptures = checkAvailableCaptures();
+        if (availableCaptures.size() > 0) {
+            return true;
+        }
+        return false;
+    }
+
+    public boolean hasAvailableCaptures(Piece piece){
+        availableCaptures = checkAvailableCaptures(piece);
         if (availableCaptures.size() > 0) {
             return true;
         }
@@ -92,27 +115,36 @@ public class GameLogic {
         result = tryMove(piece, newX, newY);
         System.out.println(result.toString());
         if (result.getType() == MoveType.INVALID) {
-            System.out.println("Invalid fucking move");
+            System.out.println("Invalid move 95");
             piece.pieceDrawer.abortMove();
             return false;
-        }
-            // If you have available captures, you must make a capture
-            System.out.println(checkAvailableCaptures().size());
-            if (hasAvailableCaptures()) {
-                // while you can capture, keep capturing until you can't
-                while (hasAvailableCaptures()) {
-                    for (Capture capture : availableCaptures) {
-                        if (result.getType() == MoveType.CAPTURE) {
-                            if (capture.equals(result.getCapture())) {
-                                movePiece(result, piece, newX, newY);
-                            }
+        }        
+            // If you have available captures with any piece, you must make a capture
+        if (hasAvailableCaptures()) {
+            // while you can capture, keep capturing until you can't
+            while (hasAvailableCaptures(piece)) {
+                for (Capture capture : availableCaptures) {
+                    if (result.getType() == MoveType.CAPTURE) {
+                        if (capture.equals(result.getCapture())) {
+                            System.out.println("move piece");
+                            movePiece(result, piece, newX, newY);
+                            checkAvailableCaptures();
+                            printAvailableCaptures();
+
                         }
+                        else {
+                            return false;
+                        }
+                    }
+                    else {
+                        return false;
                     }
                 }
             }
-            else { // If you don't have available captures, make a normal move
-                movePiece(result, piece, newX, newY);
-            }
+        }
+        else { // If you don't have available captures, make a normal move
+            movePiece(result, piece, newX, newY);
+        }
         switchTurn();
         return true;
     }
@@ -304,6 +336,13 @@ public class GameLogic {
         }
 
         return null;  // No capturable piece found
+    }
+
+    public void printAvailableCaptures(){
+        System.out.println(checkAvailableCaptures().size());
+        for (Capture capture : checkAvailableCaptures()) {
+            System.out.println(capture.toString());
+        }
     }
 
     public static void main(String[] args) {
