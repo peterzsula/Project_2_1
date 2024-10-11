@@ -14,7 +14,6 @@ import javafx.stage.Stage;
 import javafx.util.Duration;
 
 public class CheckersApp extends Application {
-    boolean whitesTurn = true;
     public static final int TILE_SIZE = 60;
     public static final int SIZE = 10;
 
@@ -22,15 +21,11 @@ public class CheckersApp extends Application {
     private Timeline timer;
     private int timeRemaining;
 
-    private Tile[][] board = new Tile[SIZE][SIZE];
     private Group tileGroup = new Group();
-    private Group pieceGroup = new Group();
+    public Group pieceGroup = new Group();
     private CapturedPiecesTracker capturedPiecesTracker;
 
-    private Piece selectedPiece = null; // piece selected for the current turn
-    private boolean isWhiteTurn = true; // white player starts the turn on default
-
-    private boolean DEBUG = true; // debug flag
+    GameLogic gameLogic;
 
     @Override
     public void start(Stage primaryStage) throws Exception {
@@ -40,35 +35,25 @@ public class CheckersApp extends Application {
         primaryStage.show();
     }
 
-    private Parent createContent() {
+    public Parent createContent() {
         Pane boardPane = new Pane();
+        gameLogic = new GameLogic(this);
         boardPane.setPrefSize(SIZE * TILE_SIZE, SIZE * TILE_SIZE);
-
+        capturedPiecesTracker = new CapturedPiecesTracker();
         timerLabel = new Label("Time remaining: 30s");
         setTimerStyle();
         startMoveTimer();
 
-        capturedPiecesTracker = new CapturedPiecesTracker();
-
-        for (int y = 0; y < SIZE; y++) {
-            for (int x = 0; x < SIZE; x++) {
-                Tile tile = new Tile(x, y);
-                board[x][y] = tile;
-
-                tileGroup.getChildren().add(tile);
-
-                Piece piece = null;
-                if (y <= 3 && tile.isBlack()) {
-                    piece = makePiece(PieceType.BLACK, x, y);
-                } else if (y >= 6 && tile.isBlack()) {
-                    piece = makePiece(PieceType.WHITE, x, y);
-                }
-
-                if (piece != null) {
-                    tile.setPiece(piece);
-                    pieceGroup.getChildren().add(piece);
+        for (Tile[] row : gameLogic.board) {
+            for (Tile tile : row) {
+                tileGroup.getChildren().add(tile.tileDrawer);
+                if (tile.hasPiece()) {
+                    Piece piece = tile.getPiece();
+                    piece.setPieceDrawer(new PieceDrawer(piece, this));
+                    pieceGroup.getChildren().add(piece.pieceDrawer);
                 }
             }
+            
         }
 
         boardPane.getChildren().addAll(tileGroup, pieceGroup);
@@ -84,6 +69,7 @@ public class CheckersApp extends Application {
         return root;
     }
 
+    //TODO: fix the timer
     private void startMoveTimer() {
         timeRemaining = 30;
 
@@ -114,7 +100,7 @@ public class CheckersApp extends Application {
     }
 
     private void displaySwitchTurnMessage() {
-        whitesTurn = !whitesTurn;
+        gameLogic.isWhiteTurn = !gameLogic.isWhiteTurn;
         timerLabel.setText("Switching to Opponent's turn...");
 
         Timeline delay = new Timeline(new KeyFrame(Duration.seconds(2), event -> resetTimer()));
@@ -133,297 +119,23 @@ public class CheckersApp extends Application {
                 "-fx-font-family: 'Arial'; -fx-border-radius: 5px; -fx-background-radius: 5px;");
     }
 
-    private MoveResult tryMove(Piece piece, int newX, int newY) {
-        int x0 = toBoard(piece.getOldX());
-        int y0 = toBoard(piece.getOldY());
-        Tile tile = board[newX][newY];
-
-        if (tile.hasPiece()) {return new MoveResult(MoveType.INVALID);}
-
-        if (!tile.isBlack()) {return new MoveResult(MoveType.INVALID);}
-
-        boolean isKing = piece.getType() == PieceType.BLACKKING || piece.getType() == PieceType.WHITEKING;
-
-        // If the piece is a king, allow multi-tile diagonal moves and captures
-        if (isKing) {
-            // Check for normal diagonal move (multi-tile)
-            if (isMoveDiagonal(x0, y0, newX, newY) && isPathClear(x0, y0, newX, newY)) {
-                return new MoveResult(MoveType.NORMAL);
-            }
-
-            // Check for diagonal capture for king
-            if (Math.abs(newX - x0) >= 2 && Math.abs(newY - y0) >= 2 && isCapturePath(x0, y0, newX, newY)) {
-                Piece capturedPiece = getCapturedPieceOnPath(x0, y0, newX, newY);
-                return new MoveResult(MoveType.CAPTURE, capturedPiece);
-            }
-        }
-
-        else {
-            // Normal diagonal move for regular pieces
-        if (isMoveDiagonalNormal(x0, y0, newX, newY) && piece.getType().moveDir == (newY - y0)) {return new MoveResult(MoveType.NORMAL);}
-
-
-        // Horizontal capture logic for normal pieces
-        if (newY == y0 && Math.abs(newX - x0) == 4) {
-            int x1 = (newX + x0) / 2;
-            Tile halfWay = board[x1][y0];
-            if (halfWay.hasPiece() && !halfWay.getPiece().getType().color.equals(piece.getType().color)) {
-                return new MoveResult(MoveType.CAPTURE, halfWay.getPiece());
-            }
-        }
-
-        // Vertical capture logic for normal pieces
-        if (newX == x0 && Math.abs(newY - y0) == 4) {
-            int y1 = (newY + y0) / 2;
-            Tile halfWay = board[x0][y1];
-            if (halfWay.hasPiece() && !halfWay.getPiece().getType().color.equals(piece.getType().color)) {
-                return new MoveResult(MoveType.CAPTURE, halfWay.getPiece());
-            }
-        }
-
-        // Diagonal capture logic for normal pieces
-        if (Math.abs(newX - x0) == 2 && Math.abs(newY - y0) == 2) {
-            int x1 = (newX + x0) / 2;
-            int y1 = (newY + y0) / 2;
-            Tile halfWay = board[x1][y1];
-            if (halfWay.hasPiece() && !halfWay.getPiece().getType().color.equals(piece.getType().color)) {
-                return new MoveResult(MoveType.CAPTURE, halfWay.getPiece());
-            }
-        }
-    }
-
-    return new MoveResult(MoveType.INVALID);
-    }
-
-
-    // Check for king promotion after a move
-    private void handleKingPromotion(Piece piece, int newY) {
-        if (piece.getType() == PieceType.BLACK && newY == SIZE - 1) {
-            piece.promoteToKing();
-        } else if (piece.getType() == PieceType.WHITE && newY == 0) {
-            piece.promoteToKing();
-        }
-    }
-
-    private int toBoard(double pixel) {
-        return (int) (pixel + TILE_SIZE / 2) / TILE_SIZE;
-    }
-
-    private Piece makePiece(PieceType type, int x, int y) {
-        Piece piece = new Piece(type, x, y);
-
-        piece.setOnMouseReleased(e -> {
-            int newX = toBoard(piece.getLayoutX());
-            int newY = toBoard(piece.getLayoutY());
-
-            MoveResult result;
-
-            if (newX < 0 || newY < 0 || newX >= SIZE || newY >= SIZE) {
-                result = new MoveResult(MoveType.INVALID);
-            } else {
-                result = tryMove(piece, newX, newY);
-            }
-
-            int x0 = toBoard(piece.getOldX());
-            int y0 = toBoard(piece.getOldY());
-
-            switch (result.getType()) {
-                case INVALID:
-                    piece.abortMove();
-                    break;
-                case NORMAL:
-                    resetTimer();
-                    piece.move(newX, newY);
-                    board[x0][y0].setPiece(null);
-                    board[newX][newY].setPiece(piece);
-                    // Check if the piece should be promoted to a king
-                    handleKingPromotion(piece, newY); // << ADD THIS LINE
-                    handleTurn(piece, board[newX][newY]); // added to handle turn movement
-                    break;
-                case CAPTURE:
-                    resetTimer();
-                    if (piece.getType().color.equals("black")) {
-                        capturedPiecesTracker.incrementWhiteCaptured();
-                    } else {
-                        capturedPiecesTracker.incrementBlackCaptured();
-                    }
-                    piece.move(newX, newY);
-                    board[x0][y0].setPiece(null);
-                    board[newX][newY].setPiece(piece);
-                    Piece otherPiece = result.getPiece();
-                    board[toBoard(otherPiece.getOldX())][toBoard(otherPiece.getOldY())].setPiece(null);
-                    pieceGroup.getChildren().remove(otherPiece);
-                    // Check if the piece should be promoted to a king after capture
-                    handleKingPromotion(piece, newY); // << ADD THIS LINE
-                    handleTurn(piece, board[newX][newY]); //added to handle turn movement
-                    break;
-            }
+    public void movePiece(Piece piece, int newX, int newY) {
+        piece.pieceDrawer.setOnMouseReleased(e -> {
+            gameLogic.takeTurn(piece, newX, newY);
         });
-
-        return piece;
-    }
-
-
-    // Helper method to check if move is diagonal for king
-    private boolean isMoveDiagonal(int x0, int y0, int newX, int newY) {
-        return Math.abs(newX - x0) == Math.abs(newY - y0);
-    }
-
-    // Helper method to check if move is diagonal for normal pieces
-    private boolean isMoveDiagonalNormal(int x0, int y0, int newX, int newY) {
-        return Math.abs(newX - x0) == 1 && Math.abs(newY - y0) == 1;
-    }
-
-
-    // Check if the path for king movement (diagonal, horizontal, vertical) is clear
-    private boolean isPathClear(int x0, int y0, int newX, int newY) {
-        int dx = Integer.signum(newX - x0);
-        int dy = Integer.signum(newY - y0);
-
-        int x = x0 + dx;
-        int y = y0 + dy;
-
-        while (x != newX || y != newY) {
-            if (board[x][y].hasPiece()) {
-                return false;  // Path is blocked
-            }
-            x += dx;
-            y += dy;
-        }
-        return true;
-    }
-
-    // Check if there is a capturable piece on the path
-    private boolean isCapturePath(int x0, int y0, int newX, int newY) {
-        int dx = Integer.signum(newX - x0);
-        int dy = Integer.signum(newY - y0);
-
-        int x = x0 + dx;
-        int y = y0 + dy;
-        Piece capturedPiece = null;
-
-        while (x != newX || y != newY) {
-            if (board[x][y].hasPiece()) {
-                if (capturedPiece == null && board[x][y].getPiece().getType() != board[x0][y0].getPiece().getType()) {
-                    capturedPiece = board[x][y].getPiece();  // Store the opponent piece for capture
-                } else {
-                    return false;  // Path is blocked by more than one piece
-                }
-            }
-            x += dx;
-            y += dy;
-        }
-
-        return capturedPiece != null;  // Return true if there's exactly one piece to capture
-    }
-
-    // Return the piece to capture along the path
-    private Piece getCapturedPieceOnPath(int x0, int y0, int newX, int newY) {
-        int dx = Integer.signum(newX - x0);
-        int dy = Integer.signum(newY - y0);
-
-        int x = x0 + dx;
-        int y = y0 + dy;
-
-        while (x != newX || y != newY) {
-            if (board[x][y].hasPiece() && board[x][y].getPiece().getType() != board[x0][y0].getPiece().getType()) {
-                return board[x][y].getPiece();  // Return the capturable piece
-            }
-            x += dx;
-            y += dy;
-        }
-
-        return null;  // No capturable piece found
-    }
-
-    public void handleTurn(Piece piece, Tile targetTile) {
-
-        // check if the piece colour matches the turn
-        if ((isWhiteTurn && piece.getType().color.equals("black")) || (!isWhiteTurn && piece.getType().color.equals("white"))) {
-            if (DEBUG) { System.out.println("incorrect turn: " + (isWhiteTurn ? "white" : "black") + "'s turn."); }
-            piece.abortMove();
-            return;
-        }
-
-        // check if a piece has been selected. if a piece has been moved one time, lock it and only allow movement for that piece
-        if (selectedPiece != null && piece != selectedPiece) {
-            if (DEBUG) { System.out.println("piece already locked: " + selectedPiece + "."); }
-            piece.abortMove();
-            return;
-        }
-
-        MoveResult result = tryMove(piece, toBoard(targetTile.getX()), toBoard(targetTile.getY()));
-
-        if (result.getType() == MoveType.INVALID) {
-            if (DEBUG) { System.out.println("invalid move type"); }
-            piece.abortMove();
-            return;
-        }
-
-        piece.move(toBoard(targetTile.getX()), toBoard(targetTile.getY()));
-
-        // after the first executed move, locks the piece in
-        if (selectedPiece == null) {
-            selectedPiece = piece;
-            if (DEBUG) { System.out.println("piece locked in: " + piece); }
-        }
-
-        // checks if more captures are possible, finishes turn if not
-        if (result.getType() == MoveType.CAPTURE) {
-            if (DEBUG) {
-                System.out.println("capture made, checking for more capture possibilities...");
-            }
-            if (!canMakeAnotherCapture(piece)) {
-                if (DEBUG) {
-                    System.out.println("no more captures possible. end of turn.");
-                }
-                finishTurn();
-            } else {
-                if (DEBUG) {
-                    System.out.println("further captures are possible. continue moving the same piece.");
-                }
-            }
-        } else {
-            // if it's a normal move, finishes the turn
-            finishTurn();
-        }
-    }
-
-
-    public boolean canMakeAnotherCapture(Piece piece) {
-        int x = toBoard(piece.getOldX());
-        int y = toBoard(piece.getOldY());
-
-        // checks in all diagonal directions for capture possibilities
-        int[][] directions = {{1, 1}, {1, -1}, {-1, 1}, {-1, -1}};
-
-        for (int[] dir : directions) {
-            int newX = x + 2 * dir[0];  // calculate the destination tile 2 steps away
-            int newY = y + 2 * dir[1];
-
-            if (isInBounds(newX, newY) && isCapturePath(x, y, newX, newY)) {
-                if(DEBUG) { System.out.println("another jump jump available from (" + x + "," + y + ") to (" + newX + "," + newY + ")"); }
-                return true;  // there is a valid capture, so the piece can make further jumps
-            }
-        }
-
-        return false; // no further jumps are possible
     }
 
     private boolean isInBounds(int x, int y) {
         return x >= 0 && x < SIZE && y >= 0 && y < SIZE;
     }
 
-    public void finishTurn() {
-        if(DEBUG) { System.out.println("turn finished"); }
-        selectedPiece = null; // reset the selected piece for the next player
-        switchTurns();        // switch the player's turn
-        resetTimer();         // reset the timer
+    public int toBoard(double pixel) {
+        return (int) (pixel + TILE_SIZE / 2) / TILE_SIZE;
     }
 
-    private void switchTurns() {
-        isWhiteTurn = !isWhiteTurn; // switch between white and black players
-        if(DEBUG) { System.out.println("turn switched: " + (isWhiteTurn ? "white" : "black") + "'s turn."); }
+    private void displayGameOverMessage() {
+        // Implement game over message display logic here
+        System.out.println("Game Over!");
     }
 
     public static void main(String[] args) {

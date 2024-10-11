@@ -1,25 +1,34 @@
 package org.testing.project_2_1;
 
 public class MoveResult {
-
     private MoveType type;
+    private Capture capture;
 
     public MoveType getType() {
         return type;
     }
 
-    private Piece piece;
+    public Piece getPieceTaken() {
+        return capture.getPiece();
+    }
 
-    public Piece getPiece() {
-        return piece;
+    public Capture getCapture() {
+        return capture;
     }
 
     public MoveResult(MoveType type) {
         this(type, null);
     }
 
-    public MoveResult(MoveType type, Piece piece) {
+    public MoveResult(MoveType type, Capture capture) {
         this.type = type;
-        this.piece = piece;
+        this.capture = capture;
     }
+
+    @Override
+    public String toString() {
+        return "MoveResult [type=" + type + "]";
+    }
+
+    
 }
