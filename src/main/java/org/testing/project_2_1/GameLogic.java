@@ -46,13 +46,20 @@ public class GameLogic {
     }
 
     private void switchTurn() {
-        System.out.println("switch turn");
         isWhiteTurn = !isWhiteTurn;
+        System.out.println();
+
         if (isWhiteTurn) {
             turnCounter++;    
+            System.out.println("White's turn");
+        }
+        else {
+
+            System.out.println("Black's turn");
         }
         availableCaptures = checkAvailableCaptures();
         printAvailableCaptures();
+        
     }
 
     public ArrayList<Capture> checkAvailableCaptures() {
@@ -112,51 +119,58 @@ public class GameLogic {
     public boolean takeTurn(Piece piece, int newX, int newY) {
         MoveResult result;
         result = tryMove(piece, newX, newY);
+        // print statements for debugging
         System.out.println(result.toString());
         if (result.getType() == MoveType.CAPTURE) {
             System.out.println(result.getCapture().toString());
         }
-        // Keep trying to move until a valid move is made
+        // if the move is invalid, abort the move, return false
         if (result.getType() == MoveType.INVALID) {
-            System.out.println("Invalid move 121");
+            System.out.println("Invalid move 129");
             piece.pieceDrawer.abortMove();
             return false;
         }        
-            // If you have available captures with any piece, you must make a capture
+        // If you have available captures with any piece, you must make a capture
         if (hasAvailableCaptures()) {
             System.out.println("has available captures");
+            // If the move is a capture, make the move and check for more captures
             if (result.getType() == MoveType.CAPTURE) {
-                while (hasAvailableCaptures(piece)) {
-                    System.out.println("move piece");
-                    movePiece(result, piece, newX, newY);
-                    checkAvailableCaptures();
-                    printAvailableCaptures();
+                movePiece(result, piece, newX, newY);
+                checkAvailableCaptures();
+                // If you don't have any more available captures, switch turns
+                if (!hasAvailableCaptures(piece)) {
+                    System.out.println("made all available captures");
+                    switchTurn();
+                    return true;        
+                }
+                // If you have more available captures, make another capture
+                else {
+                    System.out.println("made a capture, must make another");
+                    return true;
                 }
             }
+            // If the move is not a capture, abort the move and return false
             else {
                 System.out.println("abort move");
                 piece.pieceDrawer.abortMove();
                 return false;
             }
-            // while you can capture, keep capturing until you can't
-            
         }
-        else { // If you don't have available captures, make a normal move
+        // If you don't have available captures, make a normal move
+        else { 
             System.out.println("no available captures");
             movePiece(result, piece, newX, newY);
+            switchTurn();
+            return true;
         }
-        switchTurn();
-        return true;
     }
 
     private void movePiece(MoveResult result, Piece piece, int newX, int newY) {
             switch (result.getType()) {
                 case INVALID:
-                System.out.println("Invalid move");
                     piece.pieceDrawer.abortMove();
                     break;
                 case NORMAL:
-                    System.out.println("Normal move");
                     board[piece.x][piece.y].setPiece(null);
                     board[newX][newY].setPiece(piece);
                     piece.pieceDrawer.move(newX, newY);
@@ -165,7 +179,15 @@ public class GameLogic {
                     handleKingPromotion(piece, newY);
                     break;
                 case CAPTURE:
-                    System.out.println("Capture");
+                    if (result.getCapture().capturedPiece.type.color.equals("white")) {
+                        whiteList.remove(result.getPieceTaken());
+                        System.out.println("piece taken: " + result.getPieceTaken().toString());
+                    }
+                    else {
+                        blackList.remove(result.getPieceTaken());
+                        System.out.println("piece taken: " + result.getPieceTaken().toString());
+                        
+                    }
                     piece.pieceDrawer.move(newX, newY);
                     board[piece.x][piece.y].setPiece(null);
                     board[newX][newY].setPiece(piece);
@@ -195,13 +217,19 @@ public class GameLogic {
         Tile tile = board[newX][newY];
 
         // Check if it's the correct player's turn
-        if (isWhiteTurn != piece.getType().color.equals("white")) {return new MoveResult(MoveType.INVALID);}
+        if (isWhiteTurn != piece.getType().color.equals("white")) {
+            return new MoveResult(MoveType.INVALID);
+        }
 
         // Check if the tile is empty
-        if (tile.hasPiece()) {return new MoveResult(MoveType.INVALID);}
+        if (tile.hasPiece()) {
+            return new MoveResult(MoveType.INVALID);
+        }
 
         // Check if the tile is black
-        if (!tile.isBlack()) {return new MoveResult(MoveType.INVALID);}
+        if (!tile.isBlack()) {
+            return new MoveResult(MoveType.INVALID);
+        }
 
         boolean isKing = piece.getType() == PieceType.BLACKKING || piece.getType() == PieceType.WHITEKING;
 
@@ -305,7 +333,7 @@ public class GameLogic {
         Piece capturedPiece = null;
 
         while (x != newX || y != newY) {
-            if (board[x][y].hasPiece()) {
+            if (board[x][y].hasPiece()) { // TODO: there is a bug here
                 if (capturedPiece == null && board[x][y].getPiece().getType() != board[x0][y0].getPiece().getType()) {
                     capturedPiece = board[x][y].getPiece();  // Store the opponent piece for capture
                 } else {
@@ -339,7 +367,7 @@ public class GameLogic {
     }
 
     public void printAvailableCaptures(){
-        System.out.println(checkAvailableCaptures().size());
+        System.out.println("available captures: " + checkAvailableCaptures().size());
         for (Capture capture : checkAvailableCaptures()) {
             System.out.println(capture.toString());
         }

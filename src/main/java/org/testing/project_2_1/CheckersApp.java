@@ -82,11 +82,6 @@ public class CheckersApp extends Application {
             } else {
                 setTimerStyle();
             }
-
-            if (timeRemaining <= 0) {
-                timer.stop();
-                displaySwitchTurnMessage();
-            }
         }));
         timer.setCycleCount(Timeline.INDEFINITE);
         timer.playFromStart();
@@ -97,14 +92,6 @@ public class CheckersApp extends Application {
         timerLabel.setText("Time remaining: " + timeRemaining + "s");
         setTimerStyle();
         timer.playFromStart();
-    }
-
-    private void displaySwitchTurnMessage() {
-        gameLogic.isWhiteTurn = !gameLogic.isWhiteTurn;
-        timerLabel.setText("Switching to Opponent's turn...");
-
-        Timeline delay = new Timeline(new KeyFrame(Duration.seconds(2), event -> resetTimer()));
-        delay.play();
     }
 
     private void setTimerStyle() {
