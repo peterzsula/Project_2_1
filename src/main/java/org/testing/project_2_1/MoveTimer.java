@@ -6,7 +6,7 @@ import javafx.scene.control.Label;
 import javafx.util.Duration;
 
 public class MoveTimer {
-    private static final int INITIAL_TIME = 30; // Temps inicial per al torn, en segons
+    private static final int INITIAL_TIME = 30; 
     private int timeRemaining;
     private Timeline timer;
     private Label timerLabel;
@@ -16,7 +16,7 @@ public class MoveTimer {
         this.timerLabel = timerLabel;
         this.onTimeOut = onTimeOut;
         this.timeRemaining = INITIAL_TIME;
-        timerLabel.setText("Opponent's turn ends in: " + timeRemaining + "s"); // Text inicial
+        timerLabel.setText("Opponent's turn ends in: " + timeRemaining + "s"); 
         setTimerStyle();
         start();
     }
@@ -54,12 +54,10 @@ public class MoveTimer {
         start();
     }
 
-    // Mostra un missatge temporal per indicar el canvi de torn
     public void showTurnChangeMessage() {
         timerLabel.setText("Changing opponent's turn");
         setChangingTurnStyle();
 
-        // Pausa de 2 segons abans de reiniciar el temporitzador
         Timeline pause = new Timeline(new KeyFrame(Duration.seconds(2), e -> reset()));
         pause.setCycleCount(1);
         pause.play();

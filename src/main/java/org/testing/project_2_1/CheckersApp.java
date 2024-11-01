@@ -15,9 +15,9 @@ public class CheckersApp extends Application {
     public static final int SIZE = 10;
 
     private Label timerLabel;
-    private Label countdownLabel; // Temporitzador de compte enrere de la partida
-    private MoveTimer moveTimer; // Temporitzador de torn
-    private GameCountdown gameCountdown; // Temporitzador de compte enrere per a tota la partida
+    private Label countdownLabel; 
+    private MoveTimer moveTimer; 
+    private GameCountdown gameCountdown; 
 
     private Group tileGroup = new Group();
     public Group pieceGroup = new Group();
@@ -39,14 +39,12 @@ public class CheckersApp extends Application {
         boardPane.setPrefSize(SIZE * TILE_SIZE, SIZE * TILE_SIZE);
         capturedPiecesTracker = new CapturedPiecesTracker();
 
-        // Inicialització del temporitzador de torn
         timerLabel = new Label("Opponent's turn ends in: 30s");
         styleLabel(timerLabel, 16, "darkgreen");
         moveTimer = new MoveTimer(timerLabel, this::changeTurn);
 
-        // Inicialització del temporitzador de compte enrere de partida
         countdownLabel = new Label("Game ends in: 05:00");
-        styleLabel(countdownLabel, 18, "black"); // Lletra més gran i color negre
+        styleLabel(countdownLabel, 18, "black"); 
         gameCountdown = new GameCountdown(countdownLabel, this::displayGameOverMessage);
 
         for (Tile[] row : gameLogic.board) {
@@ -62,7 +60,7 @@ public class CheckersApp extends Application {
 
         boardPane.getChildren().addAll(tileGroup, pieceGroup);
 
-        VBox rightPanel = new VBox(20); // Ajusta espaiat a 20 per a la distribució uniforme
+        VBox rightPanel = new VBox(20);
         rightPanel.getChildren().addAll(timerLabel, countdownLabel, capturedPiecesTracker.getCapturedPiecesDisplay());
         rightPanel.setStyle("-fx-padding: 10 10 10 20; -fx-alignment: top-left;");
         rightPanel.setPrefWidth(260);
@@ -86,13 +84,13 @@ public class CheckersApp extends Application {
     public void movePiece(Piece piece, int newX, int newY) {
         piece.pieceDrawer.setOnMouseReleased(e -> {
             gameLogic.takeTurn(piece, newX, newY);
-            moveTimer.reset(); // Reinicia el temporitzador després de cada moviment
+            moveTimer.reset(); 
         });
     }
 
     private void changeTurn() {
         timerLabel.setText("Changing opponent's turn...");
-        moveTimer.showTurnChangeMessage(); // Mostra el missatge de canvi de torn
+        moveTimer.showTurnChangeMessage(); 
     }
 
     private boolean isInBounds(int x, int y) {
@@ -104,7 +102,7 @@ public class CheckersApp extends Application {
     }
 
     private void displayGameOverMessage() {
-        countdownLabel.setText("Game Over!"); // Mostra el missatge de final de partida
+        countdownLabel.setText("Game Over!"); 
         System.out.println("Game Over!");
     }
 
