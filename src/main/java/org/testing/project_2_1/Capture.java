@@ -1,28 +1,16 @@
 package org.testing.project_2_1;
 
-public class Capture {
-    public Piece piece;
-    public Piece capturedPiece;
-    public int toX;
-    public int toY;
+public class Capture extends Move {
+    private Piece capturedPiece;
 
     public Capture(Piece piece, Piece capturedPiece, int toX, int toY) {
-        this.piece = piece;
+        super(piece, toX, toY);
         this.capturedPiece = capturedPiece;
-        this.toX = toX;
-        this.toY = toY;
+        this.type = MoveType.CAPTURE;
     }
 
     public Piece getCapturedPiece() {
         return capturedPiece;
-    }
-
-    public int getToX() {
-        return toX;
-    }
-
-    public int getToY() {
-        return toY;
     }
 
     @Override
@@ -49,7 +37,8 @@ public class Capture {
 
     @Override
     public String toString() {
-            return "Capture [fromX=" + piece.x + ", fromY=" + piece.y + ", toX=" + toX + ", toY=" + toY + "]";
+        return "Move from X=" + piece.x + ", from Y=" + piece.y + ", to X=" + toX + ", to Y=" + toY +
+            ", CAPTURE AT X=" + capturedPiece.x + ", Y=" + capturedPiece.y;
     }
 
     public static void main(String[] args) {

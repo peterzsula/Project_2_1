@@ -16,7 +16,7 @@ public class GameLogic {
 
     public GameLogic(CheckersApp app) {
         this.app = app;
-        new Pane();
+        new Pane(); // for some reason this is needed to avoid a null pointer exception
         isWhiteTurn = true;
         turnCounter = 0;
         whiteList = new ArrayList<>();
@@ -64,15 +64,17 @@ public class GameLogic {
 
     //check all available captures for current player
     public ArrayList<Capture> checkAvailableCaptures() {
-        // TODO: improve complexity
+        // TODO: improve complexity: improved to O(n^3)/2 from O(n^3)
         ArrayList<Capture> availableCaptures = new ArrayList<>();
         ArrayList<Piece> pieces = getListOfPieces();
         for (Piece piece : pieces) {
-            for (int i = 0; i < board.length; i++) {
-                for (int j = 0; j < board.length; j++) {
-                    MoveResult result = tryMove(piece, i, j);
-                    if (result.getType() == MoveType.CAPTURE) {
-                        availableCaptures.add(result.getCapture());
+            for (int row = 0; row < board.length; row++) {
+                int startCol = (row % 2 == 0) ? 1 : 0;
+                for (int col = startCol; col < board.length; col += 2){
+                    Move move = determineMoveType(piece, row, col);
+                    if (move.getType() == MoveType.CAPTURE) {
+                        Capture capture = (Capture) move;
+                        availableCaptures.add(capture);
                     }
                 }
             }
@@ -82,12 +84,15 @@ public class GameLogic {
 
     //check all available captures for current piece
     public ArrayList<Capture> checkAvailableCaptures(Piece piece) {
+        // TODO: improve complexity: improved to O(n^3)/2 from O(n^3)
         ArrayList<Capture> availableCaptures = new ArrayList<>();
-        for (int i = 0; i < board.length; i++) {
-            for (int j = 0; j < board.length; j++) {
-                MoveResult result = tryMove(piece, i, j);
-                if (result.getType() == MoveType.CAPTURE) {
-                    availableCaptures.add(result.getCapture());
+        for (int row = 0; row < board.length; row++) {
+            int startCol = (row % 2 == 0) ? 1 : 0;
+            for (int col = startCol; col < board.length; col += 2){
+                Move move = determineMoveType(piece, row, col);
+                if (move.getType() == MoveType.CAPTURE) {
+                    Capture capture = (Capture) move;
+                    availableCaptures.add(capture);
                 }
             }
         }
@@ -120,12 +125,12 @@ public class GameLogic {
     }
 
     public boolean takeTurn(Piece piece, int newX, int newY) {
-        MoveResult result;
-        result = tryMove(piece, newX, newY);
+        Move result;
+        result = determineMoveType(piece, newX, newY);
         // print statements for debugging
         System.out.println(result.toString());
         if (result.getType() == MoveType.CAPTURE) {
-            System.out.println(result.getCapture().toString());
+            System.out.println(result.toString());
         }
         // if the move is invalid, abort the move, return false
         if (result.getType() == MoveType.INVALID) {
@@ -169,8 +174,8 @@ public class GameLogic {
         }
     }
 
-    private void movePiece(MoveResult result, Piece piece, int newX, int newY) {
-            switch (result.getType()) {
+    private void movePiece(Move move, Piece piece, int newX, int newY) {
+            switch (move.getType()) {
                 case INVALID:
                     piece.pieceDrawer.abortMove();
                     break;
@@ -183,20 +188,21 @@ public class GameLogic {
                     handleKingPromotion(piece, newY);
                     break;
                 case CAPTURE:
+                    Capture capture = (Capture) move;
                     //TODO: increment captured pieces counter
-                    if (result.getCapture().capturedPiece.type.color.equals("white")) {
-                        whiteList.remove(result.getPieceTaken());
-                        System.out.println("piece taken: " + result.getPieceTaken().toString());
+                    if (capture.getCapturedPiece().type.color.equals("white")) {
+                        whiteList.remove(capture.getCapturedPiece());
+                        System.out.println("piece taken: " + capture.getCapturedPiece().toString());
                     }
                     else {
-                        blackList.remove(result.getPieceTaken());
-                        System.out.println("piece taken: " + result.getPieceTaken().toString());
+                        blackList.remove(capture.getCapturedPiece());
+                        System.out.println("piece taken: " + capture.getCapturedPiece().toString());
                         
                     }
                     piece.pieceDrawer.move(newX, newY);
                     board[piece.x][piece.y].setPiece(null);
                     board[newX][newY].setPiece(piece);
-                    Piece otherPiece = result.getPieceTaken();
+                    Piece otherPiece = capture.getCapturedPiece();
                     board[otherPiece.x][otherPiece.y].setPiece(null);
                     app.pieceGroup.getChildren().remove(otherPiece.pieceDrawer);
                     piece.x = newX;
@@ -216,53 +222,54 @@ public class GameLogic {
         }
     }
 
-    public MoveResult tryMove(Piece piece, int newX, int newY) {
+    public Move determineMoveType(Piece piece, int newX, int newY) {
         int x0 = piece.x;
         int y0 = piece.y;
         Tile tile = board[newX][newY];
 
         // Check if it's the correct player's turn
         if (isWhiteTurn != piece.getType().color.equals("white")) {
-            return new MoveResult(MoveType.INVALID);
+            System.out.println("wrong player's turn");
+            return new InvalidMove(piece, newX, newY);
         }
 
         // Check if the tile is empty
         if (tile.hasPiece()) {
-            return new MoveResult(MoveType.INVALID);
+            return new InvalidMove(piece, newX, newY);
         }
 
         // Check if the tile is black
         if (!tile.isBlack()) {
-            return new MoveResult(MoveType.INVALID);
+            System.out.println("white tile");
+            return new InvalidMove(piece, newX, newY);
         }
 
         // If the piece is a king, allow multi-tile diagonal moves and captures
         if (piece.getType() == PieceType.BLACKKING || piece.getType() == PieceType.WHITEKING) {
             // Check for normal diagonal move (multi-tile)
             if (isMoveDiagonal(x0, y0, newX, newY) && isPathClear(x0, y0, newX, newY)) {
-                return new MoveResult(MoveType.NORMAL);
+                return new NormalMove(piece, newX, newY);
             }
 
             // Check for diagonal capture for king
             if (Math.abs(newX - x0) >= 2 && Math.abs(newY - y0) >= 2 && isCapturePath(x0, y0, newX, newY)) {
                 Piece capturedPiece = getCapturedPieceOnPath(x0, y0, newX, newY);
-                Capture capture = new Capture(piece, capturedPiece, newX, newY);
-                return new MoveResult(MoveType.CAPTURE, capture);
+                return new Capture(piece, capturedPiece, newX, newY);
             }
         }
 
         else {
             // Normal diagonal move for regular pieces
-        if (isMoveDiagonalNormal(x0, y0, newX, newY) && piece.getType().moveDir == (newY - y0)) {return new MoveResult(MoveType.NORMAL);}
+        if (isMoveDiagonalNormal(x0, y0, newX, newY) && piece.getType().moveDir == (newY - y0)) {return new NormalMove(piece, newX, newY);}
 
 
         // Horizontal capture logic for normal pieces
         if (newY == y0 && Math.abs(newX - x0) == 4) {
             int x1 = (newX + x0) / 2;
             Tile halfWay = board[x1][y0];
-            if (halfWay.hasPiece() && !halfWay.getPiece().getType().color.equals(piece.getType().color)) {
-                Capture capture = new Capture(piece, halfWay.getPiece(), newX, newY);
-                return new MoveResult(MoveType.CAPTURE, capture);
+            Piece capturedPiece = halfWay.getPiece();
+            if (halfWay.hasPiece() && !capturedPiece.getType().color.equals(piece.getType().color)) {
+                return new Capture(piece, capturedPiece, newX, newY);
             }
         }
 
@@ -270,9 +277,9 @@ public class GameLogic {
         if (newX == x0 && Math.abs(newY - y0) == 4) {
             int y1 = (newY + y0) / 2;
             Tile halfWay = board[x0][y1];
-            if (halfWay.hasPiece() && !halfWay.getPiece().getType().color.equals(piece.getType().color)) {
-                Capture capture = new Capture(piece, halfWay.getPiece(), newX, newY);
-                return new MoveResult(MoveType.CAPTURE, capture);
+            Piece capturedPiece = halfWay.getPiece();
+            if (halfWay.hasPiece() && !capturedPiece.getType().color.equals(piece.getType().color)) {
+                return new Capture(piece, capturedPiece, newX, newY);
             }
         }
 
@@ -281,14 +288,14 @@ public class GameLogic {
             int x1 = (newX + x0) / 2;
             int y1 = (newY + y0) / 2;
             Tile halfWay = board[x1][y1];
-            if (halfWay.hasPiece() && !halfWay.getPiece().getType().color.equals(piece.getType().color)) {
-                Capture capture = new Capture(piece, halfWay.getPiece(), newX, newY);
-                return new MoveResult(MoveType.CAPTURE, capture);
+            Piece capturedPiece = halfWay.getPiece();
+            if (halfWay.hasPiece() && !capturedPiece.getType().color.equals(piece.getType().color)) {
+                return new Capture(piece, capturedPiece, newX, newY);
             }
         }
     }
 
-    return new MoveResult(MoveType.INVALID);
+    return new InvalidMove(piece, newX, newY);
     }
 
     public boolean isGameOver(){
