@@ -62,7 +62,9 @@ public class GameLogic {
         
     }
 
+    //check all available captures for current player
     public ArrayList<Capture> checkAvailableCaptures() {
+        // TODO: improve complexity
         ArrayList<Capture> availableCaptures = new ArrayList<>();
         ArrayList<Piece> pieces = getListOfPieces();
         for (Piece piece : pieces) {
@@ -78,6 +80,7 @@ public class GameLogic {
         return availableCaptures;
     }
 
+    //check all available captures for current piece
     public ArrayList<Capture> checkAvailableCaptures(Piece piece) {
         ArrayList<Capture> availableCaptures = new ArrayList<>();
         for (int i = 0; i < board.length; i++) {
@@ -137,6 +140,7 @@ public class GameLogic {
             if (result.getType() == MoveType.CAPTURE) {
                 movePiece(result, piece, newX, newY);
                 checkAvailableCaptures();
+                //TODO: check if you are moving the piece as before
                 // If you don't have any more available captures, switch turns
                 if (!hasAvailableCaptures(piece)) {
                     System.out.println("made all available captures");
@@ -179,6 +183,7 @@ public class GameLogic {
                     handleKingPromotion(piece, newY);
                     break;
                 case CAPTURE:
+                    //TODO: increment captured pieces counter
                     if (result.getCapture().capturedPiece.type.color.equals("white")) {
                         whiteList.remove(result.getPieceTaken());
                         System.out.println("piece taken: " + result.getPieceTaken().toString());
@@ -231,10 +236,8 @@ public class GameLogic {
             return new MoveResult(MoveType.INVALID);
         }
 
-        boolean isKing = piece.getType() == PieceType.BLACKKING || piece.getType() == PieceType.WHITEKING;
-
         // If the piece is a king, allow multi-tile diagonal moves and captures
-        if (isKing) {
+        if (piece.getType() == PieceType.BLACKKING || piece.getType() == PieceType.WHITEKING) {
             // Check for normal diagonal move (multi-tile)
             if (isMoveDiagonal(x0, y0, newX, newY) && isPathClear(x0, y0, newX, newY)) {
                 return new MoveResult(MoveType.NORMAL);

@@ -53,7 +53,6 @@ public class CheckersApp extends Application {
                     pieceGroup.getChildren().add(piece.pieceDrawer);
                 }
             }
-            
         }
 
         boardPane.getChildren().addAll(tileGroup, pieceGroup);
@@ -110,6 +109,7 @@ public class CheckersApp extends Application {
         piece.pieceDrawer.setOnMouseReleased(e -> {
             gameLogic.takeTurn(piece, newX, newY);
         });
+        // TODO: implement click funcitonality
     }
 
     private boolean isInBounds(int x, int y) {

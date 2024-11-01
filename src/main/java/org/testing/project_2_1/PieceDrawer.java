@@ -45,14 +45,17 @@ public class PieceDrawer extends StackPane {
         getChildren().addAll(bg, ellipse);
 
         setOnMousePressed(e -> {
-            mouseX = e.getSceneX() - TILE_SIZE / 2;
-            mouseY = e.getSceneY() - TILE_SIZE / 2;
+            int newX = (int) Math.floor(e.getSceneX() / TILE_SIZE);
+            int newY = (int) Math.floor(e.getSceneY() / TILE_SIZE);
+            // highlight available moves
+            app.movePiece(piece, newX, newY);
         });
 
         setOnMouseDragged(e -> {
             relocate(e.getSceneX() - TILE_SIZE / 2, e.getSceneY() - TILE_SIZE / 2);
             int newX = (int) Math.floor(e.getSceneX() / TILE_SIZE);
             int newY = (int) Math.floor(e.getSceneY() / TILE_SIZE);
+            // highlight available moves
             app.movePiece(piece, newX, newY);
         });
     }
