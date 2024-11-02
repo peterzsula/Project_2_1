@@ -20,11 +20,11 @@ public class MoveHighlighter {
             checkAndAddMove(piece, x + 1, y + direction, availableMoves);
             checkAndAddMove(piece, x - 1, y + direction, availableMoves);
         } else if (piece.getType() == PieceType.BLACKKING || piece.getType() == PieceType.WHITEKING) {
-            // King piece moves in both directions
-            checkAndAddMove(piece, x + 1, y + 1, availableMoves);
-            checkAndAddMove(piece, x - 1, y + 1, availableMoves);
-            checkAndAddMove(piece, x + 1, y - 1, availableMoves);
-            checkAndAddMove(piece, x - 1, y - 1, availableMoves);
+            // King piece moves in multiple steps along both diagonals
+            checkAndAddMultipleMoves(piece, x, y, 1, 1, availableMoves);  // Top-right diagonal
+            checkAndAddMultipleMoves(piece, x, y, -1, 1, availableMoves); // Top-left diagonal
+            checkAndAddMultipleMoves(piece, x, y, 1, -1, availableMoves); // Bottom-right diagonal
+            checkAndAddMultipleMoves(piece, x, y, -1, -1, availableMoves); // Bottom-left diagonal
         }
         
         return availableMoves;
@@ -33,6 +33,17 @@ public class MoveHighlighter {
     private void checkAndAddMove(Piece piece, int toX, int toY, List<NormalMove> moves) {
         if (isValidPosition(toX, toY)) {
             moves.add(new NormalMove(piece, toX, toY));
+        }
+    }
+
+    private void checkAndAddMultipleMoves(Piece piece, int startX, int startY, int dx, int dy, List<NormalMove> moves) {
+        int x = startX + dx;
+        int y = startY + dy;
+        while (isValidPosition(x, y)) {
+            moves.add(new NormalMove(piece, x, y));
+            // Move one step further along the direction
+            x += dx;
+            y += dy;
         }
     }
 

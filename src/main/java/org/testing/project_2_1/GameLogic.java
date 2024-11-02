@@ -2,6 +2,7 @@ package org.testing.project_2_1;
 
 import static org.testing.project_2_1.CheckersApp.SIZE;
 import java.util.ArrayList;
+import java.util.List;
 
 import javafx.scene.layout.Pane;
 
@@ -377,13 +378,13 @@ public class GameLogic {
     }
 
     // Check if the path for king movement (diagonal, horizontal, vertical) is clear
-    private boolean isPathClear(int x0, int y0, int newX, int newY) {
+    public boolean isPathClear(int x0, int y0, int newX, int newY) {
         int dx = Integer.signum(newX - x0);
         int dy = Integer.signum(newY - y0);
-
+    
         int x = x0 + dx;
         int y = y0 + dy;
-
+    
         while (x != newX || y != newY) {
             if (board[x][y].hasPiece()) {
                 return false;  // Path is blocked
@@ -393,6 +394,7 @@ public class GameLogic {
         }
         return true;
     }
+    
 
     // Check if there is a capturable piece on the path
     private boolean isCapturePath(int x0, int y0, int newX, int newY) {
@@ -451,4 +453,13 @@ public class GameLogic {
         }
         return false;
     }
+
+    public Piece getPieceAt(int x, int y) {
+        if (x >= 0 && x < board.length && y >= 0 && y < board[0].length) {
+            return board[x][y].getPiece();  // Assuming each tile has a method getPiece()
+        }
+        return null;
+    }
+
+    
 }
