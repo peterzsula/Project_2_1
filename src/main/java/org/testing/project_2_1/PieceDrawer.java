@@ -13,13 +13,11 @@ public class PieceDrawer extends StackPane {
     int x, y;
     Piece piece;
     CheckersApp app;
-    private MoveHighlighter highlighter;
     private List<Rectangle> highlightedTiles = new ArrayList<>();
 
     public PieceDrawer(Piece piece, CheckersApp app) {
         this.piece = piece;
         this.app = app;
-        this.highlighter = new MoveHighlighter(app.gameLogic); // Pass gameLogic to MoveHighlighter
         x = piece.x * TILE_SIZE;
         y = piece.y * TILE_SIZE;
         drawPiece(piece.type, piece.x, piece.y);
@@ -60,25 +58,40 @@ public class PieceDrawer extends StackPane {
         });
     }
 
-    // FOR HIGHLIGHTER CLASS
     public void highlightMoves(Piece piece) {
         clearHighlight();
-        List<NormalMove> moves = highlighter.getAvailableMoves(piece);
-
-        for (NormalMove move : moves) {
-            if (isValidPosition(move.toX, move.toY)) {
+        List<Move> moves = app.gameLogic.getLegalMoves(piece);
+    
+        // Separate captures and normal moves
+        List<Move> captureMoves = new ArrayList<>();
+        List<Move> normalMoves = new ArrayList<>();
+        
+        for (Move move : moves) {
+            if (move.getType() == MoveType.CAPTURE) {
+                captureMoves.add(move);
+            } else if (move.getType() == MoveType.NORMAL) {
+                normalMoves.add(move);
+            }
+        }
+    
+        // Highlight captures if available, otherwise highlight normal moves
+        List<Move> movesToHighlight = !captureMoves.isEmpty() ? captureMoves : normalMoves;
+    
+        for (Move move : movesToHighlight) {
+            if (isValidPosition(move.getToX(), move.getToY())) {
                 Rectangle highlight = new Rectangle(TILE_SIZE, TILE_SIZE);
-                highlight.setFill(Color.YELLOW);
+                highlight.setFill(move.getType() == MoveType.CAPTURE ? Color.RED : Color.YELLOW);
                 highlight.setOpacity(0.5);
-
+    
                 // Position the highlight at the correct tile on the board
-                highlight.relocate(move.toX * TILE_SIZE, move.toY * TILE_SIZE);
-
+                highlight.relocate(move.getToX() * TILE_SIZE, move.getToY() * TILE_SIZE);
+    
                 highlightedTiles.add(highlight);
                 app.getBoardGroup().getChildren().add(highlight);  // Add highlight to board group
             }
         }
     }
+    
 
     public void clearHighlight() {
         if (highlightedTiles != null) {
@@ -93,7 +106,6 @@ public class PieceDrawer extends StackPane {
         // Ensure x and y are within board bounds for a 10x10 board
         return x >= 0 && x < 10 && y >= 0 && y < 10;
     }
-    // UNTIL HERE
 
     public void move(int x, int y) {
         x = x * TILE_SIZE;

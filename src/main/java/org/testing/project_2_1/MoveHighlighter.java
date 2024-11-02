@@ -5,12 +5,7 @@ import java.util.List;
 
 public class MoveHighlighter {
 
-    private final int BOARD_SIZE = 10;
-    private GameLogic gameLogic;
-
-    public MoveHighlighter(GameLogic gameLogic) {
-        this.gameLogic = gameLogic;
-    }
+    private final int BOARD_SIZE = 8;
 
     public List<NormalMove> getAvailableMoves(Piece piece) {
         List<NormalMove> availableMoves = new ArrayList<>();
@@ -18,22 +13,25 @@ public class MoveHighlighter {
         int x = piece.x;
         int y = piece.y;
         
+        // Determine moves based on piece type
         if (piece.getType() == PieceType.BLACK || piece.getType() == PieceType.WHITE) {
+            // Regular piece moves only in one direction
             int direction = piece.getType().moveDir;
-            addIfValid(piece, x + 1, y + direction, availableMoves);
-            addIfValid(piece, x - 1, y + direction, availableMoves);
+            checkAndAddMove(piece, x + 1, y + direction, availableMoves);
+            checkAndAddMove(piece, x - 1, y + direction, availableMoves);
         } else if (piece.getType() == PieceType.BLACKKING || piece.getType() == PieceType.WHITEKING) {
-            addIfValid(piece, x + 1, y + 1, availableMoves);
-            addIfValid(piece, x - 1, y + 1, availableMoves);
-            addIfValid(piece, x + 1, y - 1, availableMoves);
-            addIfValid(piece, x - 1, y - 1, availableMoves);
+            // King piece moves in both directions
+            checkAndAddMove(piece, x + 1, y + 1, availableMoves);
+            checkAndAddMove(piece, x - 1, y + 1, availableMoves);
+            checkAndAddMove(piece, x + 1, y - 1, availableMoves);
+            checkAndAddMove(piece, x - 1, y - 1, availableMoves);
         }
         
         return availableMoves;
     }
 
-    private void addIfValid(Piece piece, int toX, int toY, List<NormalMove> moves) {
-        if (isValidPosition(toX, toY) && !gameLogic.hasPieceAt(toX, toY)) {
+    private void checkAndAddMove(Piece piece, int toX, int toY, List<NormalMove> moves) {
+        if (isValidPosition(toX, toY)) {
             moves.add(new NormalMove(piece, toX, toY));
         }
     }
