@@ -117,6 +117,29 @@ public class GameLogic {
         return availableCaptures;
     }
 
+    public ArrayList<Move> getLegalMoves() {
+        ArrayList<Move> availableMoves = new ArrayList<>();
+        ArrayList<Piece> pieces = getListOfPieces();
+        boolean capturesAvailable = hasAvailableCaptures();
+                
+        for (Piece piece : pieces) {
+            //TODO: instead of iterating over all black tiles, iterate over all tiles where the piece can move
+            for (int row = 0; row < board.length; row++) {
+                int startCol = (row % 2 == 0) ? 1 : 0;
+                for (int col = startCol; col < board.length; col += 2){
+                    Move move = determineMoveType(piece, row, col);
+                    if (capturesAvailable && move.getType() == MoveType.CAPTURE) {
+                        availableMoves.add(move);
+                    }
+                    else if (move.getType() == MoveType.NORMAL) {
+                        availableMoves.add(move);
+                    }
+                }
+            }
+        }
+        return availableMoves;
+    }
+
     public boolean hasAvailableCaptures(){
         availableCaptures = checkAvailableCaptures();
         if (availableCaptures.size() > 0) {
