@@ -21,43 +21,37 @@ public class GUI extends Application {
     @Override
     public void start(Stage selectionStage) {
         Pane selectionPane = new Pane();
-        selectionPane.setPrefSize(400, 400);  // Square window size
+        selectionPane.setPrefSize(400, 400);  
 
-        // Background set to Linen (#FAF0E6)
         selectionPane.setBackground(new Background(new BackgroundFill(Color.web("#FAF0E6"), CornerRadii.EMPTY, Insets.EMPTY)));
 
-        // Title label (smaller, centered, and bold with a deep color) positioned higher
         Label gameTitle = new Label("FRISIAN DRAUGHTS");
         gameTitle.setStyle("-fx-font-size: 28px; -fx-font-weight: bold; -fx-text-fill: BLACK;");
-        gameTitle.setFont(new Font("Arial", 28));  // Set the font to Arial, smaller size
-        gameTitle.setLayoutX(75); // Centered horizontally in 400px window
-        gameTitle.setLayoutY(50); // Positioned higher up
+        gameTitle.setFont(new Font("Arial", 28)); 
+        gameTitle.setLayoutX(75); 
+        gameTitle.setLayoutY(50); 
 
-        // Dropdown menu for selecting player mode - centered horizontally, moved higher
         ComboBox<String> playerSelection = new ComboBox<>();
         playerSelection.getItems().addAll("1 Player", "2 Players");
         playerSelection.setValue("Select Players");
-        playerSelection.setLayoutX(125); // Centered horizontally in 400px window
-        playerSelection.setLayoutY(190); // Moved higher up
-        playerSelection.setPrefWidth(150);  // Ensuring consistent width
+        playerSelection.setLayoutX(125); 
+        playerSelection.setLayoutY(190);
+        playerSelection.setPrefWidth(150); 
         playerSelection.setStyle("-fx-font-size: 16px;");
 
-        // Primary button (Start Game) with Light Green (#90EE90) centered below dropdown, moved higher
         Button startGameButton = new Button("START GAME");
-        startGameButton.setLayoutX(125); // Centered horizontally in 400px window
-        startGameButton.setLayoutY(250);  // Moved higher up
-        startGameButton.setPrefWidth(150);  // Ensuring consistent width with the dropdown
+        startGameButton.setLayoutX(125); 
+        startGameButton.setLayoutY(250);  
+        startGameButton.setPrefWidth(150); 
         startGameButton.setStyle("-fx-background-color: #90EE90; -fx-text-fill: white; -fx-font-size: 18px; -fx-padding: 10px 20px;");
 
-        // Add hover effect to the Start Game button
         startGameButton.setOnMouseEntered(e -> startGameButton.setStyle("-fx-background-color: #7CFC00; -fx-text-fill: white; -fx-font-size: 18px; -fx-padding: 10px 20px;"));
         startGameButton.setOnMouseExited(e -> startGameButton.setStyle("-fx-background-color: #90EE90; -fx-text-fill: white; -fx-font-size: 18px; -fx-padding: 10px 20px;"));
 
-        // Set action based on dropdown selection
         startGameButton.setOnAction(e -> {
             String selected = playerSelection.getValue();
             if (selected.equals("2 Players")) {
-                selectionStage.close();  // Close the selection window
+                selectionStage.close();  
                 try {
                     CheckersApp game = new CheckersApp();
                     Stage gameStage = new Stage();
@@ -79,10 +73,8 @@ public class GUI extends Application {
             }
         });
 
-        // Add title, dropdown, and button to the selection pane
         selectionPane.getChildren().addAll(gameTitle, playerSelection, startGameButton);
 
-        // Setup and show the selection stage
         Scene selectionScene = new Scene(selectionPane);
         selectionStage.setTitle("Game Mode Selection");
         selectionStage.setScene(selectionScene);

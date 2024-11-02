@@ -104,7 +104,6 @@ public class PieceDrawer extends StackPane {
     
 
     private boolean isValidPosition(int x, int y) {
-        // Ensure x and y are within board bounds for a 10x10 board
         return x >= 0 && x < 10 && y >= 0 && y < 10;
     }
 

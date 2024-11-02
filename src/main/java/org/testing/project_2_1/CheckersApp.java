@@ -1,6 +1,7 @@
 package org.testing.project_2_1;
 
 import javafx.application.Application;
+import javafx.geometry.Insets;
 import javafx.scene.Group;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
@@ -9,24 +10,26 @@ import javafx.scene.layout.HBox;
 import javafx.scene.layout.Pane;
 import javafx.scene.layout.VBox;
 import javafx.stage.Stage;
+import javafx.scene.text.Font;
+import javafx.scene.text.FontWeight;
 
 public class CheckersApp extends Application {
     public static final int TILE_SIZE = 60;
     public static final int SIZE = 10;
 
-    private Label timerLabel;
-    private Label countdownLabel; 
-    private MoveTimer moveTimer; 
-    private GameCountdown gameCountdown; 
+    private Label playerOneTimerLabel;
+    private Label playerTwoTimerLabel;
+    private PlayerTimer playerOneTimer;
+    private PlayerTimer playerTwoTimer;
 
     private Group tileGroup = new Group();
     public Group pieceGroup = new Group();
     private Group boardGroup = new Group(); 
     private CapturedPiecesTracker capturedPiecesTracker;
 
+    private boolean isPlayerOneTurn = true; // Track the current turn
     GameLogic gameLogic;
 
-    // FOR HIGHLIGHTER CLASS
     public Group getBoardGroup() {
         return boardGroup;
     }
@@ -35,7 +38,7 @@ public class CheckersApp extends Application {
         gameLogic = new GameLogic(this);
     }
 
-    public CheckersApp(Agent agent, boolean isAgentWhite){
+    public CheckersApp(Agent agent, boolean isAgentWhite) {
         gameLogic = new GameLogic(this, agent, isAgentWhite);
         agent.setGameLogic(gameLogic);
     }
@@ -46,6 +49,8 @@ public class CheckersApp extends Application {
         primaryStage.setTitle("FRISIAN DRAUGHTS");
         primaryStage.setScene(scene);
         primaryStage.show();
+
+        playerOneTimer.startCountdown();
     }
 
     public Parent createContent() {
@@ -53,13 +58,17 @@ public class CheckersApp extends Application {
         boardPane.setPrefSize(SIZE * TILE_SIZE, SIZE * TILE_SIZE);
         capturedPiecesTracker = new CapturedPiecesTracker();
 
-        timerLabel = new Label("Opponent's turn ends in: 30s");
-        styleLabel(timerLabel, 16, "darkgreen");
-        moveTimer = new MoveTimer(timerLabel, this::changeTurn);
+        playerOneTimerLabel = new Label("05:00");
+        playerTwoTimerLabel = new Label("05:00");
 
-        countdownLabel = new Label("Game ends in: 05:00");
-        styleLabel(countdownLabel, 18, "black"); 
-        gameCountdown = new GameCountdown(countdownLabel, this::displayGameOverMessage);
+        playerOneTimer = new PlayerTimer(playerOneTimerLabel, 5000); 
+        playerTwoTimer = new PlayerTimer(playerTwoTimerLabel, 5000); 
+
+        playerOneTimer.setTotalTime(300_000);
+        playerTwoTimer.setTotalTime(300_000);
+
+        styleLabel(playerOneTimerLabel, 16, "black");
+        styleLabel(playerTwoTimerLabel, 16, "black");
 
         for (Tile[] row : gameLogic.board) {
             for (Tile tile : row) {
@@ -72,13 +81,38 @@ public class CheckersApp extends Application {
             }
         }
 
-        // Add tile and piece groups to boardGroup
         boardGroup.getChildren().addAll(tileGroup, pieceGroup);
         boardPane.getChildren().add(boardGroup);
 
-        VBox rightPanel = new VBox(20);
-        rightPanel.getChildren().addAll(timerLabel, countdownLabel, capturedPiecesTracker.getCapturedPiecesDisplay());
-        rightPanel.setStyle("-fx-padding: 10 10 10 20; -fx-alignment: top-left;");
+        Label playerOneTitle = new Label("PLAYER 1");
+        Label playerTwoTitle = new Label("PLAYER 2");
+        Label playerOneTimeLabel = new Label("Time Remaining:");
+        Label playerTwoTimeLabel = new Label("Time Remaining:");
+        Label playerOneCapturedLabel = new Label("Captured Pieces:");
+        Label playerTwoCapturedLabel = new Label("Captured Pieces:");
+
+        styleTitle(playerOneTitle);
+        styleTitle(playerTwoTitle);      
+        styleInfoLabel(playerOneTimeLabel);
+        styleInfoLabel(playerTwoTimeLabel);
+        styleInfoLabel(playerOneCapturedLabel);
+        styleInfoLabel(playerTwoCapturedLabel);
+
+        Label playerOneCapturedCount = capturedPiecesTracker.getCapturedPiecesDisplay("Player 1");
+        Label playerTwoCapturedCount = capturedPiecesTracker.getCapturedPiecesDisplay("Player 2");
+
+        VBox playerOneBox = new VBox(10, playerOneTitle, playerOneTimeLabel, playerOneTimerLabel, 
+                                     playerOneCapturedLabel, playerOneCapturedCount);
+        VBox playerTwoBox = new VBox(10, playerTwoTitle, playerTwoTimeLabel, playerTwoTimerLabel, 
+                                     playerTwoCapturedLabel, playerTwoCapturedCount);
+
+        playerOneBox.setStyle("-fx-background-color: #f0f8ff; -fx-border-color: #b0b0b0; -fx-border-width: 2px; -fx-border-radius: 5px;");
+        playerTwoBox.setStyle("-fx-background-color: #f0f8ff; -fx-border-color: #b0b0b0; -fx-border-width: 2px; -fx-border-radius: 5px;");
+        playerOneBox.setPadding(new Insets(15));
+        playerTwoBox.setPadding(new Insets(15));
+
+        VBox rightPanel = new VBox(20, playerOneBox, playerTwoBox);
+        rightPanel.setStyle("-fx-padding: 10 10 10 20;");
         rightPanel.setPrefWidth(260);
 
         HBox root = new HBox();
@@ -89,12 +123,17 @@ public class CheckersApp extends Application {
     }
 
     private void styleLabel(Label label, int fontSize, String textColor) {
-        label.setStyle("-fx-font-size: " + fontSize + "px; -fx-font-weight: bold; -fx-background-color: #d3d3d3; " +
-                "-fx-padding: 10px 20px; -fx-border-color: #b0b0b0; -fx-border-width: 2px; " +
-                "-fx-text-fill: " + textColor + "; -fx-font-family: 'Arial'; -fx-border-radius: 10px; -fx-background-radius: 10px;");
-        label.setPrefWidth(230);
-        label.setMaxWidth(Double.MAX_VALUE);
-        label.setWrapText(true);
+        label.setStyle("-fx-font-size: " + fontSize + "px; -fx-font-weight: bold; -fx-text-fill: " + textColor + ";");
+    }
+
+    private void styleTitle(Label titleLabel) {
+        titleLabel.setFont(Font.font("Arial", FontWeight.BOLD, 18));
+        titleLabel.setStyle("-fx-text-fill: black; -fx-underline: true;");
+    }
+
+    private void styleInfoLabel(Label infoLabel) {
+        infoLabel.setFont(Font.font("Arial", FontWeight.SEMI_BOLD, 14));
+        infoLabel.setStyle("-fx-text-fill: black;");
     }
 
     public void movePiece(Piece piece, int newX, int newY) {
@@ -102,28 +141,21 @@ public class CheckersApp extends Application {
             Move move = gameLogic.determineMoveType(piece, newX, newY);
             gameLogic.takeTurn(move);
             piece.pieceDrawer.clearHighlight(); 
-            moveTimer.reset(); 
+    
+            if (isPlayerOneTurn) {
+                playerOneTimer.stopCountdown();  
+                playerOneTimer.startMove();      
+                playerTwoTimer.startCountdown(); 
+            } else {
+                playerTwoTimer.stopCountdown();  
+                playerTwoTimer.startMove();      
+                playerOneTimer.startCountdown(); 
+            }
+
+            isPlayerOneTurn = !isPlayerOneTurn;
         });
     }
     
-    private void changeTurn() {
-        timerLabel.setText("Changing opponent's turn...");
-        moveTimer.showTurnChangeMessage(); 
-    }
-
-    private boolean isInBounds(int x, int y) {
-        return x >= 0 && x < SIZE && y >= 0 && y < SIZE;
-    }
-
-    public int toBoard(double pixel) {
-        return (int) (pixel + TILE_SIZE / 2) / TILE_SIZE;
-    }
-
-    private void displayGameOverMessage() {
-        countdownLabel.setText("Game Over!"); 
-        System.out.println("Game Over!");
-    } 
-
     public static void main(String[] args) {
         launch(args);
     }

@@ -451,7 +451,7 @@ public class GameLogic {
                 if (capturedPiece == null) {
                     // Check if it's an opponent's piece
                     if (!board[x][y].getPiece().getType().color.equals(board[x0][y0].getPiece().getType().color)) {
-                        capturedPiece = board[x][y].getPiece();  // Found an opponent's piece to capture
+                        capturedPiece = board[x][y].getPiece();  //Found an opponent's piece to capture
                     } else {
                         return null;  // Path is blocked by a friendly piece
                     }
@@ -473,7 +473,7 @@ public class GameLogic {
         }
         }
 
-        return null;  // No capturable piece found
+        return null; 
     }
 
     public void printAvailableCaptures(){
