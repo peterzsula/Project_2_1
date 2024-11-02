@@ -101,6 +101,7 @@ public class PieceDrawer extends StackPane {
             highlightedTiles.clear();
         }
     }
+    
 
     private boolean isValidPosition(int x, int y) {
         // Ensure x and y are within board bounds for a 10x10 board
