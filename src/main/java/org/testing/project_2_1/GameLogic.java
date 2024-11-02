@@ -206,7 +206,7 @@ public class GameLogic {
                 checkAvailableCaptures();
                 //TODO: check if you are moving the piece as before
                 // If you don't have any more available captures, switch turns
-                if (!hasAvailableCaptures(piece)) {
+                if (!hasAvailableCaptures(move.getPiece())) {
                     System.out.println("made all available captures");
                     switchTurn();
                     return true;        
@@ -308,7 +308,7 @@ public class GameLogic {
         // If the piece is a king, allow multi-tile diagonal moves and captures
         if (piece.getType() == PieceType.BLACKKING || piece.getType() == PieceType.WHITEKING) {
             // Check for normal diagonal move (multi-tile)
-            if (isMoveDiagonal(x0, y0, newX, newY) && isPathClear(x0, y0, newX, newY)) {
+            if (isMoveDiagonalKing(x0, y0, newX, newY) && isPathClear(x0, y0, newX, newY)) {
                 return new NormalMove(piece, newX, newY);
             }
 
@@ -367,7 +367,7 @@ public class GameLogic {
     }
 
     // Helper method to check if move is diagonal for king
-    private boolean isMoveDiagonal(int x0, int y0, int newX, int newY) {
+    private boolean isMoveDiagonalKing(int x0, int y0, int newX, int newY) {
         return Math.abs(newX - x0) == Math.abs(newY - y0);
     }
 
@@ -403,19 +403,34 @@ public class GameLogic {
         int y = y0 + dy;
         Piece capturedPiece = null;
 
-        while (x != newX || y != newY) {
-            if (board[x][y].hasPiece()) { // TODO: there is a bug here
-                if (capturedPiece == null && board[x][y].getPiece().getType() != board[x0][y0].getPiece().getType()) {
-                    capturedPiece = board[x][y].getPiece();  // Store the opponent piece for capture
+        while (x != newX && y != newY) {
+            if (board[x][y].hasPiece()) {
+                if (capturedPiece == null) {
+                    // Check if it's an opponent's piece
+                    if (!board[x][y].getPiece().getType().color.equals(board[x0][y0].getPiece().getType().color)) {
+                        capturedPiece = board[x][y].getPiece();  // Found an opponent's piece to capture
+                    } else {
+                        return false;  // Path is blocked by a friendly piece
+                    }
                 } else {
-                    return false;  // Path is blocked by more than one piece
+                    return false;  // More than one piece on the path
                 }
             }
             x += dx;
             y += dy;
         }
 
-        return capturedPiece != null;  // Return true if there's exactly one piece to capture
+        if (capturedPiece != null) {
+            int landingX = capturedPiece.x + dx;
+            int landingY = capturedPiece.y + dy;
+            if (landingX == newX && landingY == newY) {
+                return true;
+            } else {
+                return false; // Landing square isnt right after the captured piece
+            }
+        }
+
+        return false;  // No capturable piece found
     }
 
     // Return the piece to capture along the path
@@ -425,13 +440,35 @@ public class GameLogic {
 
         int x = x0 + dx;
         int y = y0 + dy;
+        Piece capturedPiece = null;
 
-        while (x != newX || y != newY) {
-            if (board[x][y].hasPiece() && board[x][y].getPiece().getType() != board[x0][y0].getPiece().getType()) {
-                return board[x][y].getPiece();  // Return the capturable piece
+
+
+        while (x != newX && y != newY) {
+            if (board[x][y].hasPiece()) {
+                if (capturedPiece == null) {
+                    // Check if it's an opponent's piece
+                    if (!board[x][y].getPiece().getType().color.equals(board[x0][y0].getPiece().getType().color)) {
+                        capturedPiece = board[x][y].getPiece();  // Found an opponent's piece to capture
+                    } else {
+                        return null;  // Path is blocked by a friendly piece
+                    }
+                } else {
+                    return null;  // More than one piece on the path
+                }
             }
             x += dx;
             y += dy;
+        }
+
+        if (capturedPiece != null) {
+            int landingX = capturedPiece.x + dx;
+            int landingY = capturedPiece.y + dy;
+            if (landingX == newX && landingY == newY) {
+                return capturedPiece;
+            } else {
+                return null;
+        }
         }
 
         return null;  // No capturable piece found
