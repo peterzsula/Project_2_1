@@ -402,4 +402,11 @@ public class GameLogic {
         }
     }
 
+    // FOR HIGHLIGHTER CLASS
+    public boolean hasPieceAt(int x, int y) {
+        if (x >= 0 && x < board.length && y >= 0 && y < board[0].length) {
+            return board[x][y].hasPiece();
+        }
+        return false;
+    }
 }
