@@ -27,6 +27,15 @@ public class CheckersApp extends Application {
 
     GameLogic gameLogic;
 
+    public CheckersApp() {
+        gameLogic = new GameLogic(this);
+    }
+
+    public CheckersApp(Agent agent, boolean isAgentWhite){
+        gameLogic = new GameLogic(this, agent, isAgentWhite);
+        agent.setGameLogic(gameLogic);
+    }
+
     @Override
     public void start(Stage primaryStage) throws Exception {
         Scene scene = new Scene(createContent(), SIZE * TILE_SIZE + 300, SIZE * TILE_SIZE);
@@ -37,7 +46,6 @@ public class CheckersApp extends Application {
 
     public Parent createContent() {
         Pane boardPane = new Pane();
-        gameLogic = new GameLogic(this);
         boardPane.setPrefSize(SIZE * TILE_SIZE, SIZE * TILE_SIZE);
         capturedPiecesTracker = new CapturedPiecesTracker();
         timerLabel = new Label("Time remaining: 30s");
@@ -107,7 +115,8 @@ public class CheckersApp extends Application {
 
     public void movePiece(Piece piece, int newX, int newY) {
         piece.pieceDrawer.setOnMouseReleased(e -> {
-            gameLogic.takeTurn(piece, newX, newY);
+            Move move = gameLogic.determineMoveType(piece, newX, newY);
+            gameLogic.takeTurn(move);
         });
         // TODO: implement click funcitonality
     }
