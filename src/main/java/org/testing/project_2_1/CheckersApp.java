@@ -21,13 +21,19 @@ public class CheckersApp extends Application {
 
     private Group tileGroup = new Group();
     public Group pieceGroup = new Group();
+    private Group boardGroup = new Group(); 
     private CapturedPiecesTracker capturedPiecesTracker;
 
     GameLogic gameLogic;
 
+    // FOR HIGHLIGHTER CLASS
+    public Group getBoardGroup() {
+        return boardGroup;
+    }
+
     @Override
     public void start(Stage primaryStage) throws Exception {
-        Scene scene = new Scene(createContent(), SIZE * TILE_SIZE + 320, SIZE * TILE_SIZE); // Ampliar l'ample de la finestra per assegurar-se que hi ha prou espai
+        Scene scene = new Scene(createContent(), SIZE * TILE_SIZE + 320, SIZE * TILE_SIZE); 
         primaryStage.setTitle("FRISIAN DRAUGHTS");
         primaryStage.setScene(scene);
         primaryStage.show();
@@ -58,7 +64,9 @@ public class CheckersApp extends Application {
             }
         }
 
-        boardPane.getChildren().addAll(tileGroup, pieceGroup);
+        // Add tile and piece groups to boardGroup
+        boardGroup.getChildren().addAll(tileGroup, pieceGroup);
+        boardPane.getChildren().add(boardGroup);
 
         VBox rightPanel = new VBox(20);
         rightPanel.getChildren().addAll(timerLabel, countdownLabel, capturedPiecesTracker.getCapturedPiecesDisplay());
@@ -84,10 +92,11 @@ public class CheckersApp extends Application {
     public void movePiece(Piece piece, int newX, int newY) {
         piece.pieceDrawer.setOnMouseReleased(e -> {
             gameLogic.takeTurn(piece, newX, newY);
+            piece.pieceDrawer.clearHighlight(); 
             moveTimer.reset(); 
         });
     }
-
+    
     private void changeTurn() {
         timerLabel.setText("Changing opponent's turn...");
         moveTimer.showTurnChangeMessage(); 
@@ -104,7 +113,7 @@ public class CheckersApp extends Application {
     private void displayGameOverMessage() {
         countdownLabel.setText("Game Over!"); 
         System.out.println("Game Over!");
-    }
+    } 
 
     public static void main(String[] args) {
         launch(args);

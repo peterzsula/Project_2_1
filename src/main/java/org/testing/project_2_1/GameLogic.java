@@ -383,6 +383,14 @@ public class GameLogic {
         }
     }
 
+    // FOR HIGHLIGHTER CLASS
+    public boolean hasPieceAt(int x, int y) {
+        if (x >= 0 && x < board.length && y >= 0 && y < board[0].length) {
+            return board[x][y].hasPiece();
+        }
+        return false;
+    }
+
     public static void main(String[] args) {
         CheckersApp app = new CheckersApp();
         GameLogic game = new GameLogic(app);
