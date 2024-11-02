@@ -15,6 +15,8 @@ import javafx.scene.text.Font;
 import javafx.stage.Stage;
 
 public class GUI extends Application {
+    public boolean isSinglePlayer;
+    public boolean isAgentWhite = false;
 
     @Override
     public void start(Stage selectionStage) {
@@ -56,7 +58,6 @@ public class GUI extends Application {
             String selected = playerSelection.getValue();
             if (selected.equals("2 Players")) {
                 selectionStage.close();  // Close the selection window
-                // Launch the CheckersApp (main game)
                 try {
                     CheckersApp game = new CheckersApp();
                     Stage gameStage = new Stage();
@@ -65,8 +66,16 @@ public class GUI extends Application {
                     ex.printStackTrace();
                 }
             } else if (selected.equals("1 Player")) {
-                // 1 Player mode implementation can be added later
-                System.out.println("1 Player mode is not yet implemented.");
+                // isSinglePlayer = true;
+                isAgentWhite = false;
+                Agent agent = new BaselineAgent();
+                CheckersApp game = new CheckersApp(agent, isAgentWhite);
+                try {
+                    Stage gameStage = new Stage();
+                    game.start(gameStage);
+                } catch (Exception ex) {
+                    ex.printStackTrace();
+                }
             }
         });
 
