@@ -3,11 +3,12 @@
 Our work on Project 2-1, academic course 2024/25  
 @Maastricht University, Bsc. Data Science and AI
 
-### _Note: To run the gameplay app, please execute the file `GUI.java` in the path src/main/java/org/testing/project_2_1_
+### **Quick start**_: Before running, the library JavaFx needs to be imported/added in Module Settings. To run the gameplay app, please execute the file `GUI.java` in the path src/main/java/org/testing/project_2_1_.
+
 
 ## Preface  
 This project aims to build a Java-based computer version of the board game
-"Frisian Draughts", a variant of the classic game checkers, which originated in the north-eastern region of the Netherlands called Fryslân around 250 years ago (originally played on a 100-square board).  
+"Frisian Draughts", a variant of the classic game checkers, which originated in the north-western region of the Netherlands called Fryslân around 250 years ago (originally played on a 100-square board).  
 For the intelligent player functionality, we will design, train and implement AI game-playing algorithms: One type of
 adversarial search algorithm and one machine learning (ML) algorithm.  
 
@@ -35,7 +36,7 @@ Along that, there are some enums, helper and complementary classes:
 - **CapturedPiecesTracker**, helper class that handles the captured pieces counter for both black and white players and the labels assigned to it.
 
 ## Running the program  
-As commented previously, after loading the .zip file this program should be executed on the class **GUI.java**  
+As commented previously, after loading the .zip file, the graphic library JavaFx needs to be added and imported from the Java files via Project Settings > Open Module Settings > Libraries > New Project Library. Done this, the program should be executed on the class **GUI.java**  
 This should launch a Homepage window where the player is asked to select the number of players (1/2) for this game. After selecting, the "Start Game" button executes the class CheckersApp and the Playing Screen is displayed, including the board and pieces, a timer for each player turn and a black and white pieces' captures tracker.  
 Now it's time to _Play It_! (Frisian's version).
 - In case its necessary, for better visualisation reasons, the Screen Size can be easily adjust by increasing/decreasing the value of the variable `int TILE_SIZE` in the CheckersApp class.
