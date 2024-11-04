@@ -312,6 +312,9 @@ public class GameLogic {
             turnCounter--;
             switchTurn();
         }
+        else if (lastMove.type == MoveType.CAPTURE) {
+            // TODO: implement undo for captures
+        }
     }
 
     private void handleKingPromotion(Piece piece, int newY) {
