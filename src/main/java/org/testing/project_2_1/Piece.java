@@ -29,4 +29,18 @@ public class Piece {
             }
         }
     }
+
+    public void demoteToNormal() {
+        if (this.type == PieceType.BLACKKING || this.type == PieceType.WHITEKING ) {
+            System.out.println("Demoted to normal");
+            if (this.type.color.equals("white")){
+                this.type = PieceType.WHITE;
+                pieceDrawer.demoteToNormal();
+            }
+            else if (this.type.color.equals("black")){
+                this.type = PieceType.BLACK;
+                pieceDrawer.demoteToNormal();
+            }
+        }
+    }
 }

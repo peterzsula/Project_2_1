@@ -2,7 +2,6 @@ package org.testing.project_2_1;
 
 import static org.testing.project_2_1.CheckersApp.SIZE;
 import java.util.ArrayList;
-import java.util.List;
 
 import javafx.scene.layout.Pane;
 
@@ -10,12 +9,13 @@ public class GameLogic {
     public Tile[][] board = new Tile[SIZE][SIZE];
     public boolean isWhiteTurn;
     public int turnCounter;
-    public ArrayList<Piece> whiteList;
-    public ArrayList<Piece> blackList;
+    public ArrayList<Piece> whitePieces;
+    public ArrayList<Piece> blackPieces;
     public ArrayList<Capture> availableCaptures;
     public CheckersApp app;
     private Agent agent;
     public boolean isAgentWhite;
+    public ArrayList<Move> movesPlayed = new ArrayList<Move>();
 
     public GameLogic(CheckersApp app) {
         this.agent = null;
@@ -23,8 +23,8 @@ public class GameLogic {
         new Pane(); // for some reason this is needed to avoid a null pointer exception
         isWhiteTurn = true;
         turnCounter = 0;
-        whiteList = new ArrayList<>();
-        blackList = new ArrayList<>();
+        whitePieces = new ArrayList<>();
+        blackPieces = new ArrayList<>();
         availableCaptures = new ArrayList<>();
         setUpBoard();
     }
@@ -36,8 +36,8 @@ public class GameLogic {
         new Pane(); // for some reason this is needed to avoid a null pointer exception
         isWhiteTurn = true;
         turnCounter = 0;
-        whiteList = new ArrayList<>();
-        blackList = new ArrayList<>();
+        whitePieces = new ArrayList<>();
+        blackPieces = new ArrayList<>();
         availableCaptures = new ArrayList<>();
         setUpBoard();
     }
@@ -51,15 +51,36 @@ public class GameLogic {
                 if (y <= 3 && tile.isBlack()) {
                     Piece piece = new Piece(PieceType.BLACK, x, y);
                     tile.setPiece(piece);
-                    blackList.add(piece);
+                    blackPieces.add(piece);
                 } else if (y >= 6 && tile.isBlack()) {
                     Piece piece = new Piece(PieceType.WHITE, x, y);
                     tile.setPiece(piece);
-                    whiteList.add(piece);
+                    whitePieces.add(piece);
                 }
 
             }
         }
+    }
+
+    public void resetGame(){
+        //TODO: reset only implemented in game logic, should implemented in checkers app too
+        for (int y = 0; y < SIZE; y++) {
+            for (int x = 0; x < SIZE; x++) {
+                Tile tile = board[x][y];
+                if (tile.hasPiece()) {
+                    app.pieceGroup.getChildren().remove(tile.getPiece().pieceDrawer);
+                    tile.setPiece(null);
+                }
+            }
+        }
+        isWhiteTurn = true;
+        whitePieces.clear();
+        blackPieces.clear();
+        setUpBoard();
+        app.createContent();
+        isWhiteTurn = true;
+        turnCounter = 0;
+        movesPlayed.clear();
     }
 
     private void switchTurn() {
@@ -78,7 +99,6 @@ public class GameLogic {
         if (agent != null && isAgentWhite == isWhiteTurn) {
             agent.makeMove();
         }
-        
     }
 
     //check all available captures for current player
@@ -178,10 +198,10 @@ public class GameLogic {
 
     public ArrayList<Piece> getListOfPieces() {
         if (isWhiteTurn) {
-            return whiteList;
+            return whitePieces;
         }
         else {
-            return blackList;
+            return blackPieces;
         }
     }
 
@@ -243,6 +263,7 @@ public class GameLogic {
                 piece.pieceDrawer.abortMove();
                 break;
             case NORMAL:
+                movesPlayed.add(move);
                 board[piece.x][piece.y].setPiece(null);
                 board[newX][newY].setPiece(piece);
                 piece.pieceDrawer.move(newX, newY);
@@ -251,14 +272,15 @@ public class GameLogic {
                 handleKingPromotion(piece, newY);
                 break;
             case CAPTURE:
+                movesPlayed.add(move);
                 Capture capture = (Capture) move;
                 //TODO: increment captured pieces counter
                 if (capture.getCapturedPiece().type.color.equals("white")) {
-                    whiteList.remove(capture.getCapturedPiece());
+                    whitePieces.remove(capture.getCapturedPiece());
                     System.out.println("piece taken: " + capture.getCapturedPiece().toString());
                 }
                 else {
-                    blackList.remove(capture.getCapturedPiece());
+                    blackPieces.remove(capture.getCapturedPiece());
                     System.out.println("piece taken: " + capture.getCapturedPiece().toString());                    
                 }
                 piece.pieceDrawer.move(newX, newY);
@@ -274,6 +296,24 @@ public class GameLogic {
         }
     }
 
+    public void undoLastMove() {
+        Move lastMove = movesPlayed.get(movesPlayed.size() - 1);
+        Piece piece = lastMove.getPiece();
+        if (lastMove.type == MoveType.NORMAL) {
+            if (promotedLastMove(lastMove)) {
+                piece.demoteToNormal();   
+            }
+            piece.x = lastMove.fromX;
+            piece.y = lastMove.fromY;
+            board[lastMove.toX][lastMove.toY].setPiece(null);
+            board[lastMove.fromX][lastMove.fromY].setPiece(piece);
+            piece.pieceDrawer.move(lastMove.fromX, lastMove.fromY);
+            movesPlayed.remove(lastMove);
+            turnCounter--;
+            switchTurn();
+        }
+    }
+
     private void handleKingPromotion(Piece piece, int newY) {
         if (piece.getType() == PieceType.BLACK && newY == SIZE - 1) {
             piece.promoteToKing();
@@ -282,6 +322,16 @@ public class GameLogic {
             piece.promoteToKing();
             piece.pieceDrawer.promoteToKing();
         }
+    }
+
+    private boolean promotedLastMove(Move lastMove) {
+        Piece piece = lastMove.getPiece();
+        if (piece.getType() == PieceType.BLACK && lastMove.fromY == SIZE - 1) {
+            return true;
+        } else if (piece.getType() == PieceType.WHITE && lastMove.fromY == 0) {
+            return true;
+        }
+        return false;
     }
 
     public Move determineMoveType(Piece piece, int newX, int newY) {
@@ -361,7 +411,7 @@ public class GameLogic {
     }
 
     public boolean isGameOver(){
-        if (whiteList.size() == 0 || blackList.size() == 0) {
+        if (whitePieces.size() == 0 || blackPieces.size() == 0) {
             return true;
         }
         return false;

@@ -5,6 +5,7 @@ import javafx.geometry.Insets;
 import javafx.scene.Group;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
+import javafx.scene.control.Button;
 import javafx.scene.control.Label;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.Pane;
@@ -53,6 +54,11 @@ public class CheckersApp extends Application {
         playerOneTimer.startCountdown();
     }
 
+    public void resetGame() {
+        //TODO: Implement resetGame method
+        gameLogic.resetGame();
+    }
+
     public Parent createContent() {
         Pane boardPane = new Pane();
         boardPane.setPrefSize(SIZE * TILE_SIZE, SIZE * TILE_SIZE);
@@ -90,6 +96,11 @@ public class CheckersApp extends Application {
         Label playerTwoTimeLabel = new Label("Time Remaining:");
         Label playerOneCapturedLabel = new Label("Captured Pieces:");
         Label playerTwoCapturedLabel = new Label("Captured Pieces:");
+        Button resetButton = new Button("RESET GAME");
+        resetButton.setOnAction(e -> gameLogic.resetGame());
+        Button undoButton = new Button("UNDO MOVE");
+        undoButton.setOnAction(e -> gameLogic.undoLastMove());
+
 
         styleTitle(playerOneTitle);
         styleTitle(playerTwoTitle);      
@@ -106,6 +117,7 @@ public class CheckersApp extends Application {
         VBox playerTwoBox = new VBox(10, playerTwoTitle, playerTwoTimeLabel, playerTwoTimerLabel, 
                                      playerTwoCapturedLabel, playerTwoCapturedCount);
 
+        
         playerOneBox.setStyle("-fx-background-color: #f0f8ff; -fx-border-color: #b0b0b0; -fx-border-width: 2px; -fx-border-radius: 5px;");
         playerTwoBox.setStyle("-fx-background-color: #f0f8ff; -fx-border-color: #b0b0b0; -fx-border-width: 2px; -fx-border-radius: 5px;");
         playerOneBox.setPadding(new Insets(15));
@@ -116,8 +128,8 @@ public class CheckersApp extends Application {
         rightPanel.setPrefWidth(260);
 
         HBox root = new HBox();
-        root.getChildren().addAll(boardPane, rightPanel);
-        root.setSpacing(50);
+        root.getChildren().addAll(boardPane, rightPanel, resetButton, undoButton);
+        root.setSpacing(20);
 
         return root;
     }

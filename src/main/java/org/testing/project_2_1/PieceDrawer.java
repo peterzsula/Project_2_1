@@ -142,4 +142,8 @@ public class PieceDrawer extends StackPane {
         crown.setStrokeWidth(TILE_SIZE * 0.03);
         getChildren().add(crown);
     }
+
+    public void demoteToNormal() {
+        getChildren().remove(getChildren().size() - 1);
+    }
 }
