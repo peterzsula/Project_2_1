@@ -97,9 +97,10 @@ public class CheckersApp extends Application {
         Label playerTwoTimeLabel = new Label("Time Remaining:");
         Label playerOneCapturedLabel = new Label("Captured Pieces:");
         Label playerTwoCapturedLabel = new Label("Captured Pieces:");
-        Button resetButton = new Button("RESET GAME");
+
+        Button resetButton = new Button("RESET");
         resetButton.setOnAction(e -> gameLogic.resetGame());
-        Button undoButton = new Button("UNDO MOVE");
+        Button undoButton = new Button("UNDO");
         undoButton.setOnAction(e -> gameLogic.undoLastMove());
 
 

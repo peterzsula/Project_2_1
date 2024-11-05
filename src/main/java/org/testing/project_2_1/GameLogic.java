@@ -216,7 +216,8 @@ public class GameLogic {
         if (move.getType() == MoveType.INVALID) {
             System.out.println("Invalid move 129");
             piece.pieceDrawer.abortMove();
-            return false;
+            return
+                    false;
         }        
         // If you have available captures with any piece, you must make a capture
         if (hasAvailableCaptures()) {
@@ -361,16 +362,16 @@ public class GameLogic {
             return new InvalidMove(piece, newX, newY);
         }
 
-        // If the piece is a king, allow multi-tile diagonal moves and captures
+        // If the piece is a king, allow all types of moves and captures
         if (piece.getType() == PieceType.BLACKKING || piece.getType() == PieceType.WHITEKING) {
-            // Check for normal diagonal move (multi-tile)
-            if (isMoveDiagonalKing(x0, y0, newX, newY) && isPathClear(x0, y0, newX, newY)) {
+            // Check for normal king move any direction (multi-tile)
+            if (isMoveforKing(x0, y0, newX, newY) && isPathClearforKing(x0, y0, newX, newY)) {
                 return new NormalMove(piece, newX, newY);
             }
 
-            // Check for diagonal capture for king
-            if (Math.abs(newX - x0) >= 2 && Math.abs(newY - y0) >= 2 && isCapturePath(x0, y0, newX, newY)) {
-                Piece capturedPiece = getCapturedPieceOnPath(x0, y0, newX, newY);
+            // Check for king capture any direction
+            if (isCapturePathforKing(x0, y0, newX, newY)) {
+                Piece capturedPiece = getCapturedPieceOnPathforKing(x0, y0, newX, newY);
                 return new Capture(piece, capturedPiece, newX, newY);
             }
         }
@@ -422,9 +423,9 @@ public class GameLogic {
         return false;
     }
 
-    // Helper method to check if move is diagonal for king
-    private boolean isMoveDiagonalKing(int x0, int y0, int newX, int newY) {
-        return Math.abs(newX - x0) == Math.abs(newY - y0);
+    // Helper method to check if move is available for king
+    private boolean isMoveforKing(int x0, int y0, int newX, int newY) {
+        return (x0 == newX || y0 == newY || Math.abs(newX - x0) == Math.abs(newY - y0));
     }
 
     // Helper method to check if move is diagonal for normal pieces
@@ -433,9 +434,9 @@ public class GameLogic {
     }
 
     // Check if the path for king movement (diagonal, horizontal, vertical) is clear
-    public boolean isPathClear(int x0, int y0, int newX, int newY) {
-        int dx = Integer.signum(newX - x0);
-        int dy = Integer.signum(newY - y0);
+    public boolean isPathClearforKing(int x0, int y0, int newX, int newY) {
+        int dx = Integer.compare(newX, x0);
+        int dy = Integer.compare(newY, y0);
     
         int x = x0 + dx;
         int y = y0 + dy;
@@ -452,20 +453,28 @@ public class GameLogic {
     
 
     // Check if there is a capturable piece on the path
-    private boolean isCapturePath(int x0, int y0, int newX, int newY) {
-        int dx = Integer.signum(newX - x0);
-        int dy = Integer.signum(newY - y0);
+    private boolean isCapturePathforKing(int x0, int y0, int newX, int newY) {
+        if (!isMoveforKing(x0, y0, newX, newY)) {
+            return false;  // Not a move for the burger king
+        }
+
+        int dx = Integer.compare(newX , x0);
+        int dy = Integer.compare(newY , y0);
 
         int x = x0 + dx;
         int y = y0 + dy;
         Piece capturedPiece = null;
+        int capturedX = -1;
+        int capturedY = -1;
 
-        while (x != newX && y != newY) {
+        while (x != newX || y != newY) {
             if (board[x][y].hasPiece()) {
                 if (capturedPiece == null) {
                     // Check if it's an opponent's piece
                     if (!board[x][y].getPiece().getType().color.equals(board[x0][y0].getPiece().getType().color)) {
                         capturedPiece = board[x][y].getPiece();  // Found an opponent's piece to capture
+                        capturedX=x;
+                        capturedY=y;
                     } else {
                         return false;  // Path is blocked by a friendly piece
                     }
@@ -476,37 +485,44 @@ public class GameLogic {
             x += dx;
             y += dy;
         }
-
+        // Ensure capturing piece can only land 1 square after the captured one
         if (capturedPiece != null) {
-            int landingX = capturedPiece.x + dx;
-            int landingY = capturedPiece.y + dy;
-            if (landingX == newX && landingY == newY) {
-                return true;
+            int landingX = capturedX + dx;
+            int landingY = capturedY + dy;
+
+            // Add error margin for vertical/horizontal captures
+            if (Math.abs(newX - landingX) <= 1 && Math.abs(newY - landingY) <= 1) {
+                return true;  // Immediately after the captured piece
             } else {
-                return false; // Landing square isnt right after the captured piece
+                return false;  // Not immediately after
             }
         }
 
-        return false;  // No capturable piece found
+        return false;  // No capturable piece wis found
     }
 
     // Return the piece to capture along the path
-    private Piece getCapturedPieceOnPath(int x0, int y0, int newX, int newY) {
-        int dx = Integer.signum(newX - x0);
-        int dy = Integer.signum(newY - y0);
+    private Piece getCapturedPieceOnPathforKing(int x0, int y0, int newX, int newY) {
+        if (!isMoveforKing(x0, y0, newX, newY)) {
+            return null;  // Not a move for the burger king
+        }
+        int dx = Integer.compare(newX , x0);
+        int dy = Integer.compare(newY , y0);
 
         int x = x0 + dx;
         int y = y0 + dy;
         Piece capturedPiece = null;
+        int capturedX = -1;
+        int capturedY = -1;
 
-
-
-        while (x != newX && y != newY) {
+        while (x != newX || y != newY) {
             if (board[x][y].hasPiece()) {
                 if (capturedPiece == null) {
                     // Check if it's an opponent's piece
                     if (!board[x][y].getPiece().getType().color.equals(board[x0][y0].getPiece().getType().color)) {
                         capturedPiece = board[x][y].getPiece();  //Found an opponent's piece to capture
+                        capturedX = x;
+                        capturedY = y;
                     } else {
                         return null;  // Path is blocked by a friendly piece
                     }
@@ -517,18 +533,19 @@ public class GameLogic {
             x += dx;
             y += dy;
         }
-
+        // Ensure capturing piece can only land 1 square after the captured one
         if (capturedPiece != null) {
-            int landingX = capturedPiece.x + dx;
-            int landingY = capturedPiece.y + dy;
-            if (landingX == newX && landingY == newY) {
-                return capturedPiece;
+            int landingX = capturedX + dx;
+            int landingY = capturedY + dy;
+
+            if (Math.abs(newX - landingX) <= 1 && Math.abs(newY - landingY) <= 1) {
+                return capturedPiece;  // Valid capture
             } else {
-                return null;
-        }
+                return null;  // not immediately after
+            }
         }
 
-        return null; 
+        return null; // No valid capture is found
     }
 
     public void printAvailableCaptures(){
