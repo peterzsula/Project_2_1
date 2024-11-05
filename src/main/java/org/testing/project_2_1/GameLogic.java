@@ -274,13 +274,15 @@ public class GameLogic {
             case CAPTURE:
                 movesPlayed.add(move);
                 Capture capture = (Capture) move;
-                //TODO: increment captured pieces counter
+
                 if (capture.getCapturedPiece().type.color.equals("white")) {
                     whitePieces.remove(capture.getCapturedPiece());
+                    app.capturedPiecesTracker.capturePiece("Player 2");
                     System.out.println("piece taken: " + capture.getCapturedPiece().toString());
                 }
                 else {
                     blackPieces.remove(capture.getCapturedPiece());
+                    app.capturedPiecesTracker.capturePiece("Player 1");
                     System.out.println("piece taken: " + capture.getCapturedPiece().toString());                    
                 }
                 piece.pieceDrawer.move(newX, newY);

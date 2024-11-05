@@ -9,8 +9,8 @@ public class CapturedPiecesTracker {
     private int blackCaptured = 0;
     private int whiteCaptured = 0;
 
-    private Label blackCapturedLabel;
-    private Label whiteCapturedLabel;
+    Label blackCapturedLabel;
+    Label whiteCapturedLabel;
 
     private int playerOneCapturedCount = 0;
     private int playerTwoCapturedCount = 0;
@@ -53,27 +53,16 @@ public class CapturedPiecesTracker {
         return blackWhiteCapturedBox;
     }
 
-    public Label getCapturedPiecesDisplay(String player) {
-        Label capturedLabel = new Label();
 
-        if (player.equals("Player 1")) {
-            capturedLabel.setText(String.valueOf(playerOneCapturedCount));
-        } else if (player.equals("Player 2")) {
-            capturedLabel.setText(String.valueOf(playerTwoCapturedCount));
-        } else {
-            capturedLabel.setText("0"); 
-        }
-
-        setLabelStyles(capturedLabel); 
-        return capturedLabel;
-    }
 
     // Increment methods for player-specific captured pieces
     public void capturePiece(String player) {
         if (player.equals("Player 1")) {
             playerOneCapturedCount++;
+            blackCapturedLabel.setText(String.valueOf(playerOneCapturedCount));
         } else if (player.equals("Player 2")) {
             playerTwoCapturedCount++;
+            whiteCapturedLabel.setText(String.valueOf(playerTwoCapturedCount));
         }
     }
 }

@@ -26,7 +26,7 @@ public class CheckersApp extends Application {
     private Group tileGroup = new Group();
     public Group pieceGroup = new Group();
     private Group boardGroup = new Group(); 
-    private CapturedPiecesTracker capturedPiecesTracker;
+    CapturedPiecesTracker capturedPiecesTracker;
 
     private boolean isPlayerOneTurn = true; // Track the current turn
     GameLogic gameLogic;
@@ -43,6 +43,7 @@ public class CheckersApp extends Application {
         gameLogic = new GameLogic(this, agent, isAgentWhite);
         agent.setGameLogic(gameLogic);
     }
+
 
     @Override
     public void start(Stage primaryStage) throws Exception {
@@ -109,8 +110,8 @@ public class CheckersApp extends Application {
         styleInfoLabel(playerOneCapturedLabel);
         styleInfoLabel(playerTwoCapturedLabel);
 
-        Label playerOneCapturedCount = capturedPiecesTracker.getCapturedPiecesDisplay("Player 1");
-        Label playerTwoCapturedCount = capturedPiecesTracker.getCapturedPiecesDisplay("Player 2");
+        Label playerOneCapturedCount = capturedPiecesTracker.blackCapturedLabel;
+        Label playerTwoCapturedCount = capturedPiecesTracker.whiteCapturedLabel;
 
         VBox playerOneBox = new VBox(10, playerOneTitle, playerOneTimeLabel, playerOneTimerLabel, 
                                      playerOneCapturedLabel, playerOneCapturedCount);
