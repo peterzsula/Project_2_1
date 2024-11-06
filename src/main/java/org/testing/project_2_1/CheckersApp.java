@@ -20,6 +20,7 @@ public class CheckersApp extends Application {
 
     private Label playerOneTimerLabel;
     private Label playerTwoTimerLabel;
+    private Label captureMessageLabel;
     private PlayerTimer playerOneTimer;
     private PlayerTimer playerTwoTimer;
 
@@ -63,6 +64,11 @@ public class CheckersApp extends Application {
     public Parent createContent() {
         Pane boardPane = new Pane();
         boardPane.setPrefSize(SIZE * TILE_SIZE, SIZE * TILE_SIZE);
+        //label to tell you when to capture
+        captureMessageLabel = new Label();
+        captureMessageLabel.setFont(new Font("Arial", 16));
+        captureMessageLabel.setStyle("-fx-text-fill: red; -fx-font-weight: bold;");
+
         capturedPiecesTracker = new CapturedPiecesTracker();
 
         playerOneTimerLabel = new Label("05:00");
@@ -125,7 +131,7 @@ public class CheckersApp extends Application {
         playerOneBox.setPadding(new Insets(15));
         playerTwoBox.setPadding(new Insets(15));
 
-        VBox rightPanel = new VBox(20, playerOneBox, playerTwoBox);
+        VBox rightPanel = new VBox(20, playerOneBox, playerTwoBox, captureMessageLabel);
         rightPanel.setStyle("-fx-padding: 10 10 10 20;");
         rightPanel.setPrefWidth(260);
 
@@ -148,6 +154,9 @@ public class CheckersApp extends Application {
     private void styleInfoLabel(Label infoLabel) {
         infoLabel.setFont(Font.font("Arial", FontWeight.SEMI_BOLD, 14));
         infoLabel.setStyle("-fx-text-fill: black;");
+    }
+    public void updateCaptureMessage(String message) {
+        captureMessageLabel.setText(message);
     }
 
     public void movePiece(Piece piece, int newX, int newY) {

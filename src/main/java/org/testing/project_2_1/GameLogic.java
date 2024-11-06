@@ -192,9 +192,12 @@ public class GameLogic {
 
     public boolean hasAvailableCaptures(Piece piece){
         availableCaptures = checkAvailableCaptures(piece);
+
         if (availableCaptures.size() > 0) {
             return true;
+
         }
+
         return false;
     }
 
@@ -227,6 +230,8 @@ public class GameLogic {
             if (move.getType() == MoveType.CAPTURE) {
                 movePiece(move);
                 checkAvailableCaptures();
+                app.updateCaptureMessage(" ");
+
                 //TODO: check if you are moving the piece as before
                 // If you don't have any more available captures, switch turns
                 if (!hasAvailableCaptures(move.getPiece())) {
@@ -243,6 +248,8 @@ public class GameLogic {
             // If the move is not a capture, abort the move and return false
             else {
                 System.out.println("abort move");
+                app.updateCaptureMessage(piece.getType().color + " must capture!");
+
                 piece.pieceDrawer.abortMove();
                 return false;
             }
