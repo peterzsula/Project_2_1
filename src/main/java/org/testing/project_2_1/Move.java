@@ -51,5 +51,9 @@ public abstract class Move {
         return "INDERTERMINED Move from X=" + fromX + ", Y=" + fromY + ", to X=" + toX + ", to Y=" + toY;
         
     }
+
+    public boolean isCapture() {
+        return type == MoveType.CAPTURE;
+    }
     
 }

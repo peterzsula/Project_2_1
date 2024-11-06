@@ -2,6 +2,8 @@ package org.testing.project_2_1;
 
 import static org.testing.project_2_1.CheckersApp.SIZE;
 import java.util.ArrayList;
+import java.util.HashSet;
+import java.util.Set;
 
 import javafx.scene.layout.Pane;
 
@@ -214,7 +216,6 @@ public class GameLogic {
         }
         // if the move is invalid, abort the move, return false
         if (move.getType() == MoveType.INVALID) {
-            System.out.println("Invalid move 129");
             piece.pieceDrawer.abortMove();
             return
                     false;
@@ -347,7 +348,6 @@ public class GameLogic {
 
         // Check if it's the correct player's turn
         if (isWhiteTurn != piece.getType().color.equals("white")) {
-            System.out.println("wrong player's turn");
             return new InvalidMove(piece, newX, newY);
         }
 
@@ -501,6 +501,19 @@ public class GameLogic {
         return false;  // No capturable piece wis found
     }
 
+    public Set<Piece> getPiecesTheathenedBy(ArrayList<Piece> pieces) {
+            Set<Piece> threatenedPieces = new HashSet<>();
+            for (Piece piece : pieces) {
+                for (Move move : getLegalMoves(piece)) {
+                    if (move.isCapture()) {
+                        Capture captureMove = (Capture) move;
+                        threatenedPieces.add(captureMove.getCapturedPiece());
+                    }
+                }
+            }
+            return threatenedPieces;
+        }
+
     // Return the piece to capture along the path
     private Piece getCapturedPieceOnPathforKing(int x0, int y0, int newX, int newY) {
         if (!isMoveforKing(x0, y0, newX, newY)) {
@@ -570,5 +583,44 @@ public class GameLogic {
         return null;
     }
 
-    
+    public double evaluateBoard() {
+        // page 8 of Machine Learning by Tom M. Mitchell
+        // xl: the number of black pieces on the board 
+        // x2: the number of white pieces on the board 
+        // x3: the number of black kings on the board 
+        // x4: the number of white kings on the board 
+        // x5: the number of black pieces threatened by white (i.e., which can be captured on white's next turn) 
+        // X6: the number of white pieces threatened by black 
+        // w1, w2, w3, w4, w5, w6: weights for the six features
+        int x1 = 0, x2 = 0, x3 = 0, x4 = 0, x5 = 0, x6 = 0;
+        // evaluation positive for white, negative for black
+        double w1 = -1, w2 = 1, w3 = -3, w4 = 3, w5 = 1, w6 = -1;
+
+        for (Piece piece : blackPieces) {
+            if (piece.type == PieceType.BLACK) {
+                x1++;
+            } else {
+                x3++;
+            }
+        }
+
+        for (Piece piece : whitePieces) {
+            if (piece.type == PieceType.WHITE) {
+                x2++;
+            } else {
+                x4++;
+            }
+        }
+            
+        Set<Piece> threatenedPieces = getPiecesTheathenedBy(whitePieces);
+        x5 = threatenedPieces.size();
+        threatenedPieces.clear();
+        threatenedPieces = getPiecesTheathenedBy(blackPieces);
+        x6 = threatenedPieces.size();
+        System.out.println("Evaluation: " +  (w1 * x1 + w2 * x2 + w3 * x3 + w4 * x4 + w5 * x5 + w6 * x6) +
+         " x1: " + x1 + " x2: " + x2 + " x3: " + x3 + " x4: " + x4 + " x5: " + x5 + " x6: " + x6);
+        return w1 * x1 + w2 * x2 + w3 * x3 + w4 * x4 + w5 * x5 + w6 * x6;
+        
+    }
+
 }

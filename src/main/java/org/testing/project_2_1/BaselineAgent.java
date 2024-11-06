@@ -23,7 +23,9 @@ public class BaselineAgent implements Agent {
             int randomIndex = random.nextInt(legalMoves.size());
             move = legalMoves.get(randomIndex);
             gameLogic.takeTurn(move);
+            gameLogic.evaluateBoard();
         }
+
     }
 
     

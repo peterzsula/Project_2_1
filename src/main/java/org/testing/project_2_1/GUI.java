@@ -63,6 +63,7 @@ public class GUI extends Application {
                 // isSinglePlayer = true;
                 isAgentWhite = false;
                 Agent agent = new BaselineAgent();
+
                 CheckersApp game = new CheckersApp(agent, isAgentWhite);
                 try {
                     Stage gameStage = new Stage();
