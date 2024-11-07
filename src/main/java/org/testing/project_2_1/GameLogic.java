@@ -133,7 +133,7 @@ public class GameLogic {
         }
         return availableCaptures;
     }
-
+    
     public ArrayList<Move> getLegalMoves() {
         ArrayList<Move> availableMoves = new ArrayList<>();
         ArrayList<Piece> pieces = getListOfPieces();

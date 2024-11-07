@@ -28,10 +28,10 @@ public class CheckersApp extends Application {
     private Group boardGroup = new Group(); 
     CapturedPiecesTracker capturedPiecesTracker;
 
-    private boolean isPlayerOneTurn = true; // Track the current turn
-    private long previousPlayerOneTime; // Store previous time for undo
-    private long previousPlayerTwoTime; // Store previous time for undo
-    private boolean wasPlayerOneTurnBeforeUndo; // Track which player's turn it was before the last move
+    private boolean isPlayerOneTurn = true;
+    private long previousPlayerOneTime; 
+    private long previousPlayerTwoTime; 
+    private boolean wasPlayerOneTurnBeforeUndo; 
     GameLogic gameLogic;
 
     public Group getBoardGroup() {
@@ -131,7 +131,6 @@ public class CheckersApp extends Application {
     public void resetGUI() {
         pieceGroup.getChildren().clear();
 
-        // Re-add the pieces
         for (Tile[] row : gameLogic.board) {
             for (Tile tile : row) {
                 if (tile.hasPiece()) {
@@ -186,44 +185,49 @@ public class CheckersApp extends Application {
         // Save current times and player turn before making a move
         previousPlayerOneTime = playerOneTimer.getRemainingTimeInSeconds();
         previousPlayerTwoTime = playerTwoTimer.getRemainingTimeInSeconds();
-        wasPlayerOneTurnBeforeUndo = isPlayerOneTurn; // Store turn before the move
-
+        wasPlayerOneTurnBeforeUndo = isPlayerOneTurn;
+    
         piece.pieceDrawer.setOnMouseReleased(e -> {
             Move move = gameLogic.determineMoveType(piece, newX, newY);
             boolean isLegalMove = gameLogic.takeTurn(move);
             piece.pieceDrawer.clearHighlight();
-
+    
             if (isLegalMove) {
+                // Use hasAvailableCaptures to check if the piece can capture again
+                boolean additionalCaptureAvailable = gameLogic.hasAvailableCaptures(piece);
+    
                 if (isPlayerOneTurn) {
                     playerOneTimer.stopCountdown();
                     playerOneTimer.startMove(true);
-                    playerTwoTimer.startCountdown();
+    
+                    if (!additionalCaptureAvailable) {
+                        playerTwoTimer.startCountdown();
+                        isPlayerOneTurn = false; // Toggle turn only if no more captures are available
+                    }
                 } else {
                     playerTwoTimer.stopCountdown();
                     playerTwoTimer.startMove(true);
-                    playerOneTimer.startCountdown();
+    
+                    if (!additionalCaptureAvailable) {
+                        playerOneTimer.startCountdown();
+                        isPlayerOneTurn = true; // Toggle turn only if no more captures are available
+                    }
                 }
-                isPlayerOneTurn = !isPlayerOneTurn; // Toggle turn
             }
         });
     }
-
+    
     public void undoLastMove() {
-        // Pause both timers
         playerOneTimer.stopCountdown();
         playerTwoTimer.stopCountdown();
 
-        // Undo the last move
         gameLogic.undoLastMove();
 
-        // Restore the previous times for each player
-        playerOneTimer.setTotalTime(previousPlayerOneTime * 1000); // Convert back to milliseconds
+        playerOneTimer.setTotalTime(previousPlayerOneTime * 1000);
         playerTwoTimer.setTotalTime(previousPlayerTwoTime * 1000);
 
-        // Restore the turn to the player who made the move before the last move
         isPlayerOneTurn = wasPlayerOneTurnBeforeUndo;
 
-        // Restart the timer for the correct player without toggling `isPlayerOneTurn`
         if (isPlayerOneTurn) {
             playerOneTimer.startCountdown();
         } else {
