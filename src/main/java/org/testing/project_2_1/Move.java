@@ -55,5 +55,9 @@ public abstract class Move {
     public boolean isCapture() {
         return type == MoveType.CAPTURE;
     }
+
+    public boolean isNormal() {
+        return type == MoveType.NORMAL;
+    }
     
 }

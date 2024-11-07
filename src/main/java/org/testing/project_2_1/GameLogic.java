@@ -317,7 +317,7 @@ public class GameLogic {
             turnCounter--;
             switchTurn();
         }
-        else if (lastMove.type == MoveType.CAPTURE) {
+        else if (lastMove.isCapture()) {
             // TODO: implement undo for captures
         }
     }
