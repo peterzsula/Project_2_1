@@ -64,7 +64,7 @@ public class GameLogic {
         }
     }
 
-    public void resetGame(){
+    public void restartGame(){
         isWhiteTurn = true;
         whitePieces.clear();
         blackPieces.clear();
@@ -76,8 +76,7 @@ public class GameLogic {
                 board[x][y].setPiece(null);
             }
         }
-        app.pieceGroup.getChildren().clear();
-        setUpBoard();
+            setUpBoard();
     }
 
     private void switchTurn() {

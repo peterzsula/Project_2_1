@@ -14,8 +14,6 @@ import javafx.stage.Stage;
 import javafx.scene.text.Font;
 import javafx.scene.text.FontWeight;
 
-import java.util.ArrayList;
-
 public class CheckersApp extends Application {
     public static final int TILE_SIZE = 60;
     public static final int SIZE = 10;
@@ -89,9 +87,11 @@ public class CheckersApp extends Application {
         Label playerOneCapturedLabel = new Label("Captured Pieces:");
         Label playerTwoCapturedLabel = new Label("Captured Pieces:");
 
-        Button resetButton = new Button("RESET");
-        resetButton.setOnAction(e -> {gameLogic.resetGame();
-        });
+        Button resetButton = new Button("RESTART");
+        resetButton.setOnAction(e -> {
+            gameLogic.restartGame();
+            resetGIU();
+                });
         Button undoButton = new Button("UNDO");
         undoButton.setOnAction(e -> gameLogic.undoLastMove());
 
@@ -128,6 +128,26 @@ public class CheckersApp extends Application {
         return root;
     }
 
+    public void resetGIU() {
+        pieceGroup.getChildren().clear();
+
+        // Re-add the pieces
+        for (Tile[] row : gameLogic.board) {
+            for (Tile tile : row) {
+                if (tile.hasPiece()) {
+                    Piece piece = tile.getPiece();
+                    piece.setPieceDrawer(new PieceDrawer(piece, this));
+                    pieceGroup.getChildren().add(piece.pieceDrawer);
+                }
+            }
+        }
+
+        isPlayerOneTurn = true;
+        playerOneTimer.startCountdown();
+        playerTwoTimer.startCountdown();
+
+    }
+
     public void addPiecestoBoard(Pane boardPane){
         for (Tile[] row : gameLogic.board) {
             for (Tile tile : row) {
@@ -144,6 +164,7 @@ public class CheckersApp extends Application {
         boardPane.getChildren().add(boardGroup);
 
     }
+
 
     private void styleLabel(Label label, int fontSize, String textColor) {
         label.setStyle("-fx-font-size: " + fontSize + "px; -fx-font-weight: bold; -fx-text-fill: " + textColor + ";");
