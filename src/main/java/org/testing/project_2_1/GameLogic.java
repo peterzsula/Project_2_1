@@ -8,16 +8,16 @@ import java.util.Set;
 import javafx.scene.layout.Pane;
 
 public class GameLogic {
-    public Tile[][] board = new Tile[SIZE][SIZE];
-    public boolean isWhiteTurn;
-    public int turnCounter;
-    public ArrayList<Piece> whitePieces;
-    public ArrayList<Piece> blackPieces;
+    public static Tile[][] board = new Tile[SIZE][SIZE];
+    public static boolean isWhiteTurn;
+    public static int turnCounter;
+    public static ArrayList<Piece> whitePieces;
+    public static ArrayList<Piece> blackPieces;
     public ArrayList<Capture> availableCaptures;
     public CheckersApp app;
     private Agent agent;
     public boolean isAgentWhite;
-    public ArrayList<Move> movesPlayed = new ArrayList<Move>();
+    public static ArrayList<Move> movesPlayed = new ArrayList<Move>();
 
     public GameLogic(CheckersApp app) {
         this.agent = null;
@@ -44,7 +44,7 @@ public class GameLogic {
         setUpBoard();
     }
 
-    private void setUpBoard(){
+    public static void setUpBoard(){
         for (int y = 0; y < SIZE; y++) {
             for (int x = 0; x < SIZE; x++) {
                 Tile tile = new Tile(x, y);
@@ -65,24 +65,19 @@ public class GameLogic {
     }
 
     public void resetGame(){
-        //TODO: reset only implemented in game logic, should implemented in checkers app too
-        for (int y = 0; y < SIZE; y++) {
-            for (int x = 0; x < SIZE; x++) {
-                Tile tile = board[x][y];
-                if (tile.hasPiece()) {
-                    app.pieceGroup.getChildren().remove(tile.getPiece().pieceDrawer);
-                    tile.setPiece(null);
-                }
-            }
-        }
         isWhiteTurn = true;
         whitePieces.clear();
         blackPieces.clear();
-        setUpBoard();
-        app.createContent();
-        isWhiteTurn = true;
         turnCounter = 0;
         movesPlayed.clear();
+
+        for (int y = 0; y < SIZE; y++) {
+            for (int x = 0; x < SIZE; x++) {
+                board[x][y].setPiece(null);
+            }
+        }
+        app.pieceGroup.getChildren().clear();
+        setUpBoard();
     }
 
     private void switchTurn() {

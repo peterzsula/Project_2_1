@@ -14,6 +14,8 @@ import javafx.stage.Stage;
 import javafx.scene.text.Font;
 import javafx.scene.text.FontWeight;
 
+import java.util.ArrayList;
+
 public class CheckersApp extends Application {
     public static final int TILE_SIZE = 60;
     public static final int SIZE = 10;
@@ -56,11 +58,6 @@ public class CheckersApp extends Application {
         playerOneTimer.startCountdown();
     }
 
-    public void resetGame() {
-        //TODO: Implement resetGame method
-        gameLogic.resetGame();
-    }
-
     public Parent createContent() {
         Pane boardPane = new Pane();
         boardPane.setPrefSize(SIZE * TILE_SIZE, SIZE * TILE_SIZE);
@@ -83,19 +80,7 @@ public class CheckersApp extends Application {
         styleLabel(playerOneTimerLabel, 16, "black");
         styleLabel(playerTwoTimerLabel, 16, "black");
 
-        for (Tile[] row : gameLogic.board) {
-            for (Tile tile : row) {
-                tileGroup.getChildren().add(tile.tileDrawer);
-                if (tile.hasPiece()) {
-                    Piece piece = tile.getPiece();
-                    piece.setPieceDrawer(new PieceDrawer(piece, this));
-                    pieceGroup.getChildren().add(piece.pieceDrawer);
-                }
-            }
-        }
-
-        boardGroup.getChildren().addAll(tileGroup, pieceGroup);
-        boardPane.getChildren().add(boardGroup);
+        addPiecestoBoard(boardPane);
 
         Label playerOneTitle = new Label("PLAYER 1");
         Label playerTwoTitle = new Label("PLAYER 2");
@@ -105,7 +90,8 @@ public class CheckersApp extends Application {
         Label playerTwoCapturedLabel = new Label("Captured Pieces:");
 
         Button resetButton = new Button("RESET");
-        resetButton.setOnAction(e -> gameLogic.resetGame());
+        resetButton.setOnAction(e -> {gameLogic.resetGame();
+        });
         Button undoButton = new Button("UNDO");
         undoButton.setOnAction(e -> gameLogic.undoLastMove());
 
@@ -140,6 +126,23 @@ public class CheckersApp extends Application {
         root.setSpacing(20);
 
         return root;
+    }
+
+    public void addPiecestoBoard(Pane boardPane){
+        for (Tile[] row : gameLogic.board) {
+            for (Tile tile : row) {
+                tileGroup.getChildren().add(tile.tileDrawer);
+                if (tile.hasPiece()) {
+                    Piece piece = tile.getPiece();
+                    piece.setPieceDrawer(new PieceDrawer(piece, this));
+                    pieceGroup.getChildren().add(piece.pieceDrawer);
+                }
+            }
+        }
+
+        boardGroup.getChildren().addAll(tileGroup, pieceGroup);
+        boardPane.getChildren().add(boardGroup);
+
     }
 
     private void styleLabel(Label label, int fontSize, String textColor) {
