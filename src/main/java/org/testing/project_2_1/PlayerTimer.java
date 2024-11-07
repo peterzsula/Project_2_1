@@ -6,15 +6,17 @@ import javafx.application.Platform;
 import javafx.scene.control.Label;
 
 public class PlayerTimer {
-    private long totalTime;       
+    private long totalTime;
+    private final long initialTotalTime;
     private final long increment; 
     private Timer timer;
     private TimerTask task;
     private boolean isRunning;
     private final Label timerLabel;
 
-    public PlayerTimer(Label timerLabel, long incrementMillis) {
-        this.totalTime = 300_000; 
+    public PlayerTimer(Label timerLabel, long initialTotalTimeMillis, long incrementMillis) {
+        this.totalTime = 300_000;
+        this.initialTotalTime = initialTotalTimeMillis;
         this.increment = incrementMillis;
         this.timerLabel = timerLabel;
         this.isRunning = false;
@@ -66,6 +68,12 @@ public class PlayerTimer {
         timerLabel.setText(String.format("%02d:%02d", minutes, seconds));
     }
 
+    public void reset() {
+        stopCountdown();
+        totalTime = initialTotalTime;
+        isRunning = false;
+        updateLabel();
+    }
     public long getRemainingTimeInSeconds() {
         return totalTime / 1000;
     }

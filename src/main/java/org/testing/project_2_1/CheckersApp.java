@@ -23,7 +23,6 @@ public class CheckersApp extends Application {
     private Label captureMessageLabel;
     private PlayerTimer playerOneTimer;
     private PlayerTimer playerTwoTimer;
-
     private Group tileGroup = new Group();
     public Group pieceGroup = new Group();
     private Group boardGroup = new Group(); 
@@ -69,8 +68,8 @@ public class CheckersApp extends Application {
         playerOneTimerLabel = new Label("05:00");
         playerTwoTimerLabel = new Label("05:00");
 
-        playerOneTimer = new PlayerTimer(playerOneTimerLabel, 5000); 
-        playerTwoTimer = new PlayerTimer(playerTwoTimerLabel, 5000); 
+        playerOneTimer = new PlayerTimer(playerOneTimerLabel, 300_000,5000);
+        playerTwoTimer = new PlayerTimer(playerTwoTimerLabel, 300_000, 5000);
 
         playerOneTimer.setTotalTime(300_000);
         playerTwoTimer.setTotalTime(300_000);
@@ -143,8 +142,8 @@ public class CheckersApp extends Application {
         }
 
         isPlayerOneTurn = true;
-        playerOneTimer.startCountdown();
-        playerTwoTimer.startCountdown();
+        playerOneTimer.reset();
+        playerTwoTimer.reset();
 
     }
 
