@@ -144,6 +144,7 @@ public class CheckersApp extends Application {
         isPlayerOneTurn = true;
         playerOneTimer.reset();
         playerTwoTimer.reset();
+        playerOneTimer.startCountdown();
 
     }
 
