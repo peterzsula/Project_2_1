@@ -624,4 +624,14 @@ public class GameLogic {
         
     }
 
+    // Timer 
+    public void processMove(PlayerTimer currentPlayerTimer, PlayerTimer opponentTimer, boolean isLegalMove) {
+        currentPlayerTimer.startMove(isLegalMove);  // Stops and increments current player's timer if the move is legal
+        
+        if (isLegalMove) {
+            opponentTimer.startCountdown();  // Start the opponent's timer
+        }
+    }
+
+
 }

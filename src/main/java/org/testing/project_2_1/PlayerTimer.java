@@ -28,10 +28,12 @@ public class PlayerTimer {
         updateLabel();
     }
 
-    public void startMove() {
-        stopCountdown();      
-        totalTime += increment; 
-        updateLabel();         
+    public void startMove(boolean isLegalMove) {
+        if (isLegalMove) {
+            stopCountdown();  
+            totalTime += increment;  
+            updateLabel();  
+        }
     }
 
     public void startCountdown() {
