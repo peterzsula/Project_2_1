@@ -8,32 +8,37 @@ import java.util.Set;
 import javafx.scene.layout.Pane;
 
 public class GameLogic {
-    public static Tile[][] board = new Tile[SIZE][SIZE];
-    public static boolean isWhiteTurn;
-    public static int turnCounter;
-    public static ArrayList<Piece> whitePieces;
-    public static ArrayList<Piece> blackPieces;
+    public Tile[][] board = new Tile[SIZE][SIZE];
+    public boolean isWhiteTurn;
+    public int turnCounter;
+    public ArrayList<Piece> whitePieces;
+    public ArrayList<Piece> blackPieces;
     public ArrayList<Capture> availableCaptures;
     public CheckersApp app;
-    private Agent agent;
-    public boolean isAgentWhite;
-    public static ArrayList<Move> movesPlayed = new ArrayList<Move>();
+    public Agent agent;
+    public Agent opponent;
+    public ArrayList<Move> movesPlayed = new ArrayList<Move>();
 
     public GameLogic(CheckersApp app) {
         this.agent = null;
-        this.app = app;
-        new Pane(); // for some reason this is needed to avoid a null pointer exception
-        isWhiteTurn = true;
-        turnCounter = 0;
-        whitePieces = new ArrayList<>();
-        blackPieces = new ArrayList<>();
-        availableCaptures = new ArrayList<>();
-        setUpBoard();
+        setStandardValues(app);
     }
 
     public GameLogic(CheckersApp app, Agent agent, boolean isAgentWhite) {
-        this.isAgentWhite = isAgentWhite;
         this.agent = agent;
+        agent.setGameLogic(this);
+        setStandardValues(app); 
+    }
+
+    public GameLogic(CheckersApp app, Agent agent1, Agent agent2) {
+        this.agent = agent1;
+        this.opponent = agent2;
+        agent1.setGameLogic(this);
+        agent2.setGameLogic(this);
+        setStandardValues(app);
+    }
+
+    public void setStandardValues(CheckersApp app) {
         this.app = app;
         new Pane(); // for some reason this is needed to avoid a null pointer exception
         isWhiteTurn = true;
@@ -44,11 +49,11 @@ public class GameLogic {
         setUpBoard();
     }
 
-    public static void setUpBoard(){
+    public void setUpBoard(){
         for (int y = 0; y < SIZE; y++) {
             for (int x = 0; x < SIZE; x++) {
                 Tile tile = new Tile(x, y);
-                board[x][y] = tile;
+                this.board[x][y] = tile;
 
                 if (y <= 3 && tile.isBlack()) {
                     Piece piece = new Piece(PieceType.BLACK, x, y);
@@ -92,8 +97,11 @@ public class GameLogic {
         }
         availableCaptures = checkAvailableCaptures();
         printAvailableCaptures();
-        if (agent != null && isAgentWhite == isWhiteTurn) {
+        if (agent != null && agent.isWhite() == isWhiteTurn) {
             agent.makeMove();
+        }
+        if (opponent != null && agent.isWhite() != isWhiteTurn) {
+            opponent.makeMove();
         }
     }
 

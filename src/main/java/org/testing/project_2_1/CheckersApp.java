@@ -17,6 +17,7 @@ import javafx.scene.text.FontWeight;
 public class CheckersApp extends Application {
     public static final int TILE_SIZE = 60;
     public static final int SIZE = 10;
+    public int noOfPlayers = 0;
 
     private Label playerOneTimerLabel;
     private Label playerTwoTimerLabel;
@@ -37,11 +38,20 @@ public class CheckersApp extends Application {
 
     public CheckersApp() {
         gameLogic = new GameLogic(this);
+        noOfPlayers = 2;
     }
 
     public CheckersApp(Agent agent, boolean isAgentWhite) {
         gameLogic = new GameLogic(this, agent, isAgentWhite);
         agent.setGameLogic(gameLogic);
+        noOfPlayers = 1;
+    }
+
+    public CheckersApp(Agent agent1, Agent agent2) {
+        gameLogic = new GameLogic(this, agent1, agent2);
+        agent1.setGameLogic(gameLogic);
+        agent2.setGameLogic(gameLogic);
+        noOfPlayers = 0;
     }
 
 
@@ -53,10 +63,13 @@ public class CheckersApp extends Application {
         primaryStage.show();
 
         playerOneTimer.startCountdown();
+        if (noOfPlayers == 0 || (!isPlayerOneTurn && noOfPlayers == 1)) {
+            gameLogic.agent.makeMove();
+        }
     }
 
     public Parent createContent() {
-        Pane boardPane = new Pane();
+    Pane boardPane = new Pane();
         boardPane.setPrefSize(SIZE * TILE_SIZE, SIZE * TILE_SIZE);
         //label to tell you when to capture
         captureMessageLabel = new Label();
@@ -123,7 +136,6 @@ public class CheckersApp extends Application {
         HBox root = new HBox();
         root.getChildren().addAll(boardPane, rightPanel, resetButton, undoButton);
         root.setSpacing(20);
-
         return root;
     }
 
@@ -145,7 +157,11 @@ public class CheckersApp extends Application {
         playerOneTimer.reset();
         playerTwoTimer.reset();
         playerOneTimer.startCountdown();
-
+        playerTwoTimer.stopCountdown();
+        
+        if (noOfPlayers == 0 || (!isPlayerOneTurn && noOfPlayers == 1)) {
+            gameLogic.agent.makeMove();
+        }
     }
 
     public void addPiecestoBoard(Pane boardPane){

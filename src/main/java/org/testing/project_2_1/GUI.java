@@ -32,7 +32,7 @@ public class GUI extends Application {
         gameTitle.setLayoutY(50); 
 
         ComboBox<String> playerSelection = new ComboBox<>();
-        playerSelection.getItems().addAll("1 Player", "2 Players");
+        playerSelection.getItems().addAll("NI vs AI", " NI vs NI", "AI vs AI");
         playerSelection.setValue("Select Players");
         playerSelection.setLayoutX(125); 
         playerSelection.setLayoutY(190);
@@ -48,29 +48,31 @@ public class GUI extends Application {
         startGameButton.setOnMouseEntered(e -> startGameButton.setStyle("-fx-background-color: #7CFC00; -fx-text-fill: white; -fx-font-size: 18px; -fx-padding: 10px 20px;"));
         startGameButton.setOnMouseExited(e -> startGameButton.setStyle("-fx-background-color: #90EE90; -fx-text-fill: white; -fx-font-size: 18px; -fx-padding: 10px 20px;"));
 
+        
         startGameButton.setOnAction(e -> {
-            String selected = playerSelection.getValue();
-            if (selected.equals("2 Players")) {
-                selectionStage.close();  
-                try {
-                    CheckersApp game = new CheckersApp();
-                    Stage gameStage = new Stage();
-                    game.start(gameStage);
-                } catch (Exception ex) {
-                    ex.printStackTrace();
-                }
-            } else if (selected.equals("1 Player")) {
-                // isSinglePlayer = true;
-                isAgentWhite = false;
-                Agent agent = new BaselineAgent();
-
-                CheckersApp game = new CheckersApp(agent, isAgentWhite);
-                try {
-                    Stage gameStage = new Stage();
-                    game.start(gameStage);
-                } catch (Exception ex) {
-                    ex.printStackTrace();
-                }
+            CheckersApp game = null;
+            switch (playerSelection.getValue()) {
+                case "NI vs NI":
+                    game = new CheckersApp();
+                    selectionStage.close();  
+                    break;
+                case "NI vs AI":
+                    isAgentWhite = false;
+                    Agent agent = new BaselineAgent(false);
+                    game = new CheckersApp(agent, isAgentWhite);
+                    break;
+                case "AI vs AI":
+                    Agent agent1 = new BaselineAgent(true);
+                    Agent agent2 = new BaselineAgent(false);
+                    game = new CheckersApp(agent1, agent2);
+                    break;
+                default:
+                    break;
+            }
+            try {
+                game.start(new Stage());
+            } catch (Exception ex) {
+                ex.printStackTrace();
             }
         });
 

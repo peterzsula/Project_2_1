@@ -7,6 +7,7 @@ import java.util.Set;
 
 // TODO: this is just CoPilot code, not the actual implementation
 public class AlphaBetaSearch implements Agent {
+    private boolean isWhite;
     private GameLogic gameLogic;
     private int maxDepth;
     private int nodesVisited;
@@ -92,6 +93,11 @@ public class AlphaBetaSearch implements Agent {
             beta = Math.min(beta, value);
         }
         return value;
+    }
+
+    @Override
+    public boolean isWhite() {
+        return isWhite;
     }
     
     
