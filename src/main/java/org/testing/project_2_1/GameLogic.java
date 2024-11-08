@@ -13,7 +13,7 @@ public class GameLogic {
     public int turnCounter;
     public ArrayList<Piece> whitePieces;
     public ArrayList<Piece> blackPieces;
-    public ArrayList<Capture> availableCaptures;
+    public ArrayList<Move> availableCaptures;
     public CheckersApp app;
     public Agent agent;
     public Agent opponent;
@@ -95,7 +95,7 @@ public class GameLogic {
         else {
             System.out.println("Black's turn");
         }
-        availableCaptures = checkAvailableCaptures();
+        availableCaptures = getAvailableCaptures();
         printAvailableCaptures();
         if (agent != null && agent.isWhite() == isWhiteTurn) {
             agent.makeMove();
@@ -105,10 +105,10 @@ public class GameLogic {
         }
     }
 
+    public ArrayList<Move> getAvailableCaptures() {
     //check all available captures for current player
-    public ArrayList<Capture> checkAvailableCaptures() {
         // TODO: improve complexity: improved to O(n^3)/2 from O(n^3)
-        ArrayList<Capture> availableCaptures = new ArrayList<>();
+        ArrayList<Move> availableCaptures = new ArrayList<>();
         ArrayList<Piece> pieces = getListOfPieces();
         for (Piece piece : pieces) {
             for (int row = 0; row < board.length; row++) {
@@ -126,9 +126,9 @@ public class GameLogic {
     }
 
     //check all available captures for current piece
-    public ArrayList<Capture> checkAvailableCaptures(Piece piece) {
+    public ArrayList<Move> checkAvailableCaptures(Piece piece) {
         // TODO: improve complexity: improved to O(n^3)/2 from O(n^3)
-        ArrayList<Capture> availableCaptures = new ArrayList<>();
+        ArrayList<Move> availableCaptures = new ArrayList<>();
         for (int row = 0; row < board.length; row++) {
             int startCol = (row % 2 == 0) ? 1 : 0;
             for (int col = startCol; col < board.length; col += 2){
@@ -146,9 +146,34 @@ public class GameLogic {
         ArrayList<Move> availableMoves = new ArrayList<>();
         ArrayList<Piece> pieces = getListOfPieces();
         boolean capturesAvailable = hasAvailableCaptures();
-                
-        for (Piece piece : pieces) {
-            //TODO: instead of iterating over all black tiles, iterate over all tiles where the piece can move
+        if (capturesAvailable) {
+            return getAvailableCaptures();
+        }
+        else {
+            System.out.println("no available captures line 153");
+            for (Piece piece : pieces) {
+                //TODO: instead of iterating over all black tiles, iterate over all tiles where the piece can move
+                for (int row = 0; row < board.length; row++) {
+                    int startCol = (row % 2 == 0) ? 1 : 0;
+                    for (int col = startCol; col < board.length; col += 2){
+                        Move move = determineMoveType(piece, row, col);
+                        if (move.getType() == MoveType.NORMAL) {
+                            availableMoves.add(move);
+                        }
+                    }
+                }
+            }
+        }      
+        return availableMoves;
+    }
+
+    public ArrayList<Move> getLegalMoves(Piece piece) {
+        ArrayList<Move> availableMoves = new ArrayList<>();
+        boolean capturesAvailable = hasAvailableCaptures();
+        if (capturesAvailable) {
+            availableCaptures = checkAvailableCaptures(piece);
+        }
+        else {
             for (int row = 0; row < board.length; row++) {
                 int startCol = (row % 2 == 0) ? 1 : 0;
                 for (int col = startCol; col < board.length; col += 2){
@@ -156,7 +181,7 @@ public class GameLogic {
                     if (capturesAvailable && move.getType() == MoveType.CAPTURE) {
                         availableMoves.add(move);
                     }
-                    else if (move.getType() == MoveType.NORMAL) {
+                    else if (!capturesAvailable && move.getType() == MoveType.NORMAL) {
                         availableMoves.add(move);
                     }
                 }
@@ -165,27 +190,8 @@ public class GameLogic {
         return availableMoves;
     }
 
-    public ArrayList<Move> getLegalMoves(Piece piece) {
-        ArrayList<Move> availableMoves = new ArrayList<>();
-        boolean capturesAvailable = hasAvailableCaptures(piece);
-        //TODO: instead of iterating over all black tiles, iterate over all tiles where the piece can move
-        for (int row = 0; row < board.length; row++) {
-            int startCol = (row % 2 == 0) ? 1 : 0;
-            for (int col = startCol; col < board.length; col += 2){
-                Move move = determineMoveType(piece, row, col);
-                if (capturesAvailable && move.getType() == MoveType.CAPTURE) {
-                    availableMoves.add(move);
-                }
-                else if (move.getType() == MoveType.NORMAL) {
-                    availableMoves.add(move);
-                }
-            }
-        }
-        return availableMoves;
-    }
-
     public boolean hasAvailableCaptures(){
-        availableCaptures = checkAvailableCaptures();
+        availableCaptures = getAvailableCaptures();
         if (availableCaptures.size() > 0) {
             return true;
         }
@@ -222,8 +228,7 @@ public class GameLogic {
         // if the move is invalid, abort the move, return false
         if (move.getType() == MoveType.INVALID) {
             piece.pieceDrawer.abortMove();
-            return
-                    false;
+            return false;
         }        
         // If you have available captures with any piece, you must make a capture
         if (hasAvailableCaptures()) {
@@ -231,7 +236,7 @@ public class GameLogic {
             // If the move is a capture, make the move and check for more captures
             if (move.getType() == MoveType.CAPTURE) {
                 movePiece(move);
-                checkAvailableCaptures();
+                getAvailableCaptures();
                 app.updateCaptureMessage(" ");
 
                 //TODO: check if you are moving the piece as before
@@ -571,9 +576,9 @@ public class GameLogic {
     }
 
     public void printAvailableCaptures(){
-        System.out.println("available captures: " + checkAvailableCaptures().size());
-        for (Capture capture : checkAvailableCaptures()) {
-            System.out.println(capture.toString());
+        System.out.println("available captures: " + getAvailableCaptures().size());
+        for (Move move : getAvailableCaptures()) {
+            System.out.println(move.toString());
         }
     }
 

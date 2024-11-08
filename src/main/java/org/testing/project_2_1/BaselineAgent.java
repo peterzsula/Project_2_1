@@ -26,15 +26,16 @@ public class BaselineAgent implements Agent {
     @Override
     public void makeMove() {
         System.out.println("Baseline agent making move");
-        PauseTransition pause = new PauseTransition(Duration.seconds(0.5));
+        PauseTransition pause = new PauseTransition(Duration.seconds(Agent.delay));
         pause.setOnFinished(event -> {
-        if (gameLogic.isWhiteTurn == isWhite && !gameLogic.isGameOver()) {
+        while (gameLogic.isWhiteTurn == isWhite && !gameLogic.isGameOver()) {
             ArrayList<Move> legalMoves = gameLogic.getLegalMoves();
+            System.out.println("Legal moves: " + legalMoves.size());
             int randomIndex = new Random().nextInt(legalMoves.size());
             Move move = legalMoves.get(randomIndex);
+            System.out.println("Take turn with move " + move);
             gameLogic.takeTurn(move);
             gameLogic.evaluateBoard();
-            pause.playFromStart(); // Restart the pause for the next move
         }
     });
     pause.play();

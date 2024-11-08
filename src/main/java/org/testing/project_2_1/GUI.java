@@ -32,7 +32,7 @@ public class GUI extends Application {
         gameTitle.setLayoutY(50); 
 
         ComboBox<String> playerSelection = new ComboBox<>();
-        playerSelection.getItems().addAll("NI vs AI", " NI vs NI", "AI vs AI");
+        playerSelection.getItems().addAll("NI vs AI", "NI vs NI", "AI vs AI");
         playerSelection.setValue("Select Players");
         playerSelection.setLayoutX(125); 
         playerSelection.setLayoutY(190);
@@ -53,8 +53,8 @@ public class GUI extends Application {
             CheckersApp game = null;
             switch (playerSelection.getValue()) {
                 case "NI vs NI":
-                    game = new CheckersApp();
-                    selectionStage.close();  
+                    System.out.println("NI vs NI");
+                    game = new CheckersApp(); 
                     break;
                 case "NI vs AI":
                     isAgentWhite = false;
