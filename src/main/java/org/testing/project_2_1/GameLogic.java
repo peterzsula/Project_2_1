@@ -141,7 +141,7 @@ public class GameLogic {
         }
         return availableCaptures;
     }
-
+    
     public ArrayList<Move> getLegalMoves() {
         ArrayList<Move> availableMoves = new ArrayList<>();
         ArrayList<Piece> pieces = getListOfPieces();
@@ -631,5 +631,15 @@ public class GameLogic {
         return w1 * x1 + w2 * x2 + w3 * x3 + w4 * x4 + w5 * x5 + w6 * x6;
         
     }
+
+    // Timer 
+    public void processMove(PlayerTimer currentPlayerTimer, PlayerTimer opponentTimer, boolean isLegalMove) {
+        currentPlayerTimer.startMove(isLegalMove);  // Stops and increments current player's timer if the move is legal
+        
+        if (isLegalMove) {
+            opponentTimer.startCountdown();  // Start the opponent's timer
+        }
+    }
+
 
 }

@@ -29,7 +29,10 @@ public class CheckersApp extends Application {
     private Group boardGroup = new Group(); 
     CapturedPiecesTracker capturedPiecesTracker;
 
-    private boolean isPlayerOneTurn = true; // Track the current turn
+    private boolean isPlayerOneTurn = true;
+    private long previousPlayerOneTime; 
+    private long previousPlayerTwoTime; 
+    private boolean wasPlayerOneTurnBeforeUndo; 
     GameLogic gameLogic;
 
     public Group getBoardGroup() {
@@ -71,7 +74,8 @@ public class CheckersApp extends Application {
     public Parent createContent() {
     Pane boardPane = new Pane();
         boardPane.setPrefSize(SIZE * TILE_SIZE, SIZE * TILE_SIZE);
-        //label to tell you when to capture
+
+        // Label to tell you when to capture
         captureMessageLabel = new Label();
         captureMessageLabel.setFont(new Font("Arial", 16));
         captureMessageLabel.setStyle("-fx-text-fill: red; -fx-font-weight: bold;");
@@ -81,7 +85,7 @@ public class CheckersApp extends Application {
         playerOneTimerLabel = new Label("05:00");
         playerTwoTimerLabel = new Label("05:00");
 
-        playerOneTimer = new PlayerTimer(playerOneTimerLabel, 300_000,5000);
+        playerOneTimer = new PlayerTimer(playerOneTimerLabel, 300_000, 5000);
         playerTwoTimer = new PlayerTimer(playerTwoTimerLabel, 300_000, 5000);
 
         playerOneTimer.setTotalTime(300_000);
@@ -102,11 +106,10 @@ public class CheckersApp extends Application {
         Button resetButton = new Button("RESTART");
         resetButton.setOnAction(e -> {
             gameLogic.restartGame();
-            resetGIU();
-                });
+            resetGUI();
+        });
         Button undoButton = new Button("UNDO");
-        undoButton.setOnAction(e -> gameLogic.undoLastMove());
-
+        undoButton.setOnAction(e -> undoLastMove());
 
         styleTitle(playerOneTitle);
         styleTitle(playerTwoTitle);      
@@ -123,7 +126,6 @@ public class CheckersApp extends Application {
         VBox playerTwoBox = new VBox(10, playerTwoTitle, playerTwoTimeLabel, playerTwoTimerLabel, 
                                      playerTwoCapturedLabel, playerTwoCapturedCount);
 
-        
         playerOneBox.setStyle("-fx-background-color: #f0f8ff; -fx-border-color: #b0b0b0; -fx-border-width: 2px; -fx-border-radius: 5px;");
         playerTwoBox.setStyle("-fx-background-color: #f0f8ff; -fx-border-color: #b0b0b0; -fx-border-width: 2px; -fx-border-radius: 5px;");
         playerOneBox.setPadding(new Insets(15));
@@ -139,10 +141,9 @@ public class CheckersApp extends Application {
         return root;
     }
 
-    public void resetGIU() {
+    public void resetGUI() {
         pieceGroup.getChildren().clear();
 
-        // Re-add the pieces
         for (Tile[] row : gameLogic.board) {
             for (Tile tile : row) {
                 if (tile.hasPiece()) {
@@ -164,7 +165,7 @@ public class CheckersApp extends Application {
         }
     }
 
-    public void addPiecestoBoard(Pane boardPane){
+    public void addPiecestoBoard(Pane boardPane) {
         for (Tile[] row : gameLogic.board) {
             for (Tile tile : row) {
                 tileGroup.getChildren().add(tile.tileDrawer);
@@ -178,9 +179,7 @@ public class CheckersApp extends Application {
 
         boardGroup.getChildren().addAll(tileGroup, pieceGroup);
         boardPane.getChildren().add(boardGroup);
-
     }
-
 
     private void styleLabel(Label label, int fontSize, String textColor) {
         label.setStyle("-fx-font-size: " + fontSize + "px; -fx-font-weight: bold; -fx-text-fill: " + textColor + ";");
@@ -195,30 +194,65 @@ public class CheckersApp extends Application {
         infoLabel.setFont(Font.font("Arial", FontWeight.SEMI_BOLD, 14));
         infoLabel.setStyle("-fx-text-fill: black;");
     }
+
     public void updateCaptureMessage(String message) {
         captureMessageLabel.setText(message);
     }
 
     public void movePiece(Piece piece, int newX, int newY) {
+        // Save current times and player turn before making a move
+        previousPlayerOneTime = playerOneTimer.getRemainingTimeInSeconds();
+        previousPlayerTwoTime = playerTwoTimer.getRemainingTimeInSeconds();
+        wasPlayerOneTurnBeforeUndo = isPlayerOneTurn;
+    
         piece.pieceDrawer.setOnMouseReleased(e -> {
             Move move = gameLogic.determineMoveType(piece, newX, newY);
-            gameLogic.takeTurn(move);
-            piece.pieceDrawer.clearHighlight(); 
+            boolean isLegalMove = gameLogic.takeTurn(move);
+            piece.pieceDrawer.clearHighlight();
     
-            if (isPlayerOneTurn) {
-                playerOneTimer.stopCountdown();  
-                playerOneTimer.startMove();      
-                playerTwoTimer.startCountdown(); 
-            } else {
-                playerTwoTimer.stopCountdown();  
-                playerTwoTimer.startMove();      
-                playerOneTimer.startCountdown(); 
+            if (isLegalMove) {
+                // Use hasAvailableCaptures to check if the piece can capture again
+                boolean additionalCaptureAvailable = gameLogic.hasAvailableCaptures(piece);
+    
+                if (isPlayerOneTurn) {
+                    playerOneTimer.stopCountdown();
+                    playerOneTimer.startMove(true);
+    
+                    if (!additionalCaptureAvailable) {
+                        playerTwoTimer.startCountdown();
+                        isPlayerOneTurn = false; // Toggle turn only if no more captures are available
+                    }
+                } else {
+                    playerTwoTimer.stopCountdown();
+                    playerTwoTimer.startMove(true);
+    
+                    if (!additionalCaptureAvailable) {
+                        playerOneTimer.startCountdown();
+                        isPlayerOneTurn = true; // Toggle turn only if no more captures are available
+                    }
+                }
             }
-
-            isPlayerOneTurn = !isPlayerOneTurn;
         });
     }
     
+    public void undoLastMove() {
+        playerOneTimer.stopCountdown();
+        playerTwoTimer.stopCountdown();
+
+        gameLogic.undoLastMove();
+
+        playerOneTimer.setTotalTime(previousPlayerOneTime * 1000);
+        playerTwoTimer.setTotalTime(previousPlayerTwoTime * 1000);
+
+        isPlayerOneTurn = wasPlayerOneTurnBeforeUndo;
+
+        if (isPlayerOneTurn) {
+            playerOneTimer.startCountdown();
+        } else {
+            playerTwoTimer.startCountdown();
+        }
+    }
+
     public static void main(String[] args) {
         launch(args);
     }
