@@ -1,11 +1,13 @@
-package org.testing.project_2_1;
+package org.testing.project_2_1.GUI;
+
+import org.testing.project_2_1.GameLogic.Tile;
 
 import javafx.scene.paint.Color;
 import javafx.scene.shape.Rectangle;
 
 public class TileDrawer extends Rectangle {
     Tile tile;
-    TileDrawer(Tile tile){
+    public TileDrawer(Tile tile){
         setWidth(CheckersApp.TILE_SIZE);
         setHeight(CheckersApp.TILE_SIZE);
 

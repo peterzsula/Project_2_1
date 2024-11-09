@@ -1,4 +1,4 @@
-package org.testing.project_2_1;
+package org.testing.project_2_1.GUI;
 
 import javafx.geometry.Insets;
 import javafx.scene.control.Label;
@@ -9,8 +9,8 @@ public class CapturedPiecesTracker {
     private int blackCaptured = 0;
     private int whiteCaptured = 0;
 
-    Label blackCapturedLabel;
-    Label whiteCapturedLabel;
+    public Label blackCapturedLabel;
+    public Label whiteCapturedLabel;
 
     private int playerOneCapturedCount = 0;
     private int playerTwoCapturedCount = 0;

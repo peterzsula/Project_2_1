@@ -1,4 +1,4 @@
-package org.testing.project_2_1;
+package org.testing.project_2_1.GameLogic;
 
 public enum PieceType {
     BLACK(1, "black"),
@@ -6,8 +6,8 @@ public enum PieceType {
     BLACKKING(0, "black"),
     WHITEKING(0, "white");
 
-    final int moveDir;
-    final String color;
+    public final int moveDir;
+    public final String color;
 
     PieceType(int moveDir, String color) {
         this.moveDir = moveDir;

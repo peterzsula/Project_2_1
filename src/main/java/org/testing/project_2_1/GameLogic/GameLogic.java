@@ -1,6 +1,16 @@
-package org.testing.project_2_1;
+package org.testing.project_2_1.GameLogic;
 
-import static org.testing.project_2_1.CheckersApp.SIZE;
+import org.testing.project_2_1.Agents.Agent;
+import org.testing.project_2_1.GUI.CheckersApp;
+import org.testing.project_2_1.GUI.PlayerTimer;
+import org.testing.project_2_1.Moves.Capture;
+import org.testing.project_2_1.Moves.InvalidMove;
+import org.testing.project_2_1.Moves.Move;
+import org.testing.project_2_1.Moves.MoveType;
+import org.testing.project_2_1.Moves.NormalMove;
+
+import static org.testing.project_2_1.GUI.CheckersApp.SIZE;
+
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.Set;
@@ -317,15 +327,15 @@ public class GameLogic {
     public void undoLastMove() {
         Move lastMove = movesPlayed.get(movesPlayed.size() - 1);
         Piece piece = lastMove.getPiece();
-        if (lastMove.type == MoveType.NORMAL) {
+        if (lastMove.getType() == MoveType.NORMAL) {
             if (promotedLastMove(lastMove)) {
                 piece.demoteToNormal();   
             }
-            piece.x = lastMove.fromX;
-            piece.y = lastMove.fromY;
-            board[lastMove.toX][lastMove.toY].setPiece(null);
-            board[lastMove.fromX][lastMove.fromY].setPiece(piece);
-            piece.pieceDrawer.move(lastMove.fromX, lastMove.fromY);
+            piece.x = lastMove.getFromX();
+            piece.y = lastMove.getFromY();
+            board[lastMove.getToX()][lastMove.getToY()].setPiece(null);
+            board[lastMove.getFromX()][lastMove.getFromY()].setPiece(piece);
+            piece.pieceDrawer.move(lastMove.getFromX(), lastMove.getFromY());
             movesPlayed.remove(lastMove);
             turnCounter--;
             switchTurn();
@@ -347,9 +357,9 @@ public class GameLogic {
 
     private boolean promotedLastMove(Move lastMove) {
         Piece piece = lastMove.getPiece();
-        if (piece.getType() == PieceType.BLACK && lastMove.fromY == SIZE - 1) {
+        if (piece.getType() == PieceType.BLACK && lastMove.getFromX() == SIZE - 1) {
             return true;
-        } else if (piece.getType() == PieceType.WHITE && lastMove.fromY == 0) {
+        } else if (piece.getType() == PieceType.WHITE && lastMove.getFromY() == 0) {
             return true;
         }
         return false;

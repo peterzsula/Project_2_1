@@ -1,4 +1,7 @@
-package org.testing.project_2_1;
+package org.testing.project_2_1.Moves;
+
+import org.testing.project_2_1.GameLogic.Piece;
+import org.testing.project_2_1.GameLogic.PieceType;
 
 public class Capture extends Move {
     private Piece capturedPiece;

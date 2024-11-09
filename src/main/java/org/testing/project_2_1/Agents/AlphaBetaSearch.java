@@ -1,4 +1,8 @@
-package org.testing.project_2_1;
+package org.testing.project_2_1.Agents;
+
+import org.testing.project_2_1.*;
+import org.testing.project_2_1.GameLogic.GameLogic;
+import org.testing.project_2_1.Moves.Move;
 
 import java.lang.reflect.Array;
 import java.util.ArrayList;

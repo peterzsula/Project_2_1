@@ -1,12 +1,19 @@
-package org.testing.project_2_1;
+package org.testing.project_2_1.GUI;
 
 import javafx.scene.layout.StackPane;
 import javafx.scene.paint.Color;
 import javafx.scene.shape.Ellipse;
 import javafx.scene.shape.Rectangle;
+
+import static org.testing.project_2_1.GUI.CheckersApp.TILE_SIZE;
+
 import java.util.ArrayList;
 import java.util.List;
-import static org.testing.project_2_1.CheckersApp.TILE_SIZE;
+
+import org.testing.project_2_1.GameLogic.Piece;
+import org.testing.project_2_1.GameLogic.PieceType;
+import org.testing.project_2_1.Moves.Move;
+import org.testing.project_2_1.Moves.MoveType;
 
 public class PieceDrawer extends StackPane {
     public double mouseX, mouseY;

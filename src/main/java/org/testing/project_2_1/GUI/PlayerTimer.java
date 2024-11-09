@@ -1,4 +1,4 @@
-package org.testing.project_2_1;
+package org.testing.project_2_1.GUI;
 
 import java.util.Timer;
 import java.util.TimerTask;

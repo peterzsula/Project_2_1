@@ -1,4 +1,6 @@
-package org.testing.project_2_1;
+package org.testing.project_2_1.Moves;
+
+import org.testing.project_2_1.GameLogic.Piece;
 
 public class InvalidMove extends Move {
     public InvalidMove(Piece piece, int toX, int toY) {

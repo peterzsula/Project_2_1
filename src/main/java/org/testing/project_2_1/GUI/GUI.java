@@ -1,4 +1,6 @@
-package org.testing.project_2_1;
+package org.testing.project_2_1.GUI;
+
+import org.testing.project_2_1.Agents.*;
 
 import javafx.application.Application;
 import javafx.scene.Scene;
@@ -19,7 +21,7 @@ public class GUI extends Application {
     public boolean isAgentWhite = false;
 
     @Override
-    public void start(Stage selectionStage) {
+    public void start(@SuppressWarnings("exports") Stage selectionStage) {
         Pane selectionPane = new Pane();
         selectionPane.setPrefSize(400, 400);  
 

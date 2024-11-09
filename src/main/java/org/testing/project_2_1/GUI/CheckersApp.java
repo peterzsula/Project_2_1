@@ -1,4 +1,10 @@
-package org.testing.project_2_1;
+package org.testing.project_2_1.GUI;
+
+import org.testing.project_2_1.Agents.*;
+import org.testing.project_2_1.GameLogic.GameLogic;
+import org.testing.project_2_1.GameLogic.Piece;
+import org.testing.project_2_1.GameLogic.Tile;
+import org.testing.project_2_1.Moves.Move;
 
 import javafx.application.Application;
 import javafx.geometry.Insets;
@@ -27,13 +33,13 @@ public class CheckersApp extends Application {
     private Group tileGroup = new Group();
     public Group pieceGroup = new Group();
     private Group boardGroup = new Group(); 
-    CapturedPiecesTracker capturedPiecesTracker;
+    public CapturedPiecesTracker capturedPiecesTracker;
 
     private boolean isPlayerOneTurn = true;
     private long previousPlayerOneTime; 
     private long previousPlayerTwoTime; 
     private boolean wasPlayerOneTurnBeforeUndo; 
-    GameLogic gameLogic;
+    public GameLogic gameLogic;
 
     public Group getBoardGroup() {
         return boardGroup;
