@@ -1,6 +1,6 @@
 package org.testing.project_2_1.GameLogic;
 
-import org.testing.project_2_1.GUI.PieceDrawer;
+import org.testing.project_2_1.UI.PieceDrawer;
 
 public class Piece {
     public PieceType type;

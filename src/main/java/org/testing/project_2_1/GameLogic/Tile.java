@@ -1,6 +1,6 @@
 package org.testing.project_2_1.GameLogic;
 
-import org.testing.project_2_1.GUI.TileDrawer;
+import org.testing.project_2_1.UI.TileDrawer;
 
 public class Tile{
     public TileDrawer tileDrawer;

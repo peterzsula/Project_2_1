@@ -1,6 +1,7 @@
-package org.testing.project_2_1.GUI;
+package org.testing.project_2_1;
 
 import org.testing.project_2_1.Agents.*;
+import org.testing.project_2_1.UI.CheckersApp;
 
 import javafx.application.Application;
 import javafx.scene.Scene;

@@ -9,6 +9,7 @@ public abstract class Move {
     protected int toX;
     protected int toY;
     protected MoveType type;
+    protected double evaluation;
     
     public Move(Piece piece, int toX, int toY) {
         this.piece = piece;
@@ -16,6 +17,7 @@ public abstract class Move {
         this.fromY = piece.y;
         this.toX = toX;
         this.toY = toY;
+        this.evaluation = 0;
     }
 
     public MoveType getType() {
@@ -40,6 +42,14 @@ public abstract class Move {
 
     public int getFromY() {
         return fromY;
+    }
+
+    public double getEvaluation() {
+        return evaluation;
+    }
+
+    public void setEvaluation(double evaluation) {
+        this.evaluation = evaluation;
     }
 
     @Override

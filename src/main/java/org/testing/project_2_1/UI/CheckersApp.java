@@ -1,7 +1,9 @@
-package org.testing.project_2_1.GUI;
+package org.testing.project_2_1.UI;
 
 import org.testing.project_2_1.Agents.*;
+import org.testing.project_2_1.GameLogic.Board;
 import org.testing.project_2_1.GameLogic.GameLogic;
+import org.testing.project_2_1.GameLogic.MoveLogic;
 import org.testing.project_2_1.GameLogic.Piece;
 import org.testing.project_2_1.GameLogic.Tile;
 import org.testing.project_2_1.Moves.Move;
@@ -150,7 +152,7 @@ public class CheckersApp extends Application {
     public void resetGUI() {
         pieceGroup.getChildren().clear();
 
-        for (Tile[] row : gameLogic.board) {
+        for (Tile[] row : Board.board) {
             for (Tile tile : row) {
                 if (tile.hasPiece()) {
                     Piece piece = tile.getPiece();
@@ -172,7 +174,7 @@ public class CheckersApp extends Application {
     }
 
     public void addPiecestoBoard(Pane boardPane) {
-        for (Tile[] row : gameLogic.board) {
+        for (Tile[] row : Board.board) {
             for (Tile tile : row) {
                 tileGroup.getChildren().add(tile.tileDrawer);
                 if (tile.hasPiece()) {
@@ -212,7 +214,7 @@ public class CheckersApp extends Application {
         wasPlayerOneTurnBeforeUndo = isPlayerOneTurn;
     
         piece.pieceDrawer.setOnMouseReleased(e -> {
-            Move move = gameLogic.determineMoveType(piece, newX, newY);
+            Move move = MoveLogic.determineMoveType(piece, newX, newY);
             boolean isLegalMove = gameLogic.takeTurn(move);
             piece.pieceDrawer.clearHighlight();
     

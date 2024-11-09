@@ -1,11 +1,11 @@
-package org.testing.project_2_1.GUI;
+package org.testing.project_2_1.UI;
 
 import javafx.scene.layout.StackPane;
 import javafx.scene.paint.Color;
 import javafx.scene.shape.Ellipse;
 import javafx.scene.shape.Rectangle;
 
-import static org.testing.project_2_1.GUI.CheckersApp.TILE_SIZE;
+import static org.testing.project_2_1.UI.CheckersApp.TILE_SIZE;
 
 import java.util.ArrayList;
 import java.util.List;

@@ -1,4 +1,4 @@
-package org.testing.project_2_1.GUI;
+package org.testing.project_2_1.UI;
 
 
 import java.util.ArrayList;
