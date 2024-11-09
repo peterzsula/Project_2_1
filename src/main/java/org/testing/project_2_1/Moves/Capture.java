@@ -1,13 +1,12 @@
 package org.testing.project_2_1.Moves;
 
 import org.testing.project_2_1.GameLogic.Piece;
-import org.testing.project_2_1.GameLogic.PieceType;
 
 public class Capture extends Move {
     private Piece capturedPiece;
 
-    public Capture(Piece piece, Piece capturedPiece, int toX, int toY) {
-        super(piece, toX, toY);
+    public Capture(int fromX, int fromY, Piece piece, Piece capturedPiece, int toX, int toY) {
+        super(fromX, fromY, piece, toX, toY);
         this.capturedPiece = capturedPiece;
         this.type = MoveType.CAPTURE;
     }
@@ -40,17 +39,8 @@ public class Capture extends Move {
 
     @Override
     public String toString() {
-        return "Move from X=" + piece.x + ", from Y=" + piece.y + ", to X=" + toX + ", to Y=" + toY +
-            ", CAPTURE AT X=" + capturedPiece.x + ", Y=" + capturedPiece.y;
+        return "Move from X=" + piece.getX() + ", from Y=" + piece.getY() + ", to X=" + toX + ", to Y=" + toY +
+            ", CAPTURE AT X=" + capturedPiece.getX() + ", Y=" + capturedPiece.getY();
     }
-
-    public static void main(String[] args) {
-        Piece piece = new Piece(PieceType.BLACK, 0, 0);
-        Piece capturedPiece = new Piece(PieceType.WHITE, 1, 1);
-        Capture capture = new Capture(piece, capturedPiece, 1, 1);
-        Capture capture2 = new Capture(piece, capturedPiece, 1, 1);
-        System.out.println(capture.equals(capture2));
-    }
-
     
 }

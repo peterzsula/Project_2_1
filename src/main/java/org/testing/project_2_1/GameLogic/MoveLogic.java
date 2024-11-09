@@ -6,50 +6,60 @@ import org.testing.project_2_1.Moves.Move;
 import org.testing.project_2_1.Moves.NormalMove;
 
 public class MoveLogic {
-    private static Tile[][] board;
+    private Tile[][] board;
+    private Board boardObj;
 
-    public MoveLogic(){
-        board = Board.board;
+    public MoveLogic(Board boardObj) {
+        this.boardObj = boardObj;
+        this.board = boardObj.getBoard();
     }
-    
-    public static Move determineMoveType(Piece piece, int newX, int newY) {
-        int x0 = piece.x;
-        int y0 = piece.y;
+
+    public Tile[][] getBoard() {
+        return board;
+    }
+
+    public Board getBoardObj() {
+        return boardObj;
+    }
+
+    public Move determineMoveType(Piece piece, int newX, int newY) {
+        int x0 = piece.getX();
+        int y0 = piece.getY();
         Tile tile = board[newX][newY];
 
         // Check if it's the correct player's turn
         if (GameLogic.isWhiteTurn != piece.getType().color.equals("white")) {
-            return new InvalidMove(piece, newX, newY);
+            return new InvalidMove(x0, y0, piece, newX, newY);
         }
 
         // Check if the tile is empty
         if (tile.hasPiece()) {
-            return new InvalidMove(piece, newX, newY);
+            return new InvalidMove(x0, y0, piece, newX, newY);
         }
 
         // Check if the tile is black
         if (!tile.isBlack()) {
             System.out.println("white tile");
-            return new InvalidMove(piece, newX, newY);
+            return new InvalidMove(x0, y0, piece, newX, newY);
         }
 
         // If the piece is a king, allow all types of moves and captures
         if (piece.getType() == PieceType.BLACKKING || piece.getType() == PieceType.WHITEKING) {
             // Check for normal king move any direction (multi-tile)
             if (isMoveforKing(x0, y0, newX, newY) && isPathClearforKing(x0, y0, newX, newY)) {
-                return new NormalMove(piece, newX, newY);
+                return new NormalMove(x0, y0, piece, newX, newY);
             }
 
             // Check for king capture any direction
             if (isCapturePathforKing(x0, y0, newX, newY)) {
                 Piece capturedPiece = getCapturedPieceOnPathforKing(x0, y0, newX, newY);
-                return new Capture(piece, capturedPiece, newX, newY);
+                return new Capture(x0, y0, piece, capturedPiece, newX, newY);
             }
         }
 
         else {
             // Normal diagonal move for regular pieces
-        if (isMoveDiagonalNormal(x0, y0, newX, newY) && piece.getType().moveDir == (newY - y0)) {return new NormalMove(piece, newX, newY);}
+        if (isMoveDiagonalNormal(x0, y0, newX, newY) && piece.getType().moveDir == (newY - y0)) {return new NormalMove(x0, y0, piece, newX, newY);}
 
 
         // Horizontal capture logic for normal pieces
@@ -58,7 +68,7 @@ public class MoveLogic {
             Tile halfWay = board[x1][y0];
             Piece capturedPiece = halfWay.getPiece();
             if (halfWay.hasPiece() && !capturedPiece.getType().color.equals(piece.getType().color)) {
-                return new Capture(piece, capturedPiece, newX, newY);
+                return new Capture(x0, y0, piece, capturedPiece, newX, newY);
             }
         }
 
@@ -68,7 +78,7 @@ public class MoveLogic {
             Tile halfWay = board[x0][y1];
             Piece capturedPiece = halfWay.getPiece();
             if (halfWay.hasPiece() && !capturedPiece.getType().color.equals(piece.getType().color)) {
-                return new Capture(piece, capturedPiece, newX, newY);
+                return new Capture(x0, y0, piece, capturedPiece, newX, newY);
             }
         }
 
@@ -79,26 +89,26 @@ public class MoveLogic {
             Tile halfWay = board[x1][y1];
             Piece capturedPiece = halfWay.getPiece();
             if (halfWay.hasPiece() && !capturedPiece.getType().color.equals(piece.getType().color)) {
-                return new Capture(piece, capturedPiece, newX, newY);
+                return new Capture(x0, y0, piece, capturedPiece, newX, newY);
             }
         }
     }
 
-    return new InvalidMove(piece, newX, newY);
+    return new InvalidMove(x0, y0, piece, newX, newY);
     }
 
     // Helper method to check if move is available for king
-    private static boolean isMoveforKing(int x0, int y0, int newX, int newY) {
+    private boolean isMoveforKing(int x0, int y0, int newX, int newY) {
         return (x0 == newX || y0 == newY || Math.abs(newX - x0) == Math.abs(newY - y0));
     }
 
     // Helper method to check if move is diagonal for normal pieces
-    private static boolean isMoveDiagonalNormal(int x0, int y0, int newX, int newY) {
+    private boolean isMoveDiagonalNormal(int x0, int y0, int newX, int newY) {
         return Math.abs(newX - x0) == 1 && Math.abs(newY - y0) == 1;
     }
 
     // Check if the path for king movement (diagonal, horizontal, vertical) is clear
-    public static boolean isPathClearforKing(int x0, int y0, int newX, int newY) {
+    private boolean isPathClearforKing(int x0, int y0, int newX, int newY) {
         int dx = Integer.compare(newX, x0);
         int dy = Integer.compare(newY, y0);
     
@@ -116,7 +126,7 @@ public class MoveLogic {
     } 
 
     // Check if there is a capturable piece on the path
-    private static boolean isCapturePathforKing(int x0, int y0, int newX, int newY) {
+    private boolean isCapturePathforKing(int x0, int y0, int newX, int newY) {
         if (!isMoveforKing(x0, y0, newX, newY)) {
             return false;  // Not a move for the burger king
         }
@@ -165,7 +175,7 @@ public class MoveLogic {
     }
 
     // Return the piece to capture along the path
-    private static Piece getCapturedPieceOnPathforKing(int x0, int y0, int newX, int newY) {
+    private Piece getCapturedPieceOnPathforKing(int x0, int y0, int newX, int newY) {
         if (!isMoveforKing(x0, y0, newX, newY)) {
             return null;  // Not a move for the burger king
         }

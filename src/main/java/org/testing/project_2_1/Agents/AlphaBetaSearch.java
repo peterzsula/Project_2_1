@@ -35,7 +35,7 @@ public class AlphaBetaSearch implements Agent {
         minPruned = 0;
         System.out.println("AlphaBeta agent making move");
         Move bestMove = alphaBetaSearch(maxDepth);
-        gameLogic.takeTurn(bestMove);
+        gameLogic.takeMove(bestMove);
     }
 
     public Move alphaBetaSearch(int depth) {
@@ -46,7 +46,7 @@ public class AlphaBetaSearch implements Agent {
         Double bestValue = Double.MIN_VALUE;
         ArrayList<Move> legalMoves = gameLogic.getLegalMoves();
         for (Move move : legalMoves) {
-            gameLogic.takeTurn(move);
+            gameLogic.takeMove(move);
             Double value = minValue(alpha, beta, depth - 1);
             if (value > bestValue) {
                 bestValue = value;
@@ -66,7 +66,7 @@ public class AlphaBetaSearch implements Agent {
         Double value = Double.MIN_VALUE;
         ArrayList<Move> legalMoves = gameLogic.getLegalMoves();
         for (Move move : legalMoves) {
-            gameLogic.takeTurn(move);
+            gameLogic.takeMove(move);
             value = Math.max(value, minValue(alpha, beta, depth - 1));
             gameLogic.undoLastMove();
             if (value >= beta) {
@@ -87,7 +87,7 @@ public class AlphaBetaSearch implements Agent {
         double value = Integer.MAX_VALUE;
         ArrayList<Move> legalMoves = gameLogic.getLegalMoves();
         for (Move move : legalMoves) {
-            gameLogic.takeTurn(move);
+            gameLogic.takeMove(move);
             value = Math.min(value, maxValue(alpha, beta, depth - 1));
             gameLogic.undoLastMove();
             if (value <= alpha) {
@@ -102,6 +102,11 @@ public class AlphaBetaSearch implements Agent {
     @Override
     public boolean isWhite() {
         return isWhite;
+    }
+
+    @Override
+    public Agent reset() {
+        return new AlphaBetaSearch(maxDepth);
     }
     
     

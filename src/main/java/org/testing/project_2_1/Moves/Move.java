@@ -4,20 +4,20 @@ import org.testing.project_2_1.GameLogic.Piece;
 
 public abstract class Move {
     protected Piece piece;
-    protected int fromX;
-    protected int fromY;
-    protected int toX;
-    protected int toY;
+    protected final int fromX;
+    protected final int fromY;
+    protected final int toX;
+    protected final int toY;
     protected MoveType type;
-    protected double evaluation;
+    protected boolean promotion;
     
-    public Move(Piece piece, int toX, int toY) {
+    public Move(int fromX, int fromY, Piece piece, int toX, int toY) {
         this.piece = piece;
-        this.fromX = piece.x;
-        this.fromY = piece.y;
+        this.fromX = fromX;
+        this.fromY = fromY;
         this.toX = toX;
         this.toY = toY;
-        this.evaluation = 0;
+        this.promotion = false;
     }
 
     public MoveType getType() {
@@ -44,12 +44,8 @@ public abstract class Move {
         return fromY;
     }
 
-    public double getEvaluation() {
-        return evaluation;
-    }
-
-    public void setEvaluation(double evaluation) {
-        this.evaluation = evaluation;
+    public void setPromotion(boolean promotion) {
+        this.promotion = promotion;
     }
 
     @Override
@@ -70,6 +66,14 @@ public abstract class Move {
 
     public boolean isNormal() {
         return type == MoveType.NORMAL;
+    }
+
+    public boolean isInvalid() {
+        return type == MoveType.INVALID;
+    }
+
+    public boolean isPromotion() {
+        return promotion;
     }
     
 }

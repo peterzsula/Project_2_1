@@ -1,6 +1,5 @@
 package org.testing.project_2_1.Agents;
 
-import org.testing.project_2_1.*;
 import org.testing.project_2_1.GameLogic.GameLogic;
 import org.testing.project_2_1.Moves.Move;
 
@@ -32,18 +31,22 @@ public class BaselineAgent implements Agent {
         System.out.println("Baseline agent making move");
         PauseTransition pause = new PauseTransition(Duration.seconds(Agent.delay));
         pause.setOnFinished(event -> {
-        while (gameLogic.isWhiteTurn == isWhite && !gameLogic.isGameOver()) {
+        while (GameLogic.isWhiteTurn == isWhite && !gameLogic.isGameOver()) {
             ArrayList<Move> legalMoves = gameLogic.getLegalMoves();
             System.out.println("Legal moves: " + legalMoves.size());
             int randomIndex = new Random().nextInt(legalMoves.size());
             Move move = legalMoves.get(randomIndex);
             System.out.println("Take turn with move " + move);
-            gameLogic.takeTurn(move);
+            gameLogic.takeMove(move);
             gameLogic.evaluateBoard();
         }
     });
     pause.play();
     }
 
+    @Override
+    public BaselineAgent reset() {
+        return new BaselineAgent(isWhite);
+    }
     
 }

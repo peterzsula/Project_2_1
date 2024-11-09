@@ -80,7 +80,7 @@ public class CheckersApp extends Application {
     }
 
     public Parent createContent() {
-    Pane boardPane = new Pane();
+        Pane boardPane = new Pane();
         boardPane.setPrefSize(SIZE * TILE_SIZE, SIZE * TILE_SIZE);
 
         // Label to tell you when to capture
@@ -150,37 +150,47 @@ public class CheckersApp extends Application {
     }
 
     public void resetGUI() {
-        pieceGroup.getChildren().clear();
-
-        for (Tile[] row : Board.board) {
-            for (Tile tile : row) {
-                if (tile.hasPiece()) {
-                    Piece piece = tile.getPiece();
-                    piece.setPieceDrawer(new PieceDrawer(piece, this));
-                    pieceGroup.getChildren().add(piece.pieceDrawer);
-                }
-            }
-        }
-
         isPlayerOneTurn = true;
         playerOneTimer.reset();
         playerTwoTimer.reset();
         playerOneTimer.startCountdown();
         playerTwoTimer.stopCountdown();
-        
+        pieceGroup.getChildren().clear();
+
+        if (noOfPlayers == 2) {
+            new CheckersApp();
+        }
+        else if (noOfPlayers == 1) {
+            new CheckersApp(gameLogic.agent, gameLogic.agent.isWhite());
+        }
+        else if (noOfPlayers == 0) {
+            new CheckersApp(gameLogic.agent, gameLogic.opponent);
+        }
+
+        for (Tile[] row : gameLogic.board) {
+            for (Tile tile : row) {
+                tileGroup.getChildren().add(tile.tileDrawer);
+                if (tile.hasPiece()) {
+                    Piece piece = tile.getPiece();
+                    piece.setPieceDrawer(new PieceDrawer(piece, this));
+                    pieceGroup.getChildren().add(piece.getPieceDrawer());
+                }
+            }
+        }
+
         if (noOfPlayers == 0 || (!isPlayerOneTurn && noOfPlayers == 1)) {
             gameLogic.agent.makeMove();
         }
     }
 
     public void addPiecestoBoard(Pane boardPane) {
-        for (Tile[] row : Board.board) {
+        for (Tile[] row : gameLogic.board) {
             for (Tile tile : row) {
                 tileGroup.getChildren().add(tile.tileDrawer);
                 if (tile.hasPiece()) {
                     Piece piece = tile.getPiece();
                     piece.setPieceDrawer(new PieceDrawer(piece, this));
-                    pieceGroup.getChildren().add(piece.pieceDrawer);
+                    pieceGroup.getChildren().add(piece.getPieceDrawer());
                 }
             }
         }
@@ -213,10 +223,10 @@ public class CheckersApp extends Application {
         previousPlayerTwoTime = playerTwoTimer.getRemainingTimeInSeconds();
         wasPlayerOneTurnBeforeUndo = isPlayerOneTurn;
     
-        piece.pieceDrawer.setOnMouseReleased(e -> {
-            Move move = MoveLogic.determineMoveType(piece, newX, newY);
-            boolean isLegalMove = gameLogic.takeTurn(move);
-            piece.pieceDrawer.clearHighlight();
+        piece.getPieceDrawer().setOnMouseReleased(e -> {
+            Move move = gameLogic.moveLogic.determineMoveType(piece, newX, newY);
+            boolean isLegalMove = gameLogic.takeMove(move);
+            piece.getPieceDrawer().clearHighlight();
     
             if (isLegalMove) {
                 // Use hasAvailableCaptures to check if the piece can capture again

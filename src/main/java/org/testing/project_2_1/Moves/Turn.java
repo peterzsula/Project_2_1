@@ -5,10 +5,25 @@ import java.util.LinkedList;
 public class Turn {
     private LinkedList<Move> moves;
     private boolean isShot;
+    private double evaluation;
+
+    public Turn() {
+        moves = new LinkedList<Move>();
+        isShot = false;
+        evaluation = 0;
+    }
 
     public Turn(LinkedList<Move> moves, boolean isShot) {
         moves = new LinkedList<Move>();
         isShot = false;
+        evaluation = 0;
+    }
+
+    public Turn(Turn currentTurn) {
+        this.moves = new LinkedList<Move>();
+        for (Move move : currentTurn.getMoves()) {
+            this.moves.add(move);
+        }
     }
 
     public LinkedList<Move> getMoves() {
@@ -31,9 +46,23 @@ public class Turn {
         moves.add(move);
     }
 
+    public double getEvaluation() {
+        return evaluation;
+    }
+
+    public void setEvaluation(double evaluation) {
+        this.evaluation = evaluation;
+    }
+
+    public void removeLastMove() {
+        if (!moves.isEmpty()) {
+            moves.remove(moves.size() - 1);
+        }
+    }
+
     @Override
     public String toString() {
-        return "Turn [noOfMoves=" + moves.size() + ", isShot=" + isShot + "]";
+        return "Turn [noOfMoves=" + moves.size() + ", isShot=" + isShot + moves.toString() + "]";
     }
     
 

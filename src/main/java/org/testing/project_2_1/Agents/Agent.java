@@ -6,4 +6,5 @@ public interface Agent {
     public boolean isWhite();
     public void makeMove();
     public void setGameLogic(GameLogic gameLogic);
+    public Agent reset();
 }

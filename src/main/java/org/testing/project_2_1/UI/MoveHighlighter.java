@@ -15,8 +15,8 @@ public class MoveHighlighter {
     public List<NormalMove> getAvailableMoves(Piece piece) {
         List<NormalMove> availableMoves = new ArrayList<>();
         
-        int x = piece.x;
-        int y = piece.y;
+        int x = piece.getX();
+        int y = piece.getY();
         
         // Determine moves based on piece type
         if (piece.getType() == PieceType.BLACK || piece.getType() == PieceType.WHITE) {
@@ -37,7 +37,8 @@ public class MoveHighlighter {
 
     private void checkAndAddMove(Piece piece, int toX, int toY, List<NormalMove> moves) {
         if (isValidPosition(toX, toY)) {
-            moves.add(new NormalMove(piece, toX, toY));
+            // TODO: FIX THIS
+            // moves.add(new NormalMove(piece, toX, toY));
         }
     }
 
@@ -45,7 +46,8 @@ public class MoveHighlighter {
         int x = startX + dx;
         int y = startY + dy;
         while (isValidPosition(x, y)) {
-            moves.add(new NormalMove(piece, x, y));
+            // TODO: FIX THIS
+            // moves.add(new NormalMove(piece, x, y));
             // Move one step further along the direction
             x += dx;
             y += dy;

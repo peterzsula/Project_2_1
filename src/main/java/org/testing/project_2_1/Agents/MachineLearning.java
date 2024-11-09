@@ -25,10 +25,38 @@ public class MachineLearning implements Agent {
     @Override
     public void makeMove() {
         System.out.println("MachineLearning agent making move");
-        ArrayList<Move> moves = gameLogic.getLegalMoves();
-        for (Move move : moves) {
-            move.setEvaluation(gameLogic.evaluateMove(move));
+        ArrayList<Turn> turns = gameLogic.getLegalTurns();
+        System.out.println("number of turns " + turns.size());
+        for (Turn turn : turns) {
+            turn.setEvaluation(gameLogic.evaluateTurn(turn));
         }
+        Turn bestTurn = getBestTurn(turns);
+        System.out.println("taking turn with evaluation " + bestTurn.getEvaluation() + bestTurn.getMoves().get(0).toString());
+        gameLogic.takeTurn(bestTurn);
+    }
+
+    @Override
+    public Agent reset() {
+        return new MachineLearning(isWhite);
+    }
+
+    private Turn getBestTurn(ArrayList<Turn> turns) {
+        Turn bestTurn = turns.get(0);
+        if (isWhite) {
+            for (Turn turn : turns) {
+                if (turn.getEvaluation() > bestTurn.getEvaluation()) {
+                    bestTurn = turn;
+                }
+            }
+        }
+        else {
+            for (Turn turn : turns) {
+                if (turn.getEvaluation() < bestTurn.getEvaluation()) {
+                    bestTurn = turn;
+                }
+            }
+        }
+        return bestTurn;
     }
     
 }

@@ -18,7 +18,6 @@ public class CapturedPiecesTracker {
     private VBox blackWhiteCapturedBox;
 
     public CapturedPiecesTracker() {
-
         blackCapturedLabel = new Label(String.valueOf(blackCaptured));
         whiteCapturedLabel = new Label(String.valueOf(whiteCaptured));
         blackWhiteCapturedBox = new VBox(10);
@@ -49,11 +48,17 @@ public class CapturedPiecesTracker {
         whiteCapturedLabel.setText(String.valueOf(whiteCaptured));
     }
 
+    public void decrementWhiteCaptured() {
+        whiteCaptured--;
+    }
+
+    public void decrementBlackCaptured() {
+        blackCaptured--;
+    }
+
     public VBox getBlackWhiteCapturedDisplay() {
         return blackWhiteCapturedBox;
     }
-
-
 
     // Increment methods for player-specific captured pieces
     public void capturePiece(String player) {
@@ -65,4 +70,5 @@ public class CapturedPiecesTracker {
             whiteCapturedLabel.setText(String.valueOf(playerTwoCapturedCount));
         }
     }
+
 }

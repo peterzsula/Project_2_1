@@ -25,9 +25,9 @@ public class PieceDrawer extends StackPane {
     public PieceDrawer(Piece piece, CheckersApp app) {
         this.piece = piece;
         this.app = app;
-        x = piece.x * TILE_SIZE;
-        y = piece.y * TILE_SIZE;
-        drawPiece(piece.type, piece.x, piece.y);
+        x = piece.getX() * TILE_SIZE;
+        y = piece.getY() * TILE_SIZE;
+        drawPiece(piece.type, piece.getX(), piece.getY());
     }
 
     public void drawPiece(PieceType type, int x, int y) {
@@ -121,8 +121,8 @@ public class PieceDrawer extends StackPane {
     }
 
     public void abortMove() {
-        x = piece.x * TILE_SIZE;
-        y = piece.y * TILE_SIZE;
+        x = piece.getX() * TILE_SIZE;
+        y = piece.getY() * TILE_SIZE;
         relocate(x, y);
     }
 
@@ -153,4 +153,5 @@ public class PieceDrawer extends StackPane {
     public void demoteToNormal() {
         getChildren().remove(getChildren().size() - 1);
     }
+
 }
