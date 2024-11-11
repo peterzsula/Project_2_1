@@ -19,10 +19,10 @@ public class GameLogic {
     public CheckersApp app;
     public Agent agent;
     public Agent opponent;
-    public static boolean isWhiteTurn;
     public Board b;
     public Tile[][] board;
     public MoveLogic moveLogic;
+    public boolean isWhiteTurn = b.getIsWhiteTurn();
     public static ArrayList<Piece> whitePieces;
     public static ArrayList<Piece> blackPieces;
     public ArrayList<Move> movesPlayed;
@@ -57,7 +57,7 @@ public class GameLogic {
         this.moveLogic = new MoveLogic(b);
         whitePieces = b.getWhitePieces();
         blackPieces = b.getBlackPieces();
-        isWhiteTurn = true;
+        isWhiteTurn = b.getIsWhiteTurn();
         movesPlayed = new ArrayList<Move>();
         turnsPlayed = new ArrayList<Turn>();
         new Pane();
@@ -75,7 +75,6 @@ public class GameLogic {
     }
 
     private void switchTurn() {
-        isWhiteTurn = !isWhiteTurn;
         System.out.println();
 
         if (isWhiteTurn) {
@@ -185,11 +184,12 @@ public class GameLogic {
     }    
 
     public ArrayList<Turn> getLegalTurns(MoveLogic moveLogic) {
-        Board b = new Board(moveLogic.getBoard());
+        Board b = new Board(moveLogic.getBoard(), moveLogic.getIsWhiteTurn());
         ArrayList<Turn> availableTurns = new ArrayList<>();
-        ArrayList<Move> availableMoves = getLegalMoves();
+        ArrayList<Move> availableMoves = getLegalMoves(moveLogic);
         if (availableMoves.get(0).isNormal()) {
             for (Move move : availableMoves) {
+                move.setTurnEnding(true);
                 Turn turn = new Turn();
                 turn.addMove(move);
                 availableTurns.add(turn);
@@ -233,6 +233,7 @@ public class GameLogic {
         ArrayList<Move> captures = getAvailableCaptures(piece, moveLogic);
         
         if (captures.isEmpty()) {
+            currentTurn.getMoves().getLast().setTurnEnding(true);
             // No more captures possible, so check if this turn is one of the max-capturing ones
             if (captureCount > maxCaptures) {
                 result.clear();
@@ -286,10 +287,10 @@ public class GameLogic {
         Board b = moveLogic.getBoardObj();
         Tile[][] board = b.getBoard();
         ArrayList<Move> availableMoves = new ArrayList<>();
-        ArrayList<Piece> pieces = getListOfPieces();
-        boolean capturesAvailable = hasAvailableCaptures();
+        ArrayList<Piece> pieces = getListOfPieces(moveLogic);
+        boolean capturesAvailable = hasAvailableCaptures(moveLogic);
         if (capturesAvailable) {
-            return getAvailableCaptures();
+            return getAvailableCaptures(moveLogic);
         }
         else {
             for (Piece piece : pieces) {
@@ -335,9 +336,9 @@ public class GameLogic {
         Board b = moveLogic.getBoardObj();
         Tile[][] tiles = b.getBoard();
         ArrayList<Move> availableMoves = new ArrayList<>();
-        boolean capturesAvailable = hasAvailableCaptures();
+        boolean capturesAvailable = hasAvailableCaptures(moveLogic);
         if (capturesAvailable) {
-            availableMoves = getAvailableCaptures(piece);
+            availableMoves = getAvailableCaptures(piece, moveLogic);
         }
         else {
             for (int row = 0; row < tiles.length; row++) {
@@ -447,6 +448,7 @@ public class GameLogic {
                 if (!hasAvailableCaptures(move.getPiece())) {
                     System.out.println("made all available captures");
                     switchTurn();
+                    move.setTurnEnding(true);
                     return true;        
                 }
                 // If you have more available captures, make another capture
@@ -468,13 +470,14 @@ public class GameLogic {
         else { 
             System.out.println("no available captures");
             movePiece(move);
+            move.setTurnEnding(true);
             switchTurn();
             return true;
         }
     }
 
     private void movePiece(Move move) {
-        Piece piece = move.getPiece();
+        Piece piece = board[move.getFromX()][move.getFromY()].getPiece();
         int oldX = move.getFromX();
         int oldY = move.getFromY();
         int newX = move.getToX();
@@ -487,7 +490,7 @@ public class GameLogic {
                 movesPlayed.add(move);
                 board[oldX][oldY].setPiece(null);
                 board[newX][newY].setPiece(piece);
-                piece.movePiece(move);
+                board[newX][newY].getPiece().movePiece(move);
                 break;
             case CAPTURE:
                 movesPlayed.add(move);
@@ -504,10 +507,10 @@ public class GameLogic {
                 
                 board[oldX][oldY].setPiece(null);
                 board[newX][newY].setPiece(piece);
+                board[newX][newY].getPiece().movePiece(move);
                 Piece otherPiece = capture.getCapturedPiece();
                 board[otherPiece.getX()][otherPiece.getY()].setPiece(null);
                 app.pieceGroup.getChildren().remove(otherPiece.getPieceDrawer());
-                piece.movePiece(move);
                 break;
         }
     }
@@ -660,18 +663,18 @@ public class GameLogic {
     }
 
     public double evaluateTurn(Turn turn) {
-        boolean isWhite = isWhiteTurn;
-        Board b0 = new Board(board);
+        Board b0 = new Board(board, isWhiteTurn);
+        MoveLogic m0 = new MoveLogic(b0);
         LinkedList<Move> moves = turn.getMoves();
         for (Move move : moves) {
             b0.movePiece(move);
         }
         Tile[][] board0 = b0.getBoard();
-        ArrayList<Turn> opponentsTurns = getLegalTurns();
+        ArrayList<Turn> opponentsTurns = getLegalTurns(m0);
         double[] evaluations = new double[opponentsTurns.size()];
         for (int i = 0; i < opponentsTurns.size(); i++) {
             Turn oTurn = opponentsTurns.get(i);
-            Board b = new Board(board0);
+            Board b = new Board(board0, b0.getIsWhiteTurn());
         
             // Process each move in the current turn
             for (Move move : oTurn.getMoves()) {
@@ -683,7 +686,7 @@ public class GameLogic {
             System.out.println("Evaluation: " + evaluations[i]);
         }
         double evaluation = 0;
-        if (isWhite) {
+        if (b.getIsWhiteTurn()) {
             evaluation = findMax(evaluations);
         }
         else {

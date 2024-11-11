@@ -7,12 +7,15 @@ import org.testing.project_2_1.Moves.Capture;
 import org.testing.project_2_1.Moves.Move;
 
 public class Board {
+    private MoveLogic moveLogic;
     private Tile[][] board;
+    private boolean isWhiteTurn;
     private ArrayList<Piece> whitePieces;
     private ArrayList<Piece> blackPieces;
     private ArrayList<Move> movesPlayed;
 
     public Board(){
+        isWhiteTurn = true;
         whitePieces = new ArrayList<Piece>();
         blackPieces = new ArrayList<Piece>();
         movesPlayed = new ArrayList<Move>();
@@ -37,7 +40,8 @@ public class Board {
 
     }
 
-    public Board(Tile[][] board) {
+    public Board(Tile[][] board, boolean isWhiteTurn) {
+        this.isWhiteTurn = isWhiteTurn;
         whitePieces = new ArrayList<Piece>();
         blackPieces = new ArrayList<Piece>();
         movesPlayed = new ArrayList<Move>();
@@ -46,7 +50,8 @@ public class Board {
             for (int col = 0; col < board.length; col++) {
                 boardCopy[row][col] = new Tile(row, col);
                 if (board[row][col].hasPiece()) {
-                    Piece piece = board[row][col].getPiece();
+                    Piece originalPiece = board[row][col].getPiece();
+                    Piece piece = new Piece(originalPiece.type, row, col);
                     boardCopy[row][col].setPiece(new Piece(piece.type, row, col));
                     if (piece.type == PieceType.WHITE || piece.type == PieceType.WHITEKING) {
                         whitePieces.add(boardCopy[row][col].getPiece());
@@ -73,40 +78,41 @@ public class Board {
     }
 
     public Tile[][] movePiece(Move move) {
-        Piece piece = move.getPiece();
-        int oldX = move.getFromX();
-        int oldY = move.getFromY();
-        int newX = move.getToX();
-        int newY = move.getToY();
+        if (move.isTurnEnding()) {
+            isWhiteTurn = !isWhiteTurn;
+        }
+        Piece piece = board[move.getFromX()][move.getFromY()].getPiece();
         if (move.isNormal()) {
             movesPlayed.add(move);
             board[move.getFromX()][move.getFromY()].setPiece(null);
-            board[move.getToX()][move.getToY()].setPiece(move.getPiece());
-            move.getPiece().movePiece(move);
+            board[move.getToX()][move.getToY()].setPiece(piece);
+            piece.movePiece(move);
+            System.out.println(piece.toString());
         }
         else if (move.isCapture()) {
             movesPlayed.add(move);
-            move.getPiece().movePiece(move);
+            piece.movePiece(move);
             Capture capture = (Capture) move;
-            Piece capturedPiece = capture.getCapturedPiece();
+            Piece capturedPiece = board[capture.getCapturedPiece().getX()][capture.getCapturedPiece().getY()].getPiece();
             board[move.getFromX()][move.getFromY()].setPiece(null);
-            board[move.getToX()][move.getToY()].setPiece(move.getPiece());
+            board[move.getToX()][move.getToY()].setPiece(piece);
             board[capturedPiece.getX()][capturedPiece.getY()].setPiece(null);
         }
         return board;
     }
 
     public Tile[][] undoMove(Move move){
+        Piece piece = board[move.getFromX()][move.getFromY()].getPiece();
         if (move.isNormal()) {
-            board[move.getFromX()][move.getFromY()].setPiece(move.getPiece());
+            board[move.getFromX()][move.getFromY()].setPiece(piece);
             board[move.getToX()][move.getToY()].setPiece(null);
-            move.getPiece().undoMove(move);
+            piece.undoMove(move);
         }
         else if (move.isCapture()) {
-            move.getPiece().undoMove(move);
+            piece.undoMove(move);
             Capture capture = (Capture) move;
-            Piece capturedPiece = capture.getCapturedPiece();
-            board[move.getFromX()][move.getFromY()].setPiece(move.getPiece());
+            Piece capturedPiece = board[capture.getCapturedPiece().getX()][capture.getCapturedPiece().getY()].getPiece();
+            board[move.getFromX()][move.getFromY()].setPiece(piece);
             board[move.getToX()][move.getToY()].setPiece(null);
             board[capturedPiece.getX()][capturedPiece.getY()].setPiece(capturedPiece);
         }
@@ -125,6 +131,10 @@ public class Board {
             return board[x][y].hasPiece();
         }
         return false;
+    }
+
+    public boolean getIsWhiteTurn() {
+        return isWhiteTurn;
     }
     
 }

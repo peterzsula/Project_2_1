@@ -225,6 +225,7 @@ public class CheckersApp extends Application {
     
         piece.getPieceDrawer().setOnMouseReleased(e -> {
             Move move = gameLogic.moveLogic.determineMoveType(piece, newX, newY);
+            System.out.println("Move: " + move.toString());
             boolean isLegalMove = gameLogic.takeMove(move);
             piece.getPieceDrawer().clearHighlight();
     

@@ -10,6 +10,7 @@ public abstract class Move {
     protected final int toY;
     protected MoveType type;
     protected boolean promotion;
+    protected boolean isTurnEnding;
     
     public Move(int fromX, int fromY, Piece piece, int toX, int toY) {
         this.piece = piece;
@@ -46,6 +47,14 @@ public abstract class Move {
 
     public void setPromotion(boolean promotion) {
         this.promotion = promotion;
+    }
+
+    public boolean isTurnEnding() {
+        return isTurnEnding;
+    }
+
+    public void setTurnEnding(boolean turnEnding) {
+        isTurnEnding = turnEnding;
     }
 
     @Override

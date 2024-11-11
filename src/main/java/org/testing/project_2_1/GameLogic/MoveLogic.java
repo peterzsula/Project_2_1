@@ -8,18 +8,12 @@ import org.testing.project_2_1.Moves.NormalMove;
 public class MoveLogic {
     private Tile[][] board;
     private Board boardObj;
+    private boolean isWhiteTurn;
 
     public MoveLogic(Board boardObj) {
         this.boardObj = boardObj;
         this.board = boardObj.getBoard();
-    }
-
-    public Tile[][] getBoard() {
-        return board;
-    }
-
-    public Board getBoardObj() {
-        return boardObj;
+        this.isWhiteTurn = boardObj.getIsWhiteTurn();
     }
 
     public Move determineMoveType(Piece piece, int newX, int newY) {
@@ -28,7 +22,7 @@ public class MoveLogic {
         Tile tile = board[newX][newY];
 
         // Check if it's the correct player's turn
-        if (GameLogic.isWhiteTurn != piece.getType().color.equals("white")) {
+        if (isWhiteTurn != piece.getType().color.equals("white")) {
             return new InvalidMove(x0, y0, piece, newX, newY);
         }
 
