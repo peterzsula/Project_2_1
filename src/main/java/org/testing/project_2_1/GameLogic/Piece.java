@@ -40,8 +40,8 @@ public class Piece {
     }
 
     public void movePiece(Move move){
-        x = move.getToX(); // anomaly here when you change the value of piece.x, move.fromX also changes to the same value as piece.x
-        y = move.getToY(); // anomaly here
+        x = move.getToX();
+        y = move.getToY(); 
         if (pieceDrawer != null) {
             pieceDrawer.move(move.getToX(), move.getToY());
         }
@@ -52,8 +52,7 @@ public class Piece {
         x = move.getFromX();
         y = move.getFromY();
         if (pieceDrawer != null) {
-            pieceDrawer.move(move.getFromX(), move.getFromY());
-            
+            pieceDrawer.move(move.getFromX(), move.getFromY()); 
         }
         handleKingDemotion(move);
     }  
@@ -84,11 +83,11 @@ public class Piece {
                     pieceDrawer.promoteToKing(); 
                 }
             }
-            else if (type.color.equals("black")){
-                type = PieceType.BLACKKING;
-                if (pieceDrawer != null) {
-                    pieceDrawer.promoteToKing(); 
-                }
+        }
+        else if (type.color.equals("black")){
+            type = PieceType.BLACKKING;
+            if (pieceDrawer != null) {
+                pieceDrawer.promoteToKing(); 
             }
         }
     }

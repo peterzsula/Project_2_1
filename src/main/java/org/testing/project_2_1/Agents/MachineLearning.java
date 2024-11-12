@@ -29,15 +29,15 @@ public class MachineLearning implements Agent {
         System.out.println("MachineLearning agent making move");
         PauseTransition pause = new PauseTransition(Duration.seconds(Agent.delay));
         pause.setOnFinished(event -> {
-        while (gameLogic.g.getIsWhiteTurn() == isWhite && !gameLogic.isGameOver(gameLogic.g)) {
+        if (gameLogic.g.getIsWhiteTurn() == isWhite && !gameLogic.isGameOver(gameLogic.g)) {
             ArrayList<Turn> turns = GameLogic.getLegalTurns(gameLogic.g);
             for (Turn turn : turns) {
                 turn.setEvaluation(gameLogic.evaluateTurn(turn, gameLogic.g));
             }
             Turn bestTurn = getBestTurn(turns);
             Move move = bestTurn.getMoves().remove(0);
-            gameLogic.takeMove(move);
             System.out.println("taking turn with evaluation " + bestTurn.getEvaluation() + move.toString());
+            gameLogic.takeMove(move);
         }
     });
     pause.play();

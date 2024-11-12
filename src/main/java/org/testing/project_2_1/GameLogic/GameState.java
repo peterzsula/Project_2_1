@@ -116,7 +116,7 @@ public class GameState {
         board[move.getFromX()][move.getFromY()].setPiece(null);
         if (move.isCapture()) {
             Capture capture = (Capture) move;
-            Piece capturedPiece = board[capture.getCapturedPiece().getX()][capture.getCapturedPiece().getY()].getPiece();
+            Piece capturedPiece = board[capture.getCaptureAtX()][capture.getCaptureAtY()].getPiece();
             board[capturedPiece.getX()][capturedPiece.getY()].setPiece(null);
             removeCapturedPieceFromLists(capturedPiece);
         }
@@ -137,7 +137,7 @@ public class GameState {
         board[move.getToX()][move.getToY()].setPiece(null);
         if (move.isCapture()) {
             Capture capture = (Capture) move;
-            Piece capturedPiece = new Piece(capture.getCapturedPiece().getType(), capture.getCapturedPiece().getX(), capture.getCapturedPiece().getY());
+            Piece capturedPiece = new Piece(capture.getCapturedPiece().getType(), capture.getCaptureAtX(), capture.getCaptureAtY());
             board[capturedPiece.getX()][capturedPiece.getY()].setPiece(capturedPiece);
             addCapturedPieceToLists(capturedPiece);
         }
