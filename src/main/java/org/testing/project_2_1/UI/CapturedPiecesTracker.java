@@ -71,4 +71,9 @@ public class CapturedPiecesTracker {
         }
     }
 
+    public void reset() {
+        // TODO Auto-generated method stub
+        throw new UnsupportedOperationException("Unimplemented method 'reset'");
+    }
+
 }

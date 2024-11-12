@@ -10,6 +10,7 @@ import static org.testing.project_2_1.UI.CheckersApp.TILE_SIZE;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.testing.project_2_1.GameLogic.GameLogic;
 import org.testing.project_2_1.GameLogic.Piece;
 import org.testing.project_2_1.GameLogic.PieceType;
 import org.testing.project_2_1.Moves.Move;
@@ -17,6 +18,7 @@ import org.testing.project_2_1.Moves.MoveType;
 
 public class PieceDrawer extends StackPane {
     public double mouseX, mouseY;
+    int oldX, oldY;
     int x, y;
     Piece piece;
     CheckersApp app;
@@ -51,23 +53,23 @@ public class PieceDrawer extends StackPane {
         getChildren().addAll(bg, ellipse);
 
         setOnMousePressed(e -> {
-            int newX = (int) Math.floor(e.getSceneX() / TILE_SIZE);
-            int newY = (int) Math.floor(e.getSceneY() / TILE_SIZE);
+            oldX = (int) Math.floor(e.getSceneX() / TILE_SIZE);
+            oldY = (int) Math.floor(e.getSceneY() / TILE_SIZE);
             highlightMoves(piece);
-            app.movePiece(piece, newX, newY);
         });
 
         setOnMouseDragged(e -> {
             relocate(e.getSceneX() - TILE_SIZE / 2, e.getSceneY() - TILE_SIZE / 2);
             int newX = (int) Math.floor(e.getSceneX() / TILE_SIZE);
             int newY = (int) Math.floor(e.getSceneY() / TILE_SIZE);
-            app.movePiece(piece, newX, newY);
+            // System.out.println(newX + " " + newY);
+            app.movePiece(oldX, oldY, piece, newX, newY);
         });
     }
 
     public void highlightMoves(Piece piece) {
         clearHighlight();
-        List<Move> moves = app.gameLogic.getLegalMoves(piece);
+        List<Move> moves = GameLogic.getLegalMoves(piece, app.gameLogic.b);
     
         // Separate captures and normal moves
         List<Move> captureMoves = new ArrayList<>();

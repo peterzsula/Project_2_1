@@ -1,6 +1,11 @@
 package org.testing.project_2_1.GameLogic;
 
 import static org.testing.project_2_1.UI.CheckersApp.SIZE;
+
+import java.util.ArrayList;
+import java.util.HashSet;
+import java.util.Set;
+
 import org.testing.project_2_1.Moves.Move;
 import org.testing.project_2_1.UI.PieceDrawer;
 
@@ -28,9 +33,15 @@ public class Piece {
         this.pieceDrawer = pieceDrawer;
     }
 
+    public void abortMove() {
+        if (pieceDrawer != null) {
+            pieceDrawer.abortMove();
+        }
+    }
+
     public void movePiece(Move move){
-        x = move.getToX();
-        y = move.getToY();
+        x = move.getToX(); // anomaly here when you change the value of piece.x, move.fromX also changes to the same value as piece.x
+        y = move.getToY(); // anomaly here
         if (pieceDrawer != null) {
             pieceDrawer.move(move.getToX(), move.getToY());
         }
@@ -108,5 +119,13 @@ public class Piece {
 
     public int getY() {
         return y;
+    }
+
+    public static Set<Piece> movesToPieces(ArrayList<Move> moves){
+        Set<Piece> pieces = new HashSet<>();
+        for (Move move : moves) {
+            pieces.add(move.getPiece());
+        }
+        return pieces;
     }
 }

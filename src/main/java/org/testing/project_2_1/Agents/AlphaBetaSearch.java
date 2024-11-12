@@ -44,7 +44,7 @@ public class AlphaBetaSearch implements Agent {
         Double beta = Double.MAX_VALUE;
         Move bestMove = null;
         Double bestValue = Double.MIN_VALUE;
-        ArrayList<Move> legalMoves = gameLogic.getLegalMoves();
+        ArrayList<Move> legalMoves = gameLogic.getLegalMoves(gameLogic.b);
         for (Move move : legalMoves) {
             gameLogic.takeMove(move);
             Double value = minValue(alpha, beta, depth - 1);
@@ -52,23 +52,23 @@ public class AlphaBetaSearch implements Agent {
                 bestValue = value;
                 bestMove = move;
             }
-            gameLogic.undoLastMove();
+            gameLogic.undoLastMove(gameLogic.b);
         }
         return bestMove;
     }
 
     public double maxValue(Double alpha, Double beta, int depth) {
         nodesVisited++;
-        if (depth == 0 || gameLogic.isGameOver()) {
+        if (depth == 0 || gameLogic.isGameOver(gameLogic.b)) {
             nodesEvaluated++;
-            return gameLogic.evaluateBoard();
+            return gameLogic.evaluateBoard(gameLogic.b);
         }
         Double value = Double.MIN_VALUE;
-        ArrayList<Move> legalMoves = gameLogic.getLegalMoves();
+        ArrayList<Move> legalMoves = gameLogic.getLegalMoves(gameLogic.b);
         for (Move move : legalMoves) {
             gameLogic.takeMove(move);
             value = Math.max(value, minValue(alpha, beta, depth - 1));
-            gameLogic.undoLastMove();
+            gameLogic.undoLastMove(gameLogic.b);
             if (value >= beta) {
                 maxPruned++;
                 return value;
@@ -80,16 +80,16 @@ public class AlphaBetaSearch implements Agent {
 
     public double minValue(Double alpha, Double beta, int depth) {
         nodesVisited++;
-        if (depth == 0 || gameLogic.isGameOver()) {
+        if (depth == 0 || gameLogic.isGameOver(gameLogic.b)) {
             nodesEvaluated++;
-            return gameLogic.evaluateBoard();
+            return gameLogic.evaluateBoard(gameLogic.b);
         }
         double value = Integer.MAX_VALUE;
-        ArrayList<Move> legalMoves = gameLogic.getLegalMoves();
+        ArrayList<Move> legalMoves = gameLogic.getLegalMoves(gameLogic.b);
         for (Move move : legalMoves) {
             gameLogic.takeMove(move);
             value = Math.min(value, maxValue(alpha, beta, depth - 1));
-            gameLogic.undoLastMove();
+            gameLogic.undoLastMove(gameLogic.b);
             if (value <= alpha) {
                 minPruned++;
                 return value;

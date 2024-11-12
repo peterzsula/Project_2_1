@@ -1,9 +1,7 @@
 package org.testing.project_2_1.UI;
 
 import org.testing.project_2_1.Agents.*;
-import org.testing.project_2_1.GameLogic.Board;
 import org.testing.project_2_1.GameLogic.GameLogic;
-import org.testing.project_2_1.GameLogic.MoveLogic;
 import org.testing.project_2_1.GameLogic.Piece;
 import org.testing.project_2_1.GameLogic.Tile;
 import org.testing.project_2_1.Moves.Move;
@@ -35,7 +33,7 @@ public class CheckersApp extends Application {
     private Group tileGroup = new Group();
     public Group pieceGroup = new Group();
     private Group boardGroup = new Group(); 
-    public CapturedPiecesTracker capturedPiecesTracker;
+    public CapturedPiecesTracker capturedPiecesTracker = new CapturedPiecesTracker();
 
     private boolean isPlayerOneTurn = true;
     private long previousPlayerOneTime; 
@@ -167,7 +165,7 @@ public class CheckersApp extends Application {
             new CheckersApp(gameLogic.agent, gameLogic.opponent);
         }
 
-        for (Tile[] row : gameLogic.board) {
+        for (Tile[] row : gameLogic.b.getBoard()) {
             for (Tile tile : row) {
                 tileGroup.getChildren().add(tile.tileDrawer);
                 if (tile.hasPiece()) {
@@ -184,7 +182,7 @@ public class CheckersApp extends Application {
     }
 
     public void addPiecestoBoard(Pane boardPane) {
-        for (Tile[] row : gameLogic.board) {
+        for (Tile[] row : gameLogic.b.getBoard()) {
             for (Tile tile : row) {
                 tileGroup.getChildren().add(tile.tileDrawer);
                 if (tile.hasPiece()) {
@@ -217,21 +215,21 @@ public class CheckersApp extends Application {
         captureMessageLabel.setText(message);
     }
 
-    public void movePiece(Piece piece, int newX, int newY) {
+    public void movePiece(int oldX, int oldY, Piece piece, int newX, int newY) {
         // Save current times and player turn before making a move
         previousPlayerOneTime = playerOneTimer.getRemainingTimeInSeconds();
         previousPlayerTwoTime = playerTwoTimer.getRemainingTimeInSeconds();
         wasPlayerOneTurnBeforeUndo = isPlayerOneTurn;
     
         piece.getPieceDrawer().setOnMouseReleased(e -> {
-            Move move = gameLogic.moveLogic.determineMoveType(piece, newX, newY);
+            Move move = gameLogic.b.determineMoveType(oldX, oldY, newX, newY);
             System.out.println("Move: " + move.toString());
             boolean isLegalMove = gameLogic.takeMove(move);
             piece.getPieceDrawer().clearHighlight();
     
             if (isLegalMove) {
                 // Use hasAvailableCaptures to check if the piece can capture again
-                boolean additionalCaptureAvailable = gameLogic.hasAvailableCaptures(piece);
+                boolean additionalCaptureAvailable = GameLogic.getLegalMoves(gameLogic.b).size() > 0;
     
                 if (isPlayerOneTurn) {
                     playerOneTimer.stopCountdown();
@@ -258,7 +256,7 @@ public class CheckersApp extends Application {
         playerOneTimer.stopCountdown();
         playerTwoTimer.stopCountdown();
 
-        gameLogic.undoLastMove();
+        gameLogic.undoLastMove(gameLogic.b);
 
         playerOneTimer.setTotalTime(previousPlayerOneTime * 1000);
         playerTwoTimer.setTotalTime(previousPlayerTwoTime * 1000);

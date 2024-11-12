@@ -31,14 +31,14 @@ public class BaselineAgent implements Agent {
         System.out.println("Baseline agent making move");
         PauseTransition pause = new PauseTransition(Duration.seconds(Agent.delay));
         pause.setOnFinished(event -> {
-        while (gameLogic.isWhiteTurn == isWhite && !gameLogic.isGameOver()) {
-            ArrayList<Move> legalMoves = gameLogic.getLegalMoves();
+        while (gameLogic.b.getIsWhiteTurn() == isWhite && !gameLogic.isGameOver(gameLogic.b)) {
+            ArrayList<Move> legalMoves = gameLogic.getLegalMoves(gameLogic.b);
             System.out.println("Legal moves: " + legalMoves.size());
             int randomIndex = new Random().nextInt(legalMoves.size());
             Move move = legalMoves.get(randomIndex);
             System.out.println("Take turn with move " + move);
             gameLogic.takeMove(move);
-            gameLogic.evaluateBoard();
+            gameLogic.evaluateBoard(gameLogic.b);
         }
     });
     pause.play();
