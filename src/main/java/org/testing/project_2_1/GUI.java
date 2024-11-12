@@ -61,12 +61,12 @@ public class GUI extends Application {
                     break;
                 case "NI vs AI":
                     isAgentWhite = false;
-                    Agent agent = new MachineLearning(false);
+                    Agent agent = new BaselineAgent(false);
                     game = new CheckersApp(agent, isAgentWhite);
                     break;
                 case "AI vs AI":
-                    Agent agent1 = new MachineLearning(true);
-                    Agent agent2 = new MachineLearning(false);
+                    Agent agent1 = new BaselineAgent(true);
+                    Agent agent2 = new BaselineAgent(false);
                     game = new CheckersApp(agent1, agent2);
                     break;
                 default:
@@ -78,9 +78,7 @@ public class GUI extends Application {
                 ex.printStackTrace();
             }
         });
-
         selectionPane.getChildren().addAll(gameTitle, playerSelection, startGameButton);
-
         Scene selectionScene = new Scene(selectionPane);
         selectionStage.setTitle("Game Mode Selection");
         selectionStage.setScene(selectionScene);

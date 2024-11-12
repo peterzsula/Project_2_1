@@ -51,7 +51,10 @@ public class Piece {
     public void undoMove(Move move){
         x = move.getFromX();
         y = move.getFromY();
-        pieceDrawer.move(move.getFromX(), move.getFromY());
+        if (pieceDrawer != null) {
+            pieceDrawer.move(move.getFromX(), move.getFromY());
+            
+        }
         handleKingDemotion(move);
     }  
 
@@ -92,7 +95,6 @@ public class Piece {
 
     public void demoteToNormal() {
         if (type == PieceType.BLACKKING || this.type == PieceType.WHITEKING ) {
-            System.out.println("Demoted to normal");
             if (type.color.equals("white")){
                 type = PieceType.WHITE;
                 if (pieceDrawer != null) {

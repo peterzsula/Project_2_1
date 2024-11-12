@@ -165,7 +165,7 @@ public class CheckersApp extends Application {
             new CheckersApp(gameLogic.agent, gameLogic.opponent);
         }
 
-        for (Tile[] row : gameLogic.b.getBoard()) {
+        for (Tile[] row : gameLogic.g.getBoard()) {
             for (Tile tile : row) {
                 tileGroup.getChildren().add(tile.tileDrawer);
                 if (tile.hasPiece()) {
@@ -182,7 +182,7 @@ public class CheckersApp extends Application {
     }
 
     public void addPiecestoBoard(Pane boardPane) {
-        for (Tile[] row : gameLogic.b.getBoard()) {
+        for (Tile[] row : gameLogic.g.getBoard()) {
             for (Tile tile : row) {
                 tileGroup.getChildren().add(tile.tileDrawer);
                 if (tile.hasPiece()) {
@@ -222,14 +222,14 @@ public class CheckersApp extends Application {
         wasPlayerOneTurnBeforeUndo = isPlayerOneTurn;
     
         piece.getPieceDrawer().setOnMouseReleased(e -> {
-            Move move = gameLogic.b.determineMoveType(oldX, oldY, newX, newY);
+            Move move = gameLogic.g.determineMoveType(oldX, oldY, newX, newY);
             System.out.println("Move: " + move.toString());
             boolean isLegalMove = gameLogic.takeMove(move);
             piece.getPieceDrawer().clearHighlight();
     
             if (isLegalMove) {
                 // Use hasAvailableCaptures to check if the piece can capture again
-                boolean additionalCaptureAvailable = GameLogic.getLegalMoves(gameLogic.b).size() > 0;
+                boolean additionalCaptureAvailable = GameLogic.getLegalMoves(gameLogic.g).size() > 0; // not correct, if you run out of moves, this will just get the other players moves
     
                 if (isPlayerOneTurn) {
                     playerOneTimer.stopCountdown();
@@ -256,7 +256,7 @@ public class CheckersApp extends Application {
         playerOneTimer.stopCountdown();
         playerTwoTimer.stopCountdown();
 
-        gameLogic.undoLastMove(gameLogic.b);
+        gameLogic.undoLastMove(gameLogic.g);
 
         playerOneTimer.setTotalTime(previousPlayerOneTime * 1000);
         playerTwoTimer.setTotalTime(previousPlayerTwoTime * 1000);

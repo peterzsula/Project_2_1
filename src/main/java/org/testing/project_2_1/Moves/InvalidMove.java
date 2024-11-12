@@ -10,6 +10,6 @@ public class InvalidMove extends Move {
 
     @Override
     public String toString() {
-        return "INVALID Move from X=" + piece.getX() + ", Y=" + piece.getY() + ", to X=" + toX + ", to Y=" + toY;
+        return "INVALID Move from X=" + fromX + ", Y=" + fromY + ", to X=" + toX + ", to Y=" + toY;
     }
 }

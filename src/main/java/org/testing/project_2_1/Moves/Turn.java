@@ -76,4 +76,16 @@ public class Turn {
         return turns;
     }
 
+    public void removeMove(Move move) {
+        moves.remove(move);
+    }
+
+    public Move getLast() {
+        return moves.getLast();
+    }
+
+    public boolean isEmpty() {
+        return moves.isEmpty();
+    }
+
 }

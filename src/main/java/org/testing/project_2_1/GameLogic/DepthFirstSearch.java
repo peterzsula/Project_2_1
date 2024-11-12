@@ -13,10 +13,8 @@ public class DepthFirstSearch {
         maxCaptures = 0;
     }
     
-    public static void dfs(Board b, Piece piece, Turn currentTurn, int captureCount) {
-        // Get all available captures for the current state
-        ArrayList<Move> captures = GameLogic.getLegalMoves(piece, b);
-        
+    public static void dfs(GameState g, Piece piece, Turn currentTurn, int captureCount) {
+        ArrayList<Move> captures = GameLogic.getCaptures(piece, g);
         if (captures.isEmpty()) {
             currentTurn.getMoves().getLast().setTurnEnding(true);
             //TODO: add 2 kings rule
@@ -32,14 +30,14 @@ public class DepthFirstSearch {
         
         // Iterate over each capture move and explore further captures
         for (Move capture : captures) {
-            b.move(capture);  // Make the move on a board copy
+            g.move(capture);  // Make the move on a board copy
             currentTurn.addMove(capture);
-
+            piece = g.getPiece(capture.getToX(), capture.getToY());
             // Recursively continue to capture and increment captureCount
-            dfs(b, piece, currentTurn, captureCount + 1);
+            dfs(g, piece, currentTurn, captureCount + 1);
             
             // Backtrack by undoing the last move and removing it from the current turn
-            b.undoMove(capture);
+            g.undoMove(capture);
             currentTurn.removeLastMove();
         }
     }

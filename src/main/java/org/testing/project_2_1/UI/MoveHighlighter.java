@@ -6,6 +6,7 @@ import java.util.List;
 
 import org.testing.project_2_1.GameLogic.Piece;
 import org.testing.project_2_1.GameLogic.PieceType;
+import org.testing.project_2_1.Moves.Capture;
 import org.testing.project_2_1.Moves.NormalMove;
 
 public class MoveHighlighter {

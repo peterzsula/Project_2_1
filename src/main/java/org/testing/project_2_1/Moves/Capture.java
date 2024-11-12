@@ -17,24 +17,11 @@ public class Capture extends Move {
 
     @Override
     public boolean equals(Object obj) {
-        if (getClass() != obj.getClass())
-            return false;
-        Capture other = (Capture) obj;
-        if (piece == null) {
-            if (other.piece != null)
-                return false;
-        } else if (!piece.equals(other.piece))
-            return false;
-        if (capturedPiece == null) {
-            if (other.capturedPiece != null)
-                return false;
-        } else if (!capturedPiece.equals(other.capturedPiece))
-            return false;
-        if (toX != other.toX)
-            return false;
-        if (toY != other.toY)
-            return false;
-        return true;
+        if (obj instanceof Capture) {
+            Capture other = (Capture) obj;
+            return other.getToX() == toX && other.getToY() == toY && other.getFromX() == fromX && other.getFromY() == fromY;
+        }
+        return false;
     }
 
     @Override

@@ -4,6 +4,9 @@ import java.util.ArrayList;
 import org.testing.project_2_1.GameLogic.GameLogic;
 import org.testing.project_2_1.Moves.*;
 
+import javafx.animation.PauseTransition;
+import javafx.util.Duration;
+
 public class MachineLearning implements Agent {
     private GameLogic gameLogic;
     private boolean isWhite;
@@ -24,14 +27,20 @@ public class MachineLearning implements Agent {
     @Override
     public void makeMove() {
         System.out.println("MachineLearning agent making move");
-        ArrayList<Turn> turns = GameLogic.getLegalTurns(gameLogic.b);
-        System.out.println("number of turns " + turns.size());
-        for (Turn turn : turns) {
-            turn.setEvaluation(gameLogic.evaluateTurn(turn, gameLogic.b));
+        PauseTransition pause = new PauseTransition(Duration.seconds(Agent.delay));
+        pause.setOnFinished(event -> {
+        while (gameLogic.g.getIsWhiteTurn() == isWhite && !gameLogic.isGameOver(gameLogic.g)) {
+            ArrayList<Turn> turns = GameLogic.getLegalTurns(gameLogic.g);
+            for (Turn turn : turns) {
+                turn.setEvaluation(gameLogic.evaluateTurn(turn, gameLogic.g));
+            }
+            Turn bestTurn = getBestTurn(turns);
+            Move move = bestTurn.getMoves().remove(0);
+            gameLogic.takeMove(move);
+            System.out.println("taking turn with evaluation " + bestTurn.getEvaluation() + move.toString());
         }
-        Turn bestTurn = getBestTurn(turns);
-        System.out.println("taking turn with evaluation " + bestTurn.getEvaluation() + bestTurn.getMoves().get(0).toString());
-        gameLogic.takeTurn(bestTurn);
+    });
+    pause.play();
     }
 
     @Override

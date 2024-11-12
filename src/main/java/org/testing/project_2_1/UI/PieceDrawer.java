@@ -69,7 +69,7 @@ public class PieceDrawer extends StackPane {
 
     public void highlightMoves(Piece piece) {
         clearHighlight();
-        List<Move> moves = GameLogic.getLegalMoves(piece, app.gameLogic.b);
+        List<Move> moves = GameLogic.getLegalMoves(piece, app.gameLogic.g);
     
         // Separate captures and normal moves
         List<Move> captureMoves = new ArrayList<>();

@@ -58,6 +58,19 @@ public abstract class Move {
     }
 
     @Override
+    public boolean equals(Object obj) {
+        if (obj instanceof Move) {
+            Move move = (Move) obj;
+            return move.fromX == fromX && move.fromY == fromY && move.toX == toX && move.toY == toY;
+        }
+        if (obj instanceof Capture) {
+            Capture move = (Capture) obj;
+            return move.fromX == fromX && move.fromY == fromY && move.toX == toX && move.toY == toY;
+        }
+        return false;
+    }
+
+    @Override
     public String toString() {
         if (type == MoveType.INVALID) {
             return "INVALID Move from X=" + fromX + ", Y=" + fromY + ", to X=" + toX + ", to Y=" + toY;

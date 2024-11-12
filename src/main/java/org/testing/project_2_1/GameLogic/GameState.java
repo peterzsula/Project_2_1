@@ -9,20 +9,22 @@ import org.testing.project_2_1.Moves.Move;
 import org.testing.project_2_1.Moves.NormalMove;
 import org.testing.project_2_1.Moves.Turn;
 
-public class Board {
+public class GameState {
     protected Tile[][] board;
     protected boolean isWhiteTurn;
     private ArrayList<Piece> whitePieces;
     private ArrayList<Piece> blackPieces;
     private ArrayList<Move> movesPlayed;
     private ArrayList<Turn> turnsPlayed;
+    private Turn currentTurn;
 
-    public Board(){
+    public GameState(){
         isWhiteTurn = true;
         whitePieces = new ArrayList<Piece>();
         blackPieces = new ArrayList<Piece>();
         movesPlayed = new ArrayList<Move>();
         turnsPlayed = new ArrayList<Turn>();
+        currentTurn = new Turn();
         board = new Tile[SIZE][SIZE];
         for (int y = 0; y < SIZE; y++) {
             for (int x = 0; x < SIZE; x++) {
@@ -44,30 +46,41 @@ public class Board {
 
     }
 
-    public Board(Tile[][] board, boolean isWhiteTurn) {
-        this.isWhiteTurn = isWhiteTurn;
+    public GameState(GameState originalB) {
+        isWhiteTurn = true;
         whitePieces = new ArrayList<Piece>();
         blackPieces = new ArrayList<Piece>();
         movesPlayed = new ArrayList<Move>();
-        Tile[][] boardCopy = new Tile[SIZE][SIZE];
-        for (int col = 0; col < SIZE; col++) {
-            for (int row = 0; row < SIZE; row++) {
-                boardCopy[row][col] = new Tile(row, col);
-                if (board[row][col].hasPiece()) {
-                    Piece originalPiece = board[row][col].getPiece();
-                    Piece piece = new Piece(originalPiece.type, row, col);
-                    boardCopy[row][col].setPiece(piece);
+        turnsPlayed = new ArrayList<Turn>();
+        currentTurn = new Turn();
+        this.isWhiteTurn = originalB.getIsWhiteTurn();
+        this.board = new Tile[SIZE][SIZE];
+        for (int y = 0; y < SIZE; y++) {
+            for (int x = 0; x < SIZE; x++) {
+                this.board[x][y] = new Tile(x, y);
+                if (originalB.board[x][y].hasPiece()) {
+                    Piece originalPiece = originalB.board[x][y].getPiece();
+                    Piece piece = new Piece(originalPiece.type, x, y);
+                    this.board[x][y].setPiece(piece);
                     if (piece.type == PieceType.WHITE || piece.type == PieceType.WHITEKING) {
-                        whitePieces.add(boardCopy[row][col].getPiece());
+                        this.whitePieces.add(this.board[x][y].getPiece());
                     } 
                     else {
-                        blackPieces.add(boardCopy[row][col].getPiece());
+                        this.blackPieces.add(this.board[x][y].getPiece());
                     }
                 }
             }
         }
-        System.out.println(this.toString());
-        this.board = boardCopy;
+        // copy originalB.turnsPlayed to bCopy.turnsPlayed
+        this.turnsPlayed = new ArrayList<Turn>();
+        for (Turn turn : originalB.getTurnsPlayed()) {
+            Turn turnCopy = new Turn(turn);
+            turnsPlayed.add(turnCopy);
+        }
+        this.movesPlayed = new ArrayList<Move>();
+        for (Move move : originalB.getMovesPlayed()) {
+            movesPlayed.add(move);
+        }
     }
 
     public Tile[][] getBoard() {
@@ -95,24 +108,49 @@ public class Board {
     }
 
     public boolean move(Move move) {
-        Piece piece = board[move.getFromX()][move.getFromY()].getPiece();
         movesPlayed.add(move);
-        board[move.getToX()][move.getToY()].setPiece(piece);
+        currentTurn.addMove(move);
+        Piece piece = board[move.getFromX()][move.getFromY()].getPiece();
         piece.movePiece(move);
+        board[move.getToX()][move.getToY()].setPiece(piece);
         board[move.getFromX()][move.getFromY()].setPiece(null);
         if (move.isCapture()) {
             Capture capture = (Capture) move;
             Piece capturedPiece = board[capture.getCapturedPiece().getX()][capture.getCapturedPiece().getY()].getPiece();
             board[capturedPiece.getX()][capturedPiece.getY()].setPiece(null);
-            removeCapturedPiece(capturedPiece);
+            removeCapturedPieceFromLists(capturedPiece);
         }
         if (move.isTurnEnding()) {
+            turnsPlayed.add(currentTurn);
+            currentTurn = new Turn();
             switchTurn();
         }
         return true;
     }
 
-    private void removeCapturedPiece(Piece piece){
+    public boolean undoMove(Move move){
+        movesPlayed.remove(move);
+        currentTurn.removeMove(move);
+        Piece piece = board[move.getToX()][move.getToY()].getPiece();
+        piece.undoMove(move);
+        board[move.getFromX()][move.getFromY()].setPiece(piece);
+        board[move.getToX()][move.getToY()].setPiece(null);
+        if (move.isCapture()) {
+            Capture capture = (Capture) move;
+            Piece capturedPiece = new Piece(capture.getCapturedPiece().getType(), capture.getCapturedPiece().getX(), capture.getCapturedPiece().getY());
+            board[capturedPiece.getX()][capturedPiece.getY()].setPiece(capturedPiece);
+            addCapturedPieceToLists(capturedPiece);
+        }
+        if (move.isTurnEnding()) {
+            turnsPlayed.remove(currentTurn);
+            currentTurn = turnsPlayed.get(turnsPlayed.size() - 1);
+            switchTurn();
+        }
+        return true;
+    }
+
+    
+    private void removeCapturedPieceFromLists(Piece piece){
         if (piece.type.color.equals("white")) {
             whitePieces.remove(piece);
         }
@@ -121,31 +159,13 @@ public class Board {
         }
     }
 
-    public Tile[][] undoMove(Move move){
-        Piece piece = board[move.getToX()][move.getToY()].getPiece();
-        if (move.isNormal()) {
-            piece.undoMove(move);
-            board[move.getFromX()][move.getFromY()].setPiece(piece);
-            board[move.getToX()][move.getToY()].setPiece(null);
+    private void addCapturedPieceToLists(Piece piece){
+        if (piece.type.color.equals("white")) {
+            whitePieces.add(piece);
         }
-        else if (move.isCapture()) {
-            piece.undoMove(move);
-            Capture capture = (Capture) move;
-            Piece capturedPiece = board[capture.getCapturedPiece().getX()][capture.getCapturedPiece().getY()].getPiece();
-            board[move.getFromX()][move.getFromY()].setPiece(piece);
-            board[move.getToX()][move.getToY()].setPiece(null);
-            board[capturedPiece.getX()][capturedPiece.getY()].setPiece(capturedPiece);
-            if (capturedPiece.type.color.equals("white")) {
-                whitePieces.add(capturedPiece);
-            }
-            else {
-                blackPieces.add(capturedPiece);
-            }
+        else {
+            blackPieces.add(piece);
         }
-        if (move.isTurnEnding()) {
-            switchTurn();
-        }
-        return board;
     }
 
     public Piece getPieceAt(int x, int y) {
@@ -369,23 +389,47 @@ public class Board {
         for (int y = 0; y < SIZE; y++) {
             for (int x = 0; x < SIZE; x++) {
                 if (!board[x][y].hasPiece())  {
-                    sb.append("0");
+                    sb.append("0 ");
                 }
                 else {
                     Piece piece = board[x][y].getPiece();
                     if (piece.getType() == PieceType.BLACK) {
-                        sb.append("B");
+                        sb.append("b ");
                     } else if (piece.getType() == PieceType.WHITE) {
-                        sb.append("W");
+                        sb.append("w ");
                     } else if (piece.getType() == PieceType.BLACKKING) {
-                        sb.append("K");
+                        sb.append("B ");
                     } else if (piece.getType() == PieceType.WHITEKING) {
-                        sb.append("Q");
+                        sb.append("W ");
                     }
                 }
             }
             sb.append("\n");
         }
         return sb.toString();
+    }
+
+    public boolean equals(GameState b){
+        for (int y = 0; y < SIZE; y++) {
+            for (int x = 0; x < SIZE; x++) {
+                if (board[x][y].hasPiece() != b.getBoard()[x][y].hasPiece()) {
+                    return false;
+                }
+                if (board[x][y].hasPiece() && b.getBoard()[x][y].hasPiece()) {
+                    if (!board[x][y].getPiece().equals(b.getBoard()[x][y].getPiece())) {
+                        return false;
+                    }
+                }
+            }
+        }
+        return true;
+    }
+
+    public Piece getPiece(int x, int y) {
+        return board[x][y].getPiece();
+    }
+
+    public Turn getCurrentTurn() {
+        return currentTurn;
     }
 }
