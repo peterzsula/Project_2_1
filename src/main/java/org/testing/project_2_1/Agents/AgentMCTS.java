@@ -30,10 +30,8 @@ public class AgentMCTS implements Agent {
         System.out.println("MCTS agent making move");
         PauseTransition pause = new PauseTransition(Duration.seconds(Agent.delay));
         pause.setOnFinished(event -> {
-            while (gameLogic.getWhiteTurn == isWhite && !gameLogic.isGameOver()) {
+            if (gameLogic.g.getIsWhiteTurn() == isWhite && !gameLogic.isGameOver(gameLogic.g)) {
                 // TODO: Agent MCTS yet to implement
-                // gameLogic.takeTurn(move);
-                // gameLogic.evaluateBoard();
             }
         });
         pause.play();
