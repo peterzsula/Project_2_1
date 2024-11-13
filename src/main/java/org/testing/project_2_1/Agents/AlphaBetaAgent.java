@@ -1,6 +1,10 @@
 package org.testing.project_2_1.Agents;
 import org.testing.project_2_1.GameLogic.GameLogic;
+import org.testing.project_2_1.GameLogic.GameState;
+import org.testing.project_2_1.Moves.Move;
+import org.testing.project_2_1.Moves.Turn;
 
+import java.util.ArrayList;
 import javafx.animation.PauseTransition;
 import javafx.util.Duration;
 
@@ -15,10 +19,7 @@ public class AlphaBetaAgent implements Agent { //for now uses minimax algorithm,
         this.isWhite=isWhite;
     }
 
-    public void setGameLogic(GameLogic gameLogic) {
-
-        this.gameLogic = gameLogic;
-    }
+    public void setGameLogic(GameLogic gameLogic) { this.gameLogic = gameLogic; }
     @Override
     public boolean isWhite() {
         return isWhite;
@@ -29,19 +30,19 @@ public class AlphaBetaAgent implements Agent { //for now uses minimax algorithm,
         System.out.println("Alpha-Beta agent making move");
         PauseTransition pause = new PauseTransition(Duration.seconds(Agent.delay));
         pause.setOnFinished(event -> {
-            while (gameLogic.isWhiteTurn == isWhite && !gameLogic.isGameOver()) {
-                Move bestMove = findBestMove();
-                System.out.println("Take turn with move " + bestMove);
-                gameLogic.takeTurn(bestMove);
-                gameLogic.evaluateBoard();
-                isWhiteTurn = true;
+            if (gameLogic.g.getIsWhiteTurn() == isWhite && !gameLogic.isGameOver(gameLogic.g)) {
+                ArrayList<Turn> turns = GameLogic.getLegalTurns(gameLogic.g);
+                Turn bestTurn = getBestTurn(turns);
+                Move move = bestTurn.getMoves().remove(0);
+                System.out.println("Takes turn with move " + move);
+                gameLogic.takeMove(move);
             }
         });
         pause.play();
     }
-    private Move findBestMove() {
-        ArrayList<Move> legalMoves = gameLogic.getLegalMoves();
-        Move bestMove = null;
+
+    private Turn getBestTurn(ArrayList<Turn> turns) {
+        Turn bestTurn = null;
         int bestValue;
         if (isWhite) {
             bestValue = Integer.MIN_VALUE;
@@ -49,33 +50,41 @@ public class AlphaBetaAgent implements Agent { //for now uses minimax algorithm,
             bestValue = Integer.MAX_VALUE;
         }
 
-        for (Move move : legalMoves) {
-            gameLogic.takeTurn(move);
-            int boardValue = minimax(maxDepth, Integer.MIN_VALUE, Integer.MAX_VALUE, !isWhite);
+        for (Turn turn : turns) {
+            GameState newState = new GameState(gameLogic.g);
+            for (Move move : turn.getMoves()) {
+                newState.move(move);
+            }
+
+            int boardValue = minimax(newState, maxDepth - 1, Integer.MIN_VALUE, Integer.MAX_VALUE, !isWhite);
 
             if (isWhite && boardValue > bestValue) {
                 bestValue = boardValue;
-                bestMove = move;
+                bestTurn = turn;
             } else if (!isWhite && boardValue < bestValue) {
                 bestValue = boardValue;
-                bestMove = move;
+                bestTurn = turn;
             }
         }
-
-        return bestMove;
+        return bestTurn;
     }
 
-    private int minimax(int depth, int alpha, int beta, boolean maximizingPlayer) {
-        if (depth == 0 || gameLogic.isGameOver()) {
-            return (int) evaluateBoard();
+    private int minimax(GameState gameState, int depth, int alpha, int beta, boolean maxPlayer) {
+        if (depth == 0 || gameLogic.isGameOver(gameState)) {
+            return (int) GameLogic.evaluateBoard(gameState);
         }
 
-        ArrayList<Move> legalMoves = gameLogic.getLegalMoves();
-        if (maximizingPlayer) {
+        ArrayList<Turn> legalTurns = GameLogic.getLegalTurns(gameState);
+
+        if (maxPlayer) {
             int maxEval = Integer.MIN_VALUE;
-            for (Move move : legalMoves) {
-                gameLogic.takeTurn(move);
-                int eval = minimax(depth - 1, alpha, beta, false);
+            for (Turn turn : legalTurns) {
+                GameState newState = new GameState(gameState);
+                for (Move move : turn.getMoves()) {
+                    newState.move(move);
+                }
+
+                int eval = minimax(newState, depth - 1, alpha, beta, false);
                 maxEval = Math.max(maxEval, eval);
                 alpha = Math.max(alpha, eval);
                 if (beta <= alpha) {
@@ -85,9 +94,13 @@ public class AlphaBetaAgent implements Agent { //for now uses minimax algorithm,
             return maxEval;
         } else {
             int minEval = Integer.MAX_VALUE;
-            for (Move move : legalMoves) {
-                gameLogic.takeTurn(move);
-                int eval = minimax(depth - 1, alpha, beta, true);
+            for (Turn turn : legalTurns) {
+                GameState newState = new GameState(gameState);
+                for (Move move : turn.getMoves()) {
+                    newState.move(move);
+                }
+
+                int eval = minimax(newState, depth - 1, alpha, beta, true);
                 minEval = Math.min(minEval, eval);
                 beta = Math.min(beta, eval);
                 if (beta <= alpha) {
@@ -97,10 +110,7 @@ public class AlphaBetaAgent implements Agent { //for now uses minimax algorithm,
             return minEval;
         }
     }
-    private int evaluateBoard() {
-        return (int) gameLogic.evaluateBoard();
-    }
     public Agent reset() {
-        return new AgentMCTS(isWhite);
+        return new AlphaBetaAgent(isWhite);
     }
 }
