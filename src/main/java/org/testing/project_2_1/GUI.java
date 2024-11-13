@@ -60,9 +60,8 @@ public class GUI extends Application {
                     game = new CheckersApp(); 
                     break;
                 case "NI vs AI":
-                    isAgentWhite = false;
                     Agent agent = new MachineLearning(false);
-                    game = new CheckersApp(agent, isAgentWhite);
+                    game = new CheckersApp(agent);
                     break;
                 case "AI vs AI":
                     Agent agent1 = new BaselineAgent(true);

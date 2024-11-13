@@ -25,7 +25,7 @@ public class GameLogic {
         setStandardValues(app);
     }
 
-    public GameLogic(CheckersApp app, Agent agent, boolean isAgentWhite) {
+    public GameLogic(CheckersApp app, Agent agent) {
         this.agent = agent.reset();
         this.opponent = null;
         this.agent.setGameLogic(this);
@@ -73,6 +73,14 @@ public class GameLogic {
         }
         if (opponent != null && opponent.isWhite() == g.isWhiteTurn) {
             opponent.makeMove();
+        }
+    }
+
+    public void printAvailableCaptures(GameState g){
+        ArrayList<Turn> availableTurns = getLegalTurns(g);
+        System.out.println("Nuber of available moves: " + availableTurns.size());
+        for (Turn turn : availableTurns) {
+            System.out.println(turn.getMoves().getFirst().toString());
         }
     }
 
@@ -183,14 +191,6 @@ public class GameLogic {
         return availableMoves;
     }
 
-    public void printAvailableCaptures(GameState g){
-        ArrayList<Turn> availableTurns = getLegalTurns(g);
-        System.out.println("Nuber of available moves: " + availableTurns.size());
-        for (Turn turn : availableTurns) {
-            System.out.println(turn.getMoves().getFirst().toString());
-        }
-    }
-
     public static ArrayList<Piece> getListOfPieces(GameState b) {
         if (b.isWhiteTurn) {
             return b.getWhitePieces();
@@ -233,9 +233,11 @@ public class GameLogic {
                     askForMove(); 
                     return true;
                 }
-                System.out.println("made capture, can take again");
-                askForMove();
-                return true;
+                else {
+                    System.out.println("made capture, can take again");
+                    askForMove();
+                    return true;
+                }
             }
         }
         if (g.getCurrentTurn().isEmpty()) {

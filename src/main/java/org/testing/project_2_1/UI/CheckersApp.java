@@ -50,8 +50,8 @@ public class CheckersApp extends Application {
         noOfPlayers = 2;
     }
 
-    public CheckersApp(Agent agent, boolean isAgentWhite) {
-        gameLogic = new GameLogic(this, agent, isAgentWhite);
+    public CheckersApp(Agent agent) {
+        gameLogic = new GameLogic(this, agent);
         agent.setGameLogic(gameLogic);
         noOfPlayers = 1;
     }
@@ -159,7 +159,7 @@ public class CheckersApp extends Application {
             new CheckersApp();
         }
         else if (noOfPlayers == 1) {
-            new CheckersApp(gameLogic.agent, gameLogic.agent.isWhite());
+            new CheckersApp(gameLogic.agent);
         }
         else if (noOfPlayers == 0) {
             new CheckersApp(gameLogic.agent, gameLogic.opponent);

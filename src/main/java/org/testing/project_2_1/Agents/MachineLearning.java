@@ -36,7 +36,7 @@ public class MachineLearning implements Agent {
             }
             Turn bestTurn = getBestTurn(turns);
             Move move = bestTurn.getMoves().remove(0);
-            System.out.println("taking turn with evaluation " + bestTurn.getEvaluation() + move.toString());
+            System.out.println("taking turn with evaluation " + bestTurn.getEvaluation() + " " + move.toString());
             gameLogic.takeMove(move);
         }
     });
