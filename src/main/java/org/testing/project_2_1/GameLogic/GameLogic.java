@@ -217,6 +217,7 @@ public class GameLogic {
         if (move.isNormal() && !legalTurns.get(0).isShot()) {
             System.out.println("no available captures, making normal move");
             movePiece(move);
+            app.updateEvaluationBar();
             askForMove();
             return true;
         }
@@ -228,6 +229,7 @@ public class GameLogic {
                 }
                 movePiece(move);
                 app.updateCaptureMessage(" ");
+                app.updateEvaluationBar();
                 if (curMove.isTurnEnding()) {
                     System.out.println("made all available captures");
                     askForMove(); 

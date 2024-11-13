@@ -19,6 +19,7 @@ import javafx.scene.layout.VBox;
 import javafx.stage.Stage;
 import javafx.scene.text.Font;
 import javafx.scene.text.FontWeight;
+import javafx.scene.control.ProgressBar;
 
 public class CheckersApp extends Application {
     public static final int TILE_SIZE = 60;
@@ -30,6 +31,10 @@ public class CheckersApp extends Application {
     private Label captureMessageLabel;
     private PlayerTimer playerOneTimer;
     private PlayerTimer playerTwoTimer;
+    private ProgressBar evaluationBar;
+    private Label evaluationScoreLabel;
+    private double minObservedScore = -20;
+    private double maxObservedScore = 20;
     private Group tileGroup = new Group();
     public Group pieceGroup = new Group();
     private Group boardGroup = new Group(); 
@@ -48,6 +53,7 @@ public class CheckersApp extends Application {
     public CheckersApp() {
         gameLogic = new GameLogic(this);
         noOfPlayers = 2;
+        evaluationBar = new ProgressBar(0.5);
     }
 
     public CheckersApp(Agent agent) {
@@ -85,6 +91,16 @@ public class CheckersApp extends Application {
         captureMessageLabel = new Label();
         captureMessageLabel.setFont(new Font("Arial", 16));
         captureMessageLabel.setStyle("-fx-text-fill: red; -fx-font-weight: bold;");
+
+        // Initialize the evaluation bar
+        evaluationBar = new ProgressBar(0.5);
+        evaluationBar.setPrefWidth(200);
+        evaluationBar.setStyle("-fx-accent: gray;");
+
+        // Label to display the evaluation score
+        evaluationScoreLabel = new Label("Score: 0.0");
+        evaluationScoreLabel.setFont(new Font("Arial", 14));
+        evaluationScoreLabel.setStyle("-fx-text-fill: black; -fx-font-weight: bold;");
 
         capturedPiecesTracker = new CapturedPiecesTracker();
 
@@ -137,7 +153,7 @@ public class CheckersApp extends Application {
         playerOneBox.setPadding(new Insets(15));
         playerTwoBox.setPadding(new Insets(15));
 
-        VBox rightPanel = new VBox(20, playerOneBox, playerTwoBox, captureMessageLabel);
+        VBox rightPanel = new VBox(20, playerOneBox, playerTwoBox, captureMessageLabel, evaluationBar, evaluationScoreLabel);
         rightPanel.setStyle("-fx-padding: 10 10 10 20;");
         rightPanel.setPrefWidth(260);
 
@@ -145,6 +161,8 @@ public class CheckersApp extends Application {
         root.getChildren().addAll(boardPane, rightPanel, resetButton, undoButton);
         root.setSpacing(20);
         return root;
+
+
     }
 
     public void resetGUI() {
@@ -267,6 +285,41 @@ public class CheckersApp extends Application {
             playerOneTimer.startCountdown();
         } else {
             playerTwoTimer.startCountdown();
+        }
+    }
+
+    // Method to update the evaluation bar based on the game state
+    public void updateEvaluationBar() {
+        double evaluationScore = GameLogic.evaluateBoard(gameLogic.g); // Get current evaluation
+        updateObservedRange(evaluationScore);
+        double normalizedScore = normalizeEvaluation(evaluationScore);
+
+        // Set the bar progress and color based on the normalized score
+        evaluationBar.setProgress(normalizedScore);
+        if (evaluationScore > 0) {
+            evaluationBar.setStyle("-fx-accent: lightgreen;"); // White advantage
+        } else if (evaluationScore < 0) {
+            evaluationBar.setStyle("-fx-accent: lightcoral;"); // Black advantage
+        } else {
+            evaluationBar.setStyle("-fx-accent: gray;"); // Balanced
+        }
+
+
+        evaluationScoreLabel.setText(String.format("Score: %.1f", evaluationScore));
+    }
+    // Normalize evaluation score between 0.0 and 1.0
+    private double normalizeEvaluation(double evaluationScore) {
+        if (maxObservedScore == minObservedScore) {
+            return 0.5;
+        }
+        return (evaluationScore - minObservedScore) / (maxObservedScore - minObservedScore);
+    }
+    // Adjust min and max score bounds based on observed scores
+    private void updateObservedRange(double evaluationScore) {
+        if (evaluationScore < minObservedScore) {
+            minObservedScore = evaluationScore;
+        } else if (evaluationScore > maxObservedScore) {
+            maxObservedScore = evaluationScore;
         }
     }
 
