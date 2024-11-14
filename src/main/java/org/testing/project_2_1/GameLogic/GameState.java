@@ -142,7 +142,7 @@ public class GameState {
             addCapturedPieceToLists(capturedPiece);
         }
         if (move.isTurnEnding()) {
-            currentTurn = turnsPlayed.get(turnsPlayed.size() - 1); // bug here
+            currentTurn = turnsPlayed.get(turnsPlayed.size() - 1); // bug here when AB agent depth is 4
             turnsPlayed.remove(currentTurn);
             switchTurn();
         }
