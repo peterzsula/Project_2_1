@@ -142,7 +142,7 @@ public class GameState {
             addCapturedPieceToLists(capturedPiece);
         }
         if (move.isTurnEnding()) {
-            currentTurn = turnsPlayed.get(turnsPlayed.size() - 1);
+            currentTurn = turnsPlayed.get(turnsPlayed.size() - 1); // bug here
             turnsPlayed.remove(currentTurn);
             switchTurn();
         }
