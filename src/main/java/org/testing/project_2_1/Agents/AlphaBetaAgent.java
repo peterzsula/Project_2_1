@@ -15,6 +15,7 @@ public class AlphaBetaAgent implements Agent { //for now uses minimax algorithm,
 
     private static final int maxDepth = 3;
 
+    // TODO: add parameter for depth
     public AlphaBetaAgent(boolean isWhite) {
         this.isWhite=isWhite;
     }
@@ -112,5 +113,11 @@ public class AlphaBetaAgent implements Agent { //for now uses minimax algorithm,
     }
     public Agent reset() {
         return new AlphaBetaAgent(isWhite);
+    }
+
+    @Override
+    public void simulate() {
+        // TODO Auto-generated method stub
+        throw new UnsupportedOperationException("Unimplemented method 'simulate'");
     }
 }

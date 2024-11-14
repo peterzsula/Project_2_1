@@ -111,7 +111,7 @@ public class GameLogic {
     }
 
     public static ArrayList<Turn> getLegalTurns(Piece piece, GameState originalGS) {
-        GameState b = new GameState(originalGS); // g
+        GameState g = new GameState(originalGS); // g
         ArrayList<Move> availableMoves = getLegalMoves(originalGS); //g, piece?
         if (availableMoves.get(0).isNormal()) {
             return Turn.copyMovesToTurns(availableMoves);
@@ -119,7 +119,7 @@ public class GameLogic {
         DepthFirstSearch.resetMaxCaptures();
         DepthFirstSearch.resetResult();
         Turn initialTurn = new Turn();
-        DepthFirstSearch.dfs(b, piece, initialTurn, 0); // g
+        DepthFirstSearch.dfs(g, piece, initialTurn, 0); // g
         ArrayList<Turn> result = DepthFirstSearch.getResult();
         return result;
     }

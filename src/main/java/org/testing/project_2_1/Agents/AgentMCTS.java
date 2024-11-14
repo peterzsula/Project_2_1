@@ -41,4 +41,10 @@ public class AgentMCTS implements Agent {
         return new AgentMCTS(isWhite);
     }
 
+    @Override
+    public void simulate() {
+        // TODO Auto-generated method stub
+        throw new UnsupportedOperationException("Unimplemented method 'simulate'");
+    }
+
 }

@@ -27,5 +27,11 @@ public class Human implements Agent{
         // TODO Auto-generated method stub
         throw new UnsupportedOperationException("Unimplemented method 'reset'");
     }
+
+    @Override
+    public void simulate() {
+        // TODO Auto-generated method stub
+        throw new UnsupportedOperationException("Unimplemented method 'simulate'");
+    }
     
 }

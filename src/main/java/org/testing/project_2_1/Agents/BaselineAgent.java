@@ -50,5 +50,11 @@ public class BaselineAgent implements Agent {
     public BaselineAgent reset() {
         return new BaselineAgent(isWhite);
     }
+
+    @Override
+    public void simulate() {
+        // TODO Auto-generated method stub
+        throw new UnsupportedOperationException("Unimplemented method 'simulate'");
+    }
     
 }

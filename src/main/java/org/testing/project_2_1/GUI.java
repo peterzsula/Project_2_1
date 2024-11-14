@@ -88,8 +88,8 @@ public class GUI extends Application {
                     }
                     break;
                 case "AI vs AI": // for now lets keep this baseline vs baseline
-                    Agent agent1 = new BaselineAgent(true);
-                    Agent agent2 = new BaselineAgent(false);
+                    Agent agent1 = new AlphaBetaAgent(true);
+                    Agent agent2 = new MLBaseLine(false);
                     game = new CheckersApp(agent1, agent2);
                     break;
                 default:

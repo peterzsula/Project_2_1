@@ -7,11 +7,11 @@ import org.testing.project_2_1.Moves.*;
 import javafx.animation.PauseTransition;
 import javafx.util.Duration;
 
-public class MachineLearning implements Agent {
+public class MLBaseLine implements Agent {
     private GameLogic gameLogic;
     private boolean isWhite;
 
-    public MachineLearning(boolean isWhite) {
+    public MLBaseLine(boolean isWhite) {
         this.isWhite = isWhite;
     }
     
@@ -45,7 +45,7 @@ public class MachineLearning implements Agent {
 
     @Override
     public Agent reset() {
-        return new MachineLearning(isWhite);
+        return new MLBaseLine(isWhite);
     }
 
     private Turn getBestTurn(ArrayList<Turn> turns) {
@@ -65,6 +65,12 @@ public class MachineLearning implements Agent {
             }
         }
         return bestTurn;
+    }
+
+    @Override
+    public void simulate() {
+        // TODO Auto-generated method stub
+        throw new UnsupportedOperationException("Unimplemented method 'simulate'");
     }
     
 }
