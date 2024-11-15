@@ -28,7 +28,7 @@ public class GUI extends Application {
         selectionPane.setPrefSize(500, 500);
         selectionPane.setBackground(new Background(new BackgroundFill(Color.web("#FAF0E6"), CornerRadii.EMPTY, Insets.EMPTY)));
 
-        Label gameTitle = new Label("FRISIAN DRAUGHTS");
+        Label gameTitle = new Label("Esteban Checkers");
         gameTitle.setFont(new Font("Arial", 32));
         gameTitle.setTextFill(Color.BLACK);  // Set title color to black
         gameTitle.setStyle("-fx-font-weight: bold;");
@@ -54,7 +54,7 @@ public class GUI extends Application {
         player2Selection.setStyle("-fx-font-size: 16px; -fx-background-radius: 10; -fx-border-radius: 10;");
         player2Selection.setEffect(new DropShadow(5, Color.LIGHTGRAY));
 
-        Button startGameButton = new Button("Peter has STds");
+        Button startGameButton = new Button("START GAME");
         startGameButton.setLayoutX(175);
         startGameButton.setLayoutY(330);
         startGameButton.setPrefWidth(150);
