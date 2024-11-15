@@ -54,7 +54,7 @@ public class GUI extends Application {
         player2Selection.setStyle("-fx-font-size: 16px; -fx-background-radius: 10; -fx-border-radius: 10;");
         player2Selection.setEffect(new DropShadow(5, Color.LIGHTGRAY));
 
-        Button startGameButton = new Button("START GAME");
+        Button startGameButton = new Button("Peter has STds");
         startGameButton.setLayoutX(175);
         startGameButton.setLayoutY(330);
         startGameButton.setPrefWidth(150);

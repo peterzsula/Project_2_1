@@ -1,6 +1,7 @@
 package org.testing.project_2_1.GameLogic;
 import static org.testing.project_2_1.UI.CheckersApp.SIZE;
 
+import java.time.format.SignStyle;
 import java.util.ArrayList;
 
 import org.testing.project_2_1.Moves.Capture;
@@ -31,11 +32,11 @@ public class GameState {
                 Tile tile = new Tile(x, y);
                 board[x][y] = tile;
 
-                if (y <= 3 && tile.isBlack()) {
+                if (y <= (SIZE-4)/2 && tile.isBlack()) {
                     Piece piece = new Piece(PieceType.BLACK, x, y);
                     tile.setPiece(piece);
                     blackPieces.add(piece);
-                } else if (y >= 6 && tile.isBlack()) {
+                } else if (y >= SIZE-((SIZE-4)/2) && tile.isBlack()) {
                     Piece piece = new Piece(PieceType.WHITE, x, y);
                     tile.setPiece(piece);
                     whitePieces.add(piece);
