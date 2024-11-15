@@ -1,5 +1,6 @@
 package org.testing.project_2_1.UI;
 
+import javafx.scene.image.Image;
 import org.testing.project_2_1.Agents.*;
 import org.testing.project_2_1.GameLogic.GameLogic;
 import org.testing.project_2_1.GameLogic.Piece;
@@ -20,6 +21,8 @@ import javafx.stage.Stage;
 import javafx.scene.text.Font;
 import javafx.scene.text.FontWeight;
 import javafx.scene.control.ProgressBar;
+
+import java.util.Objects;
 
 public class CheckersApp extends Application {
     public static final int TILE_SIZE = 60;
@@ -76,6 +79,8 @@ public class CheckersApp extends Application {
         primaryStage.setTitle("FRISIAN DRAUGHTS");
         primaryStage.setScene(scene);
         primaryStage.show();
+        Image icon = new Image("pixel-frisian.png");
+        primaryStage.getIcons().add(icon);
 
         playerOneTimer.startCountdown();
         if (noOfPlayers == 0 || (!isPlayerOneTurn && noOfPlayers == 1)) {

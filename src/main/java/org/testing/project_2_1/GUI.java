@@ -17,6 +17,9 @@ import javafx.scene.layout.CornerRadii;
 import javafx.geometry.Insets;
 import javafx.scene.text.Font;
 import javafx.stage.Stage;
+import javafx.scene.image.Image;
+import java.util.Objects;
+
 
 public class GUI extends Application {
     public boolean isSinglePlayer;
@@ -28,9 +31,11 @@ public class GUI extends Application {
         selectionPane.setPrefSize(500, 500);
         selectionPane.setBackground(new Background(new BackgroundFill(Color.web("#FAF0E6"), CornerRadii.EMPTY, Insets.EMPTY)));
 
-        Label gameTitle = new Label("Esteban Checkers");
+        Image icon = new Image("pixel-frisian-png");
+        selectionStage.getIcons().add(icon);
+        Label gameTitle = new Label("Frisian Checkers");
         gameTitle.setFont(new Font("Arial", 32));
-        gameTitle.setTextFill(Color.BLACK);  // Set title color to black
+        gameTitle.setTextFill(Color.BLACK);
         gameTitle.setStyle("-fx-font-weight: bold;");
         gameTitle.setEffect(new DropShadow(5, Color.GRAY));
         gameTitle.setLayoutX(85);

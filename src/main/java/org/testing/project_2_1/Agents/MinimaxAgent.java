@@ -84,12 +84,9 @@ public class MinimaxAgent implements Agent {
                     newState.move(move);
                 }
 
-                int eval = minimax(newState, depth - 1, alpha, beta, false);
+                int eval = minimax(newState, depth, alpha, beta, false);
                 maxEval = Math.max(maxEval, eval);
                 alpha = Math.max(alpha, eval);
-                if (beta <= alpha) {
-                    break;
-                }
             }
             return maxEval;
         } else {
@@ -111,7 +108,7 @@ public class MinimaxAgent implements Agent {
         }
     }
     public Agent reset() {
-        return new MinimaxAgent(isWhite,3);
+        return new MinimaxAgent(isWhite,maxDepth);
     }
 
     @Override

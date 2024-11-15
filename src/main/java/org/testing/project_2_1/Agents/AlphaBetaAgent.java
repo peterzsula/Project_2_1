@@ -8,7 +8,7 @@ import java.util.ArrayList;
 import javafx.animation.PauseTransition;
 import javafx.util.Duration;
 
-public class AlphaBetaAgent implements Agent { //for now uses minimax algorithm, still not ab-pruning
+public class AlphaBetaAgent implements Agent {
     private GameLogic gameLogic;
     private boolean isWhite;
 
@@ -87,7 +87,7 @@ public class AlphaBetaAgent implements Agent { //for now uses minimax algorithm,
                 int eval = minimax(newState, depth - 1, alpha, beta, false);
                 maxEval = Math.max(maxEval, eval);
                 alpha = Math.max(alpha, eval);
-                if (beta <= alpha) {
+                if (beta <= alpha) { // Beta cutoff, pruning is done
                     break;
                 }
             }
@@ -111,7 +111,7 @@ public class AlphaBetaAgent implements Agent { //for now uses minimax algorithm,
         }
     }
     public Agent reset() {
-        return new AlphaBetaAgent(isWhite, 3);
+        return new AlphaBetaAgent(isWhite, maxDepth);
     }
 
     @Override
