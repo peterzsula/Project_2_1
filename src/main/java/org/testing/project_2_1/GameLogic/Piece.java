@@ -59,10 +59,10 @@ public class Piece {
 
     private void handleKingPromotion(Move move) {
         int newY = move.getToY();
-        if (getType() == PieceType.BLACK && newY == SIZE - 1) {
+        if (getType() == PieceType.BLACK && newY == SIZE - 1 && move.isTurnEnding()) {
             move.setPromotion(true);
             promoteToKing();
-        } else if (getType() == PieceType.WHITE && newY == 0) {
+        } else if (getType() == PieceType.WHITE && newY == 0 && move.isTurnEnding()) {
             promoteToKing();
             move.setPromotion(true);
         }
