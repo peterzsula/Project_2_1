@@ -74,8 +74,11 @@ public class GUI extends Application {
                 case "Baseline AI":
                     player1Agent = new BaselineAgent(true);
                     break;
+                case "Minimax":
+                    player1Agent = new MinimaxAgent(true, 3);
+                    break;
                 case "AB-Pruning":
-                    player1Agent = new AlphaBetaAgent(true);
+                    player1Agent = new AlphaBetaAgent(true, 3);
                     break;
                 case "MCTS":
                     player1Agent = new AgentMCTS(true);
@@ -89,8 +92,11 @@ public class GUI extends Application {
                 case "Baseline AI":
                     player2Agent = new BaselineAgent(false);
                     break;
+                case "Minimax":
+                    player2Agent = new MinimaxAgent(false, 3);
+                    break;
                 case "AB-Pruning":
-                    player2Agent = new AlphaBetaAgent(false);
+                    player2Agent = new AlphaBetaAgent(false, 3);
                     break;
                 case "MCTS":
                     player2Agent = new AgentMCTS(false);

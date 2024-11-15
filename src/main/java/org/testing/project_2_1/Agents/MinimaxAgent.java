@@ -8,13 +8,13 @@ import java.util.ArrayList;
 import javafx.animation.PauseTransition;
 import javafx.util.Duration;
 
-public class AlphaBetaAgent implements Agent { //for now uses minimax algorithm, still not ab-pruning
+public class MinimaxAgent implements Agent {
     private GameLogic gameLogic;
     private boolean isWhite;
 
     private int maxDepth;
 
-    public AlphaBetaAgent(boolean isWhite, int maxDepth) {
+    public MinimaxAgent(boolean isWhite, int maxDepth) {
         this.isWhite=isWhite;
         this.maxDepth=maxDepth;
     }
@@ -111,7 +111,7 @@ public class AlphaBetaAgent implements Agent { //for now uses minimax algorithm,
         }
     }
     public Agent reset() {
-        return new AlphaBetaAgent(isWhite, 3);
+        return new MinimaxAgent(isWhite,3);
     }
 
     @Override
@@ -120,3 +120,4 @@ public class AlphaBetaAgent implements Agent { //for now uses minimax algorithm,
         throw new UnsupportedOperationException("Unimplemented method 'simulate'");
     }
 }
+
