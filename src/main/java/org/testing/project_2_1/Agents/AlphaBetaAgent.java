@@ -56,7 +56,7 @@ public class AlphaBetaAgent implements Agent {
                 newState.move(move);
             }
 
-            int boardValue = minimax(newState, maxDepth - 1, Integer.MIN_VALUE, Integer.MAX_VALUE, !isWhite);
+            int boardValue = minimaxPruning(newState, maxDepth, Integer.MIN_VALUE, Integer.MAX_VALUE, !isWhite);
 
             if (isWhite && boardValue > bestValue) {
                 bestValue = boardValue;
@@ -69,7 +69,7 @@ public class AlphaBetaAgent implements Agent {
         return bestTurn;
     }
 
-    private int minimax(GameState gameState, int depth, int alpha, int beta, boolean maxPlayer) {
+    private int minimaxPruning(GameState gameState, int depth, int alpha, int beta, boolean maxPlayer) {
         if (depth == 0 || gameLogic.isGameOver(gameState)) {
             return (int) GameLogic.evaluateBoard(gameState);
         }
@@ -84,10 +84,10 @@ public class AlphaBetaAgent implements Agent {
                     newState.move(move);
                 }
 
-                int eval = minimax(newState, depth - 1, alpha, beta, false);
+                int eval = minimaxPruning(newState, depth - 1, alpha, beta, false);
                 maxEval = Math.max(maxEval, eval);
                 alpha = Math.max(alpha, eval);
-                if (beta <= alpha) { // Beta cutoff, pruning is done
+                if (beta <= alpha) { // Beta cutoff, pruning is done here
                     break;
                 }
             }
@@ -100,10 +100,10 @@ public class AlphaBetaAgent implements Agent {
                     newState.move(move);
                 }
 
-                int eval = minimax(newState, depth - 1, alpha, beta, true);
+                int eval = minimaxPruning(newState, depth - 1, alpha, beta, true);
                 minEval = Math.min(minEval, eval);
                 beta = Math.min(beta, eval);
-                if (beta <= alpha) {
+                if (beta <= alpha) { // Alpha cutoff, pruning is done here
                     break;
                 }
             }

@@ -31,7 +31,7 @@ public class GUI extends Application {
         selectionPane.setPrefSize(500, 500);
         selectionPane.setBackground(new Background(new BackgroundFill(Color.web("#FAF0E6"), CornerRadii.EMPTY, Insets.EMPTY)));
 
-        Image icon = new Image("pixel-frisian-png");
+        Image icon = new Image("pixel-frisian.png");
         selectionStage.getIcons().add(icon);
         Label gameTitle = new Label("Frisian Checkers");
         gameTitle.setFont(new Font("Arial", 32));
@@ -42,7 +42,7 @@ public class GUI extends Application {
         gameTitle.setLayoutY(70);
 
         ComboBox<String> player1Selection = new ComboBox<>();
-        player1Selection.getItems().addAll("Human", "Baseline AI", "AB-Pruning", "MCTS");
+        player1Selection.getItems().addAll("Human", "Minimax", "Baseline AI", "Alpha-Beta Pruning", "MCTS");
         player1Selection.setValue("Select Player 1");
         player1Selection.setLayoutX(125);
         player1Selection.setLayoutY(180);
@@ -51,7 +51,7 @@ public class GUI extends Application {
         player1Selection.setEffect(new DropShadow(5, Color.LIGHTGRAY));
 
         ComboBox<String> player2Selection = new ComboBox<>();
-        player2Selection.getItems().addAll("Human", "Baseline AI", "AB-Pruning", "MCTS");
+        player2Selection.getItems().addAll("Human", "Baseline AI", "Minimax", "Alpha-Beta Pruning", "MCTS");
         player2Selection.setValue("Select Player 2");
         player2Selection.setLayoutX(125);
         player2Selection.setLayoutY(240);
@@ -82,7 +82,7 @@ public class GUI extends Application {
                 case "Minimax":
                     player1Agent = new MinimaxAgent(true, 3);
                     break;
-                case "AB-Pruning":
+                case "Alpha-Beta Pruning":
                     player1Agent = new AlphaBetaAgent(true, 3);
                     break;
                 case "MCTS":
@@ -100,7 +100,7 @@ public class GUI extends Application {
                 case "Minimax":
                     player2Agent = new MinimaxAgent(false, 3);
                     break;
-                case "AB-Pruning":
+                case "Alpha-Beta Pruning":
                     player2Agent = new AlphaBetaAgent(false, 3);
                     break;
                 case "MCTS":

@@ -27,7 +27,7 @@ public class MinimaxAgent implements Agent {
 
     @Override
     public void makeMove() {
-        System.out.println("Alpha-Beta agent making move");
+        System.out.println("Minimax agent making move");
         PauseTransition pause = new PauseTransition(Duration.seconds(Agent.delay));
         pause.setOnFinished(event -> {
             if (gameLogic.g.getIsWhiteTurn() == isWhite && !gameLogic.isGameOver(gameLogic.g)) {
@@ -56,7 +56,7 @@ public class MinimaxAgent implements Agent {
                 newState.move(move);
             }
 
-            int boardValue = minimax(newState, maxDepth - 1, Integer.MIN_VALUE, Integer.MAX_VALUE, !isWhite);
+            int boardValue = minimax(newState, maxDepth, !isWhite);
 
             if (isWhite && boardValue > bestValue) {
                 bestValue = boardValue;
@@ -69,7 +69,7 @@ public class MinimaxAgent implements Agent {
         return bestTurn;
     }
 
-    private int minimax(GameState gameState, int depth, int alpha, int beta, boolean maxPlayer) {
+    private int minimax(GameState gameState, int depth, boolean maxPlayer) {
         if (depth == 0 || gameLogic.isGameOver(gameState)) {
             return (int) GameLogic.evaluateBoard(gameState);
         }
@@ -84,9 +84,8 @@ public class MinimaxAgent implements Agent {
                     newState.move(move);
                 }
 
-                int eval = minimax(newState, depth, alpha, beta, false);
+                int eval = minimax(newState, depth-1, false);
                 maxEval = Math.max(maxEval, eval);
-                alpha = Math.max(alpha, eval);
             }
             return maxEval;
         } else {
@@ -97,12 +96,8 @@ public class MinimaxAgent implements Agent {
                     newState.move(move);
                 }
 
-                int eval = minimax(newState, depth - 1, alpha, beta, true);
+                int eval = minimax(newState, depth - 1, true);
                 minEval = Math.min(minEval, eval);
-                beta = Math.min(beta, eval);
-                if (beta <= alpha) {
-                    break;
-                }
             }
             return minEval;
         }
