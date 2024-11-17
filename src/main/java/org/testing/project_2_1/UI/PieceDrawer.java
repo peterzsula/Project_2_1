@@ -87,11 +87,7 @@ public class PieceDrawer extends StackPane {
 
     private void highlightMoves() {
         clearHighlight();
-        List<Turn> availableTurns = GameLogic.getLegalTurns(this.piece, app.gameLogic.g); 
-        List<Move> availableMoves = new ArrayList<>(); // this should be a method in GameLogic
-        for (Turn turn : availableTurns) {
-            availableMoves.add(turn.getMoves().getFirst());
-        }
+        List<Move> availableMoves = GameLogic.getLegalMoves(piece, app.gameLogic.g);
         if (availableMoves.isEmpty()) {
             return;
         }

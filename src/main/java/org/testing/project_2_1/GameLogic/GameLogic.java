@@ -86,7 +86,7 @@ public class GameLogic {
     }
 
     public static ArrayList<Turn> getLegalTurns(GameState originalGS) {
-        ArrayList<Move> availableMoves = getLegalMoves(originalGS);
+        ArrayList<Move> availableMoves = getPossibleMoves(originalGS);
         if (availableMoves.isEmpty()) {
             return new ArrayList<>();
         }
@@ -116,7 +116,7 @@ public class GameLogic {
 
     public static ArrayList<Turn> getLegalTurns(Piece piece, GameState originalGS) {
         GameState g = new GameState(originalGS);
-        ArrayList<Move> availableMoves = getLegalMoves(piece, g);
+        ArrayList<Move> availableMoves = getPossibleMoves(piece, g);
         if (availableMoves.isEmpty()) {
             return new ArrayList<>();
         }
@@ -155,14 +155,14 @@ public class GameLogic {
         return availableCaptures;
     }
 
-    public static ArrayList<Move> getLegalMoves(GameState b) {
+    private static ArrayList<Move> getPossibleMoves(GameState b) {
         ArrayList<Move> availableMoves = new ArrayList<>();
         ArrayList<Move> availableCaptures = new ArrayList<>();
         ArrayList<Move> currentMoves = new ArrayList<>();
         ArrayList<Piece> pieces = getListOfPieces(b);
         for (Piece piece : pieces) {
             //TODO: instead of iterating over all black tiles, iterate over all tiles where the piece can move
-            currentMoves = getLegalMoves(piece, b);
+            currentMoves = getPossibleMoves(piece, b);
             if (currentMoves.isEmpty()) {
                 continue;
             } else if (currentMoves.get(0).isCapture()) {
@@ -177,7 +177,7 @@ public class GameLogic {
         return availableMoves;
     }
 
-    public static ArrayList<Move> getLegalMoves(Piece piece, GameState g) {
+    private static ArrayList<Move> getPossibleMoves(Piece piece, GameState g) {
         ArrayList<Move> availableMoves = new ArrayList<>();
         ArrayList<Move> availableCaptures = new ArrayList<>();
         // TODO: instead of iterating over all black tiles, iterate over all tiles where the piece can move
@@ -195,6 +195,24 @@ public class GameLogic {
         if (availableCaptures.size() > 0) {
             return availableCaptures;
         } 
+        return availableMoves;
+    }
+
+    public static List<Move> getLegalMoves(Piece piece, GameState g) {
+        List<Turn> availableTurns = getLegalTurns(piece, g); 
+        List<Move> availableMoves = new ArrayList<>(); 
+        for (Turn turn : availableTurns) {
+            availableMoves.add(turn.getMoves().getFirst());
+        }
+        return availableMoves;
+    }
+
+    public static List<Move> getLegalMoves(GameState g) {
+        List<Turn> availableTurns = getLegalTurns(g); 
+        List<Move> availableMoves = new ArrayList<>(); 
+        for (Turn turn : availableTurns) {
+            availableMoves.add(turn.getMoves().getFirst());
+        }
         return availableMoves;
     }
 
@@ -291,7 +309,7 @@ public class GameLogic {
         //TODO: instead of getLegalMoves, iterate over all legal Turns
         Set<Piece> threatenedPieces = new HashSet<>();
         for (Piece piece : pieces) {
-            for (Move move : getLegalMoves(piece, g)) {
+            for (Move move : getPossibleMoves(piece, g)) {
                 if (move.isCapture()) {
                     Capture captureMove = (Capture) move;
                     threatenedPieces.add(captureMove.getCapturedPiece());
@@ -438,7 +456,7 @@ public class GameLogic {
     List<Piece> allPieces = g.getAllPieces();
 
     for (Piece piece : allPieces) {
-        List<Move> moves = getLegalMoves(piece, g);
+        List<Move> moves = getPossibleMoves(piece, g);
         if (!moves.isEmpty()) {
             movablePieces.add(piece);
         }
