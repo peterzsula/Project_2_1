@@ -18,8 +18,6 @@ import javafx.geometry.Insets;
 import javafx.scene.text.Font;
 import javafx.stage.Stage;
 import javafx.scene.image.Image;
-import java.util.Objects;
-
 
 public class GUI extends Application {
     public boolean isSinglePlayer;

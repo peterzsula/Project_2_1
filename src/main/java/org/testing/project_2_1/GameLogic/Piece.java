@@ -4,6 +4,7 @@ import static org.testing.project_2_1.UI.CheckersApp.SIZE;
 
 import java.util.ArrayList;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Set;
 
 import org.testing.project_2_1.Moves.Move;
@@ -122,9 +123,9 @@ public class Piece {
         return y;
     }
 
-    public static Set<Piece> movesToPieces(ArrayList<Move> moves){
+    public static Set<Piece> movesToPieces(List<Move> availableMoves){
         Set<Piece> pieces = new HashSet<>();
-        for (Move move : moves) {
+        for (Move move : availableMoves) {
             pieces.add(move.getPiece());
         }
         return pieces;

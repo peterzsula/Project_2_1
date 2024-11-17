@@ -13,7 +13,15 @@ public class Tile{
         this.piece = null;
         this.x = x;
         this.y = y;
-        this.tileDrawer = new TileDrawer(this);
+        this.tileDrawer = null;
+    }
+
+    public TileDrawer getTileDrawer() {
+        return tileDrawer;
+    }
+
+    public void setTileDrawer(TileDrawer tileDrawer) {
+        this.tileDrawer = tileDrawer;
     }
     
     public boolean hasPiece() {

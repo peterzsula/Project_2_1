@@ -5,18 +5,20 @@ import javafx.scene.paint.Color;
 import javafx.scene.shape.Ellipse;
 import javafx.scene.shape.Rectangle;
 
+import static org.testing.project_2_1.UI.CheckersApp.SIZE;
 import static org.testing.project_2_1.UI.CheckersApp.TILE_SIZE;
 
 import org.testing.project_2_1.GameLogic.Piece;
 import org.testing.project_2_1.GameLogic.PieceType;
 import org.testing.project_2_1.GameLogic.GameLogic;
 import org.testing.project_2_1.Moves.Move;
+import org.testing.project_2_1.Moves.Turn;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Set;
 
 public class PieceDrawer extends StackPane {
-    private double mouseX, mouseY;
     private int oldX, oldY;
     private Piece piece;
     private CheckersApp app;
@@ -24,7 +26,7 @@ public class PieceDrawer extends StackPane {
 
     public PieceDrawer(Piece piece, CheckersApp app) {
         if (piece == null) {
-            throw new IllegalArgumentException("Piece cannot be null when creating PieceDrawer.");
+            throw new IllegalArgumentException("Piece cannot be null when creating PieceDrawer."); //bit unnecessary
         }
         this.piece = piece;
         this.app = app;
@@ -66,7 +68,7 @@ public class PieceDrawer extends StackPane {
             int newY = (int) Math.floor(e.getSceneY() / TILE_SIZE);
 
             Move move = app.gameLogic.g.determineMoveType(oldX, oldY, newX, newY);
-            if (move == null || move instanceof org.testing.project_2_1.Moves.InvalidMove) {
+            if (move == null || move.isInvalid()) {
                 System.out.println("Invalid move attempted.");
                 abortMove();
                 return;
@@ -85,42 +87,29 @@ public class PieceDrawer extends StackPane {
 
     private void highlightMoves() {
         clearHighlight();
-
-        // Get all pieces with possible moves
-        List<Piece> movablePieces = GameLogic.getMovablePieces(app.gameLogic.g);
-
-        // Iterate through the pieces to prioritize captures
-        List<Move> captureMoves = new ArrayList<>();
-        for (Piece movablePiece : movablePieces) {
-            List<Move> moves = GameLogic.getLegalMoves(movablePiece, app.gameLogic.g);
-            for (Move move : moves) {
-                if (move.isCapture()) {
-                    captureMoves.add(move);
-                }
-            }
+        List<Turn> availableTurns = GameLogic.getLegalTurns(this.piece, app.gameLogic.g); 
+        List<Move> availableMoves = new ArrayList<>(); // this should be a method in GameLogic
+        for (Turn turn : availableTurns) {
+            availableMoves.add(turn.getMoves().getFirst());
         }
-
+        if (availableMoves.isEmpty()) {
+            return;
+        }
         // If capture moves exist, highlight only captures
-        if (!captureMoves.isEmpty()) {
-            for (Move move : captureMoves) {
+        if (availableMoves.getFirst().isCapture()) {
+            for (Move move : availableMoves) {
                 highlightTile(move.getToX(), move.getToY(), Color.RED);
             }
             return;
         }
 
-        // Highlight normal moves if no captures are available
-        for (Piece movablePiece : movablePieces) {
-            List<Move> moves = GameLogic.getLegalMoves(movablePiece, app.gameLogic.g);
-            for (Move move : moves) {
-                if (move.isNormal()) {
-                    highlightTile(move.getToX(), move.getToY(), Color.YELLOW);
-                }
-            }
+        for (Move move : availableMoves) {
+            highlightTile(move.getToX(), move.getToY(), Color.YELLOW);
         }
     }
 
     private void highlightTile(int x, int y, Color color) {
-        if (x >= 0 && x < 10 && y >= 0 && y < 10) { // Assuming a 10x10 board
+        if (x >= 0 && x < SIZE && y >= 0 && y < SIZE) { 
             Rectangle highlight = new Rectangle(TILE_SIZE, TILE_SIZE);
             highlight.setFill(color);
             highlight.setOpacity(0.5);
@@ -132,7 +121,7 @@ public class PieceDrawer extends StackPane {
         }
     }
 
-    private void clearHighlight() {
+    public void clearHighlight() {
         for (Rectangle highlight : highlightedTiles) {
             app.getBoardGroup().getChildren().remove(highlight);
         }

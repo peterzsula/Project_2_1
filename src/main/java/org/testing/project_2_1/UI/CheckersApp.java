@@ -167,6 +167,7 @@ public class CheckersApp extends Application {
 
     public void movePiece(int oldX, int oldY, Piece piece, int newX, int newY) {
         Move move = gameLogic.g.determineMoveType(oldX, oldY, newX, newY);
+        piece.getPieceDrawer().clearHighlight();
         System.out.println("Move: " + move);
 
         if (gameLogic.takeMove(move)) {
@@ -180,8 +181,6 @@ public class CheckersApp extends Application {
                 playerOneTimer.startCountdown();
             }
             isPlayerOneTurn = !isPlayerOneTurn; // Switch turn
-        } else {
-            piece.abortMove(); // Invalid move, revert
         }
     }
 
@@ -220,6 +219,7 @@ public class CheckersApp extends Application {
     public void addPiecestoBoard(Pane boardPane) {
         for (Tile[] row : gameLogic.g.getBoard()) {
             for (Tile tile : row) {
+                tile.setTileDrawer(new TileDrawer(tile, this));
                 tileGroup.getChildren().add(tile.tileDrawer);
                 if (tile.hasPiece()) {
                     Piece piece = tile.getPiece();
@@ -301,7 +301,13 @@ public class CheckersApp extends Application {
         }
     }
 
-
+    public void clearHighlights() {
+        for (Tile[] row : gameLogic.g.getBoard()) {
+            for (Tile tile : row) {
+                tile.tileDrawer.clearHighlight();
+            }
+        }
+    }
     
 
     public static void main(String[] args) {
