@@ -16,4 +16,5 @@ public class TileDrawer extends Rectangle {
         setFill(tile.isBlack() ? Color.valueOf("#D2B48C") : Color.valueOf("#FFFAF0"));
     }
     
+    
 }

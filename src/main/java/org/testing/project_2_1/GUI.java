@@ -17,6 +17,9 @@ import javafx.scene.layout.CornerRadii;
 import javafx.geometry.Insets;
 import javafx.scene.text.Font;
 import javafx.stage.Stage;
+import javafx.scene.image.Image;
+import java.util.Objects;
+
 
 public class GUI extends Application {
     public boolean isSinglePlayer;
@@ -28,16 +31,18 @@ public class GUI extends Application {
         selectionPane.setPrefSize(500, 500);
         selectionPane.setBackground(new Background(new BackgroundFill(Color.web("#FAF0E6"), CornerRadii.EMPTY, Insets.EMPTY)));
 
-        Label gameTitle = new Label("Esteban Checkers");
+        Image icon = new Image("pixel-frisian.png");
+        selectionStage.getIcons().add(icon);
+        Label gameTitle = new Label("Frisian Checkers");
         gameTitle.setFont(new Font("Arial", 32));
-        gameTitle.setTextFill(Color.BLACK);  // Set title color to black
+        gameTitle.setTextFill(Color.BLACK);
         gameTitle.setStyle("-fx-font-weight: bold;");
         gameTitle.setEffect(new DropShadow(5, Color.GRAY));
         gameTitle.setLayoutX(85);
         gameTitle.setLayoutY(70);
 
         ComboBox<String> player1Selection = new ComboBox<>();
-        player1Selection.getItems().addAll("Human", "Baseline AI", "AB-Pruning", "MCTS");
+        player1Selection.getItems().addAll("Human", "Minimax", "Baseline AI", "Alpha-Beta Pruning", "MCTS");
         player1Selection.setValue("Select Player 1");
         player1Selection.setLayoutX(125);
         player1Selection.setLayoutY(180);
@@ -46,7 +51,7 @@ public class GUI extends Application {
         player1Selection.setEffect(new DropShadow(5, Color.LIGHTGRAY));
 
         ComboBox<String> player2Selection = new ComboBox<>();
-        player2Selection.getItems().addAll("Human", "Baseline AI", "AB-Pruning", "MCTS");
+        player2Selection.getItems().addAll("Human", "Baseline AI", "Minimax", "Alpha-Beta Pruning", "MCTS");
         player2Selection.setValue("Select Player 2");
         player2Selection.setLayoutX(125);
         player2Selection.setLayoutY(240);
@@ -74,8 +79,11 @@ public class GUI extends Application {
                 case "Baseline AI":
                     player1Agent = new BaselineAgent(true);
                     break;
-                case "AB-Pruning":
-                    player1Agent = new AlphaBetaAgent(true);
+                case "Minimax":
+                    player1Agent = new MinimaxAgent(true, 3);
+                    break;
+                case "Alpha-Beta Pruning":
+                    player1Agent = new AlphaBetaAgent(true, 3);
                     break;
                 case "MCTS":
                     player1Agent = new AgentMCTS(true);
@@ -89,8 +97,11 @@ public class GUI extends Application {
                 case "Baseline AI":
                     player2Agent = new BaselineAgent(false);
                     break;
-                case "AB-Pruning":
-                    player2Agent = new AlphaBetaAgent(false);
+                case "Minimax":
+                    player2Agent = new MinimaxAgent(false, 3);
+                    break;
+                case "Alpha-Beta Pruning":
+                    player2Agent = new AlphaBetaAgent(false, 3);
                     break;
                 case "MCTS":
                     player2Agent = new AgentMCTS(false);

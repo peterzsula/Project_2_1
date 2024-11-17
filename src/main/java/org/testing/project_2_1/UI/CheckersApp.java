@@ -1,5 +1,6 @@
 package org.testing.project_2_1.UI;
 
+import javafx.scene.image.Image;
 import org.testing.project_2_1.Agents.*;
 import org.testing.project_2_1.GameLogic.GameLogic;
 import org.testing.project_2_1.GameLogic.Piece;
@@ -37,13 +38,13 @@ public class CheckersApp extends Application {
     private double maxObservedScore = 20;
     private Group tileGroup = new Group();
     public Group pieceGroup = new Group();
-    private Group boardGroup = new Group(); 
+    private Group boardGroup = new Group();
     public CapturedPiecesTracker capturedPiecesTracker = new CapturedPiecesTracker();
 
     private boolean isPlayerOneTurn = true;
-    private long previousPlayerOneTime; 
-    private long previousPlayerTwoTime; 
-    private boolean wasPlayerOneTurnBeforeUndo; 
+    private long previousPlayerOneTime;
+    private long previousPlayerTwoTime;
+    private boolean wasPlayerOneTurnBeforeUndo;
     public GameLogic gameLogic;
 
     public Group getBoardGroup() {
@@ -69,13 +70,14 @@ public class CheckersApp extends Application {
         noOfPlayers = 0;
     }
 
-
     @Override
     public void start(Stage primaryStage) throws Exception {
-        Scene scene = new Scene(createContent(), SIZE * TILE_SIZE + 320, SIZE * TILE_SIZE); 
+        Scene scene = new Scene(createContent(), SIZE * TILE_SIZE + 320, SIZE * TILE_SIZE);
         primaryStage.setTitle("FRISIAN DRAUGHTS");
         primaryStage.setScene(scene);
         primaryStage.show();
+        Image icon = new Image("pixel-frisian.png");
+        primaryStage.getIcons().add(icon);
 
         playerOneTimer.startCountdown();
         if (noOfPlayers == 0 || (!isPlayerOneTurn && noOfPlayers == 1)) {
@@ -134,7 +136,7 @@ public class CheckersApp extends Application {
         undoButton.setOnAction(e -> undoLastMove());
 
         styleTitle(playerOneTitle);
-        styleTitle(playerTwoTitle);      
+        styleTitle(playerTwoTitle);
         styleInfoLabel(playerOneTimeLabel);
         styleInfoLabel(playerTwoTimeLabel);
         styleInfoLabel(playerOneCapturedLabel);
@@ -143,9 +145,9 @@ public class CheckersApp extends Application {
         Label playerOneCapturedCount = capturedPiecesTracker.blackCapturedLabel;
         Label playerTwoCapturedCount = capturedPiecesTracker.whiteCapturedLabel;
 
-        VBox playerOneBox = new VBox(10, playerOneTitle, playerOneTimeLabel, playerOneTimerLabel, 
+        VBox playerOneBox = new VBox(10, playerOneTitle, playerOneTimeLabel, playerOneTimerLabel,
                                      playerOneCapturedLabel, playerOneCapturedCount);
-        VBox playerTwoBox = new VBox(10, playerTwoTitle, playerTwoTimeLabel, playerTwoTimerLabel, 
+        VBox playerTwoBox = new VBox(10, playerTwoTitle, playerTwoTimeLabel, playerTwoTimerLabel,
                                      playerTwoCapturedLabel, playerTwoCapturedCount);
 
         playerOneBox.setStyle("-fx-background-color: #f0f8ff; -fx-border-color: #b0b0b0; -fx-border-width: 2px; -fx-border-radius: 5px;");
@@ -161,8 +163,26 @@ public class CheckersApp extends Application {
         root.getChildren().addAll(boardPane, rightPanel, resetButton, undoButton);
         root.setSpacing(20);
         return root;
+    }
 
+    public void movePiece(int oldX, int oldY, Piece piece, int newX, int newY) {
+        Move move = gameLogic.g.determineMoveType(oldX, oldY, newX, newY);
+        System.out.println("Move: " + move);
 
+        if (gameLogic.takeMove(move)) {
+            piece.movePiece(move);
+
+            if (isPlayerOneTurn) {
+                playerOneTimer.stopCountdown();
+                playerTwoTimer.startCountdown();
+            } else {
+                playerTwoTimer.stopCountdown();
+                playerOneTimer.startCountdown();
+            }
+            isPlayerOneTurn = !isPlayerOneTurn; // Switch turn
+        } else {
+            piece.abortMove(); // Invalid move, revert
+        }
     }
 
     public void resetGUI() {
@@ -175,11 +195,9 @@ public class CheckersApp extends Application {
 
         if (noOfPlayers == 2) {
             new CheckersApp();
-        }
-        else if (noOfPlayers == 1) {
+        } else if (noOfPlayers == 1) {
             new CheckersApp(gameLogic.agent);
-        }
-        else if (noOfPlayers == 0) {
+        } else if (noOfPlayers == 0) {
             new CheckersApp(gameLogic.agent, gameLogic.opponent);
         }
 
@@ -233,43 +251,6 @@ public class CheckersApp extends Application {
         captureMessageLabel.setText(message);
     }
 
-    public void movePiece(int oldX, int oldY, Piece piece, int newX, int newY) {
-        // Save current times and player turn before making a move
-        previousPlayerOneTime = playerOneTimer.getRemainingTimeInSeconds();
-        previousPlayerTwoTime = playerTwoTimer.getRemainingTimeInSeconds();
-        wasPlayerOneTurnBeforeUndo = isPlayerOneTurn;
-    
-        piece.getPieceDrawer().setOnMouseReleased(e -> {
-            Move move = gameLogic.g.determineMoveType(oldX, oldY, newX, newY);
-            System.out.println("Move: " + move.toString());
-            boolean isLegalMove = gameLogic.takeMove(move);
-            piece.getPieceDrawer().clearHighlight();
-    
-            if (isLegalMove) {
-                // Use hasAvailableCaptures to check if the piece can capture again
-                boolean additionalCaptureAvailable = GameLogic.getLegalMoves(gameLogic.g).size() > 0; // not correct, if you run out of moves, this will just get the other players moves
-    
-                if (isPlayerOneTurn) {
-                    playerOneTimer.stopCountdown();
-                    playerOneTimer.startMove(true);
-    
-                    if (!additionalCaptureAvailable) {
-                        playerTwoTimer.startCountdown();
-                        isPlayerOneTurn = false; // Toggle turn only if no more captures are available
-                    }
-                } else {
-                    playerTwoTimer.stopCountdown();
-                    playerTwoTimer.startMove(true);
-    
-                    if (!additionalCaptureAvailable) {
-                        playerOneTimer.startCountdown();
-                        isPlayerOneTurn = true; // Toggle turn only if no more captures are available
-                    }
-                }
-            }
-        });
-    }
-    
     public void undoLastMove() {
         playerOneTimer.stopCountdown();
         playerTwoTimer.stopCountdown();
@@ -288,13 +269,11 @@ public class CheckersApp extends Application {
         }
     }
 
-    // Method to update the evaluation bar based on the game state
     public void updateEvaluationBar() {
         double evaluationScore = GameLogic.evaluateBoard(gameLogic.g); // Get current evaluation
         updateObservedRange(evaluationScore);
         double normalizedScore = normalizeEvaluation(evaluationScore);
 
-        // Set the bar progress and color based on the normalized score
         evaluationBar.setProgress(normalizedScore);
         if (evaluationScore > 0) {
             evaluationBar.setStyle("-fx-accent: lightgreen;"); // White advantage
@@ -304,17 +283,16 @@ public class CheckersApp extends Application {
             evaluationBar.setStyle("-fx-accent: gray;"); // Balanced
         }
 
-
         evaluationScoreLabel.setText(String.format("Score: %.1f", evaluationScore));
     }
-    // Normalize evaluation score between 0.0 and 1.0
+
     private double normalizeEvaluation(double evaluationScore) {
         if (maxObservedScore == minObservedScore) {
             return 0.5;
         }
         return (evaluationScore - minObservedScore) / (maxObservedScore - minObservedScore);
     }
-    // Adjust min and max score bounds based on observed scores
+
     private void updateObservedRange(double evaluationScore) {
         if (evaluationScore < minObservedScore) {
             minObservedScore = evaluationScore;
@@ -322,6 +300,9 @@ public class CheckersApp extends Application {
             maxObservedScore = evaluationScore;
         }
     }
+
+
+    
 
     public static void main(String[] args) {
         launch(args);

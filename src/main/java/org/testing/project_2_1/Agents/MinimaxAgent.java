@@ -8,13 +8,13 @@ import java.util.ArrayList;
 import javafx.animation.PauseTransition;
 import javafx.util.Duration;
 
-public class AlphaBetaAgent implements Agent {
+public class MinimaxAgent implements Agent {
     private GameLogic gameLogic;
     private boolean isWhite;
 
     private int maxDepth;
 
-    public AlphaBetaAgent(boolean isWhite, int maxDepth) {
+    public MinimaxAgent(boolean isWhite, int maxDepth) {
         this.isWhite=isWhite;
         this.maxDepth=maxDepth;
     }
@@ -27,7 +27,7 @@ public class AlphaBetaAgent implements Agent {
 
     @Override
     public void makeMove() {
-        System.out.println("Alpha-Beta agent making move");
+        System.out.println("Minimax agent making move");
         PauseTransition pause = new PauseTransition(Duration.seconds(Agent.delay));
         pause.setOnFinished(event -> {
             if (gameLogic.g.getIsWhiteTurn() == isWhite && !gameLogic.isGameOver(gameLogic.g)) {
@@ -56,7 +56,7 @@ public class AlphaBetaAgent implements Agent {
                 newState.move(move);
             }
 
-            int boardValue = minimaxPruning(newState, maxDepth, Integer.MIN_VALUE, Integer.MAX_VALUE, !isWhite);
+            int boardValue = minimax(newState, maxDepth, !isWhite);
 
             if (isWhite && boardValue > bestValue) {
                 bestValue = boardValue;
@@ -69,7 +69,7 @@ public class AlphaBetaAgent implements Agent {
         return bestTurn;
     }
 
-    private int minimaxPruning(GameState gameState, int depth, int alpha, int beta, boolean maxPlayer) {
+    private int minimax(GameState gameState, int depth, boolean maxPlayer) {
         if (depth == 0 || gameLogic.isGameOver(gameState)) {
             return (int) GameLogic.evaluateBoard(gameState);
         }
@@ -84,12 +84,8 @@ public class AlphaBetaAgent implements Agent {
                     newState.move(move);
                 }
 
-                int eval = minimaxPruning(newState, depth - 1, alpha, beta, false);
+                int eval = minimax(newState, depth-1, false);
                 maxEval = Math.max(maxEval, eval);
-                alpha = Math.max(alpha, eval);
-                if (beta <= alpha) { // Beta cutoff, pruning is done here
-                    break;
-                }
             }
             return maxEval;
         } else {
@@ -100,18 +96,14 @@ public class AlphaBetaAgent implements Agent {
                     newState.move(move);
                 }
 
-                int eval = minimaxPruning(newState, depth - 1, alpha, beta, true);
+                int eval = minimax(newState, depth - 1, true);
                 minEval = Math.min(minEval, eval);
-                beta = Math.min(beta, eval);
-                if (beta <= alpha) { // Alpha cutoff, pruning is done here
-                    break;
-                }
             }
             return minEval;
         }
     }
     public Agent reset() {
-        return new AlphaBetaAgent(isWhite, maxDepth);
+        return new MinimaxAgent(isWhite,maxDepth);
     }
 
     @Override
@@ -120,3 +112,4 @@ public class AlphaBetaAgent implements Agent {
         throw new UnsupportedOperationException("Unimplemented method 'simulate'");
     }
 }
+
