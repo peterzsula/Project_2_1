@@ -3,6 +3,7 @@ import static org.testing.project_2_1.UI.CheckersApp.SIZE;
 
 import java.time.format.SignStyle;
 import java.util.ArrayList;
+import java.util.List;
 
 import org.testing.project_2_1.Moves.Capture;
 import org.testing.project_2_1.Moves.InvalidMove;
@@ -188,78 +189,112 @@ public class GameState {
     }
     
     public Move determineMoveType(int x0, int y0, int newX, int newY) {
-        Piece piece = board[x0][y0].getPiece();
-        Tile tile = board[newX][newY];
-
+        // Check for out-of-bounds coordinates
+        if (!isValidPosition(x0, y0) || !isValidPosition(newX, newY)) {
+            System.out.println("Invalid board coordinates: (" + x0 + ", " + y0 + ") to (" + newX + ", " + newY + ")");
+            return new InvalidMove(x0, y0, null, newX, newY);
+        }
+    
+        Tile startTile = board[x0][y0];
+        Tile targetTile = board[newX][newY];
+    
+        // Check if start tile or piece is null
+        if (startTile == null || !startTile.hasPiece()) {
+            System.out.println("No piece at starting position: (" + x0 + ", " + y0 + ")");
+            return new InvalidMove(x0, y0, null, newX, newY);
+        }
+    
+        Piece piece = startTile.getPiece();
+    
         // Check if it's the correct player's turn
         if (isWhiteTurn != piece.getType().color.equals("white")) {
+            //System.out.println("It's not the correct player's turn for piece at: (" + x0 + ", " + y0 + ")");
             return new InvalidMove(x0, y0, piece, newX, newY);
         }
-
-        // Check if the tile is empty
-        if (tile.hasPiece()) {
+    
+        // Check if the target tile is empty
+        if (targetTile == null || targetTile.hasPiece()) {
+            //System.out.println("Target tile is not empty: (" + newX + ", " + newY + ")");
             return new InvalidMove(x0, y0, piece, newX, newY);
         }
-
-        // Check if the tile is black
-        if (!tile.isBlack()) {
-            System.out.println("white tile");
+    
+        // Check if the target tile is black
+        if (!targetTile.isBlack()) {
+            //System.out.println("Target tile is not black: (" + newX + ", " + newY + ")");
             return new InvalidMove(x0, y0, piece, newX, newY);
         }
-
-        // If the piece is a king, allow all types of moves and captures
+    
+        // King logic
         if (piece.getType() == PieceType.BLACKKING || piece.getType() == PieceType.WHITEKING) {
-            // Check for normal king move any direction (multi-tile)
             if (isMoveforKing(x0, y0, newX, newY) && isPathClearforKing(x0, y0, newX, newY)) {
                 return new NormalMove(x0, y0, piece, newX, newY);
             }
-
-            // Check for king capture any direction
             if (isCapturePathforKing(x0, y0, newX, newY)) {
                 Piece capturedPiece = getCapturedPieceOnPathforKing(x0, y0, newX, newY);
                 return new Capture(x0, y0, piece, capturedPiece, newX, newY);
             }
-        }
-
-        else {
-            // Normal diagonal move for regular pieces
-        if (isMoveDiagonalNormal(x0, y0, newX, newY) && piece.getType().moveDir == (newY - y0)) {return new NormalMove(x0, y0, piece, newX, newY);}
-
-
-        // Horizontal capture logic for normal pieces
-        if (newY == y0 && Math.abs(newX - x0) == 4) {
-            int x1 = (newX + x0) / 2;
-            Tile halfWay = board[x1][y0];
-            Piece capturedPiece = halfWay.getPiece();
-            if (halfWay.hasPiece() && !capturedPiece.getType().color.equals(piece.getType().color)) {
-                return new Capture(x0, y0, piece, capturedPiece, newX, newY);
+        } else {
+            // Normal piece logic
+            if (isMoveDiagonalNormal(x0, y0, newX, newY) && piece.getType().moveDir == (newY - y0)) {
+                return new NormalMove(x0, y0, piece, newX, newY);
+            }
+            if (newY == y0 && Math.abs(newX - x0) == 4) {
+                return checkHorizontalCapture(x0, y0, newX, newY, piece);
+            }
+            if (newX == x0 && Math.abs(newY - y0) == 4) {
+                return checkVerticalCapture(x0, y0, newX, newY, piece);
+            }
+            if (Math.abs(newX - x0) == 2 && Math.abs(newY - y0) == 2) {
+                return checkDiagonalCapture(x0, y0, newX, newY, piece);
             }
         }
-
-        // Vertical capture logic for normal pieces
-        if (newX == x0 && Math.abs(newY - y0) == 4) {
-            int y1 = (newY + y0) / 2;
-            Tile halfWay = board[x0][y1];
-            Piece capturedPiece = halfWay.getPiece();
-            if (halfWay.hasPiece() && !capturedPiece.getType().color.equals(piece.getType().color)) {
-                return new Capture(x0, y0, piece, capturedPiece, newX, newY);
-            }
-        }
-
-        // Diagonal capture logic for normal pieces
-        if (Math.abs(newX - x0) == 2 && Math.abs(newY - y0) == 2) {
-            int x1 = (newX + x0) / 2;
-            int y1 = (newY + y0) / 2;
-            Tile halfWay = board[x1][y1];
-            Piece capturedPiece = halfWay.getPiece();
-            if (halfWay.hasPiece() && !capturedPiece.getType().color.equals(piece.getType().color)) {
-                return new Capture(x0, y0, piece, capturedPiece, newX, newY);
-            }
-        }
+    
+        return new InvalidMove(x0, y0, piece, newX, newY);
     }
-
-    return new InvalidMove(x0, y0, piece, newX, newY);
+    
+    // Helper methods for capture logic
+    private Move checkHorizontalCapture(int x0, int y0, int newX, int newY, Piece piece) {
+        int x1 = (newX + x0) / 2;
+        Tile halfWay = board[x1][y0];
+        if (halfWay != null && halfWay.hasPiece()) {
+            Piece capturedPiece = halfWay.getPiece();
+            if (!capturedPiece.getType().color.equals(piece.getType().color)) {
+                return new Capture(x0, y0, piece, capturedPiece, newX, newY);
+            }
+        }
+        return new InvalidMove(x0, y0, piece, newX, newY);
     }
+    
+    private Move checkVerticalCapture(int x0, int y0, int newX, int newY, Piece piece) {
+        int y1 = (newY + y0) / 2;
+        Tile halfWay = board[x0][y1];
+        if (halfWay != null && halfWay.hasPiece()) {
+            Piece capturedPiece = halfWay.getPiece();
+            if (!capturedPiece.getType().color.equals(piece.getType().color)) {
+                return new Capture(x0, y0, piece, capturedPiece, newX, newY);
+            }
+        }
+        return new InvalidMove(x0, y0, piece, newX, newY);
+    }
+    
+    private Move checkDiagonalCapture(int x0, int y0, int newX, int newY, Piece piece) {
+        int x1 = (newX + x0) / 2;
+        int y1 = (newY + y0) / 2;
+        Tile halfWay = board[x1][y1];
+        if (halfWay != null && halfWay.hasPiece()) {
+            Piece capturedPiece = halfWay.getPiece();
+            if (!capturedPiece.getType().color.equals(piece.getType().color)) {
+                return new Capture(x0, y0, piece, capturedPiece, newX, newY);
+            }
+        }
+        return new InvalidMove(x0, y0, piece, newX, newY);
+    }
+    
+    // Helper method to validate positions
+    private boolean isValidPosition(int x, int y) {
+        return x >= 0 && x < board.length && y >= 0 && y < board[0].length;
+    }
+    
 
     // Helper method to check if move is available for king
     private boolean isMoveforKing(int x0, int y0, int newX, int newY) {
@@ -433,4 +468,18 @@ public class GameState {
     public Turn getCurrentTurn() {
         return currentTurn;
     }
+
+    public List<Piece> getAllPieces() {
+    List<Piece> pieces = new ArrayList<>();
+    for (int row = 0; row < board.length; row++) {
+        for (int col = 0; col < board[row].length; col++) {
+            Tile tile = board[row][col];
+            if (tile != null && tile.hasPiece()) {
+                pieces.add(tile.getPiece());
+            }
+        }
+    }
+    return pieces;
+}
+
 }

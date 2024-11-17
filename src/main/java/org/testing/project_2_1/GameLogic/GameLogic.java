@@ -9,6 +9,7 @@ import static org.testing.project_2_1.UI.CheckersApp.SIZE;
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.LinkedList;
+import java.util.List;
 import java.util.Set;
 
 import javafx.scene.layout.Pane;
@@ -425,5 +426,19 @@ public class GameLogic {
         return max;
     }
 
+
+    public static List<Piece> getMovablePieces(GameState g) {
+    List<Piece> movablePieces = new ArrayList<>();
+    List<Piece> allPieces = g.getAllPieces();
+
+    for (Piece piece : allPieces) {
+        List<Move> moves = getLegalMoves(piece, g);
+        if (!moves.isEmpty()) {
+            movablePieces.add(piece);
+        }
+    }
+
+    return movablePieces;
+}
 
 }
