@@ -19,6 +19,8 @@ public class GameLogic {
     public Agent agent;
     public Agent opponent;
     public GameState g;   
+    private Tile[][] board;
+
 
     public GameLogic(CheckersApp app) {
         this.agent = null;
@@ -56,6 +58,10 @@ public class GameLogic {
         return false;
     }
 
+    public Tile[][] getBoard() {
+        return board;
+    }
+    
     public void restartGame(){
         setStandardValues(app);
     }
@@ -199,32 +205,58 @@ public class GameLogic {
     }
 
     public static List<Move> getLegalMoves(Piece piece, GameState g) {
-        List<Turn> availableTurns = getLegalTurns(piece, g); 
-        List<Move> availableMoves = new ArrayList<>(); 
+        List<Turn> availableTurns = getLegalTurns(piece, g); // Fetch all legal turns for the piece
+        List<Move> availableMoves = new ArrayList<>();
+    
         for (Turn turn : availableTurns) {
-            availableMoves.add(turn.getMoves().getFirst());
+            availableMoves.add(turn.getMoves().getFirst()); // Add the first move of each turn
         }
+    
         return availableMoves;
     }
-
-    public static List<Move> getLegalMoves(GameState g) {
+    
+    /*public static List<Move> getLegalMoves(GameState g) {
         List<Turn> availableTurns = getLegalTurns(g); 
         List<Move> availableMoves = new ArrayList<>(); 
         for (Turn turn : availableTurns) {
             availableMoves.add(turn.getMoves().getFirst());
         }
         return availableMoves;
-    }
+    }*/
 
-    public static ArrayList<Piece> getListOfPieces(GameState b) {
+    public static List<Move> getLegalMoves(GameState g) {
+        List<Turn> availableTurns = getLegalTurns(g); 
+        List<Move> availableMoves = new ArrayList<>(); 
+    
+        for (Turn turn : availableTurns) {
+            availableMoves.add(turn.getMoves().getFirst());
+            System.out.println("Move found: From (" + turn.getMoves().getFirst().getFromX() + ", " + turn.getMoves().getFirst().getFromY() +
+                               ") to (" + turn.getMoves().getFirst().getToX() + ", " + turn.getMoves().getFirst().getToY() + ")");
+        }
+    
+        System.out.println("Total legal moves: " + availableMoves.size());
+        return availableMoves;
+    } 
+
+    /*public static ArrayList<Piece> getListOfPieces(GameState b) {
         if (b.isWhiteTurn) {
             return b.getWhitePieces();
         }
         else {
             return b.getBlackPieces();
         }
-    }
+    }*/
 
+    public static ArrayList<Piece> getListOfPieces(GameState b) {
+        if (b.isWhiteTurn) {
+            //System.out.println("Returning white pieces: " + b.getWhitePieces());
+            return b.getWhitePieces();
+        } else {
+            //System.out.println("Returning black pieces: " + b.getBlackPieces());
+            return b.getBlackPieces();
+        }
+    }
+    
     public void takeTurn(Turn turn) {
         for (Move move : turn.getMoves()) {
             takeMove(move);
@@ -238,14 +270,20 @@ public class GameLogic {
             askForMove();
             return false;
         }
+    
         ArrayList<Turn> legalTurns = getLegalTurns(g);
+    
+        // Handle normal moves when no captures are available
         if (move.isNormal() && !legalTurns.get(0).isShot()) {
-            System.out.println("no available captures, making normal move");
+            System.out.println("No available captures, making normal move");
             movePiece(move);
             app.updateEvaluationBar();
+            app.updateGlows(); // Update glowing after the normal move
             askForMove();
             return true;
         }
+    
+        // Handle capture moves
         for (Turn turn : legalTurns) {
             Move curMove = turn.getMoves().getFirst();
             if (curMove.equals(move)) {
@@ -255,35 +293,60 @@ public class GameLogic {
                 movePiece(move);
                 app.updateCaptureMessage(" ");
                 app.updateEvaluationBar();
+    
+                // If the turn ends after the move
                 if (curMove.isTurnEnding()) {
-                    System.out.println("made all available captures");
-                    askForMove(); 
+                    System.out.println("Made all available captures");
+                    app.updateGlows(); // Update glowing after the turn ends
+                    askForMove();
                     return true;
-                }
-                else {
-                    System.out.println("made capture, can take again");
+                } else {
+                    // Handle additional captures in the same turn
+                    System.out.println("Made capture, can take again");
+                    app.updateGlows(); // Update glowing to reflect new capture options
                     askForMove();
                     return true;
                 }
             }
         }
+    
+        // Handle cases where the current turn is empty
         if (g.getCurrentTurn().isEmpty()) {
             piece.abortMove();
             app.updateCaptureMessage(piece.getType().color + " must capture!");
             askForMove();
             return false;
         }
+    
+        // Handle cases where additional captures are available
         if (g.getCurrentTurn().getLast().isCapture()) {
             piece.abortMove();
             app.updateCaptureMessage(" ");
-            System.out.println("can take again");
+            System.out.println("Can take again");
+            app.updateGlows(); // Update glowing for additional capture options
             askForMove();
-            return true; 
+            return true;
         }
+    
+        // Default case: no valid move
         piece.abortMove();
         app.updateCaptureMessage(piece.getType().color + " must capture!");
         askForMove();
         return false;
+    }
+
+    public List<Piece> getAllPieces() {
+        List<Piece> pieces = new ArrayList<>();
+        Tile[][] board = getBoard(); 
+        for (int row = 0; row < board.length; row++) {
+            for (int col = 0; col < board[row].length; col++) {
+                Tile tile = board[row][col];
+                if (tile != null && tile.hasPiece()) {
+                    pieces.add(tile.getPiece()); 
+                }
+            }
+        }
+        return pieces;
     }
 
     private void movePiece(Move move) {

@@ -1,12 +1,12 @@
 package org.testing.project_2_1.UI;
 
-import javafx.scene.image.Image;
 import org.testing.project_2_1.Agents.*;
 import org.testing.project_2_1.GameLogic.GameLogic;
 import org.testing.project_2_1.GameLogic.Piece;
 import org.testing.project_2_1.GameLogic.Tile;
 import org.testing.project_2_1.Moves.Move;
 
+import javafx.scene.image.Image;
 import javafx.application.Application;
 import javafx.geometry.Insets;
 import javafx.scene.Group;
@@ -21,6 +21,8 @@ import javafx.stage.Stage;
 import javafx.scene.text.Font;
 import javafx.scene.text.FontWeight;
 import javafx.scene.control.ProgressBar;
+import java.util.ArrayList;
+import java.util.List;
 
 public class CheckersApp extends Application {
     public static final int TILE_SIZE = 60;
@@ -40,8 +42,10 @@ public class CheckersApp extends Application {
     public Group pieceGroup = new Group();
     private Group boardGroup = new Group();
     public CapturedPiecesTracker capturedPiecesTracker = new CapturedPiecesTracker();
+    private List<PieceDrawer> pieceDrawers = new ArrayList<>();
 
-    private boolean isPlayerOneTurn = true;
+
+    boolean isPlayerOneTurn = true;
     private long previousPlayerOneTime;
     private long previousPlayerTwoTime;
     private boolean wasPlayerOneTurnBeforeUndo;
@@ -217,21 +221,24 @@ public class CheckersApp extends Application {
     }
 
     public void addPiecestoBoard(Pane boardPane) {
+        pieceDrawers.clear(); // Clear the list to avoid duplicates
         for (Tile[] row : gameLogic.g.getBoard()) {
             for (Tile tile : row) {
                 tile.setTileDrawer(new TileDrawer(tile, this));
                 tileGroup.getChildren().add(tile.tileDrawer);
                 if (tile.hasPiece()) {
                     Piece piece = tile.getPiece();
-                    piece.setPieceDrawer(new PieceDrawer(piece, this));
-                    pieceGroup.getChildren().add(piece.getPieceDrawer());
+                    PieceDrawer drawer = new PieceDrawer(piece, this);
+                    piece.setPieceDrawer(drawer); // Associate the drawer with the piece
+                    pieceGroup.getChildren().add(drawer);
+                    pieceDrawers.add(drawer); 
                 }
             }
         }
-
         boardGroup.getChildren().addAll(tileGroup, pieceGroup);
         boardPane.getChildren().add(boardGroup);
     }
+    
 
     private void styleLabel(Label label, int fontSize, String textColor) {
         label.setStyle("-fx-font-size: " + fontSize + "px; -fx-font-weight: bold; -fx-text-fill: " + textColor + ";");
@@ -309,7 +316,15 @@ public class CheckersApp extends Application {
         }
     }
     
-
+    public void updateGlows() {
+        System.out.println("updateGlows() called. Total drawers: " + pieceDrawers.size());
+        for (PieceDrawer drawer : pieceDrawers) {
+            Piece piece = drawer.getPiece(); // Now accessible
+            System.out.println("Updating glow for piece at: " + piece.getX() + ", " + piece.getY());
+            drawer.updateGlow();
+        }
+    }
+ 
     public static void main(String[] args) {
         launch(args);
     }

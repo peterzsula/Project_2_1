@@ -128,6 +128,7 @@ public class GameState {
         }
         return true;
     }
+    
 
     public boolean undoMove(Move move){
         movesPlayed.remove(move);

@@ -31,13 +31,15 @@ public class GUI extends Application {
 
         Image icon = new Image("pixel-frisian.png");
         selectionStage.getIcons().add(icon);
+
         Label gameTitle = new Label("Frisian Checkers");
         gameTitle.setFont(new Font("Arial", 32));
         gameTitle.setTextFill(Color.BLACK);
         gameTitle.setStyle("-fx-font-weight: bold;");
         gameTitle.setEffect(new DropShadow(5, Color.GRAY));
-        gameTitle.setLayoutX(85);
-        gameTitle.setLayoutY(70);
+
+        gameTitle.layoutXProperty().bind(selectionPane.widthProperty().subtract(gameTitle.widthProperty()).divide(2));
+        gameTitle.setLayoutY(70); 
 
         ComboBox<String> player1Selection = new ComboBox<>();
         player1Selection.getItems().addAll("Human", "Minimax", "Baseline AI", "Alpha-Beta Pruning", "MCTS");
@@ -49,7 +51,7 @@ public class GUI extends Application {
         player1Selection.setEffect(new DropShadow(5, Color.LIGHTGRAY));
 
         ComboBox<String> player2Selection = new ComboBox<>();
-        player2Selection.getItems().addAll("Human", "Baseline AI", "Minimax", "Alpha-Beta Pruning", "MCTS");
+        player2Selection.getItems().addAll("Human", "Minimax", "Baseline AI", "Alpha-Beta Pruning", "MCTS");
         player2Selection.setValue("Select Player 2");
         player2Selection.setLayoutX(125);
         player2Selection.setLayoutY(240);
@@ -61,67 +63,58 @@ public class GUI extends Application {
         startGameButton.setLayoutX(175);
         startGameButton.setLayoutY(330);
         startGameButton.setPrefWidth(150);
+        startGameButton.setDisable(true); 
         startGameButton.setStyle("-fx-background-color: #4CAF50; -fx-text-fill: white; -fx-font-size: 18px; -fx-background-radius: 15; -fx-border-radius: 15;");
         startGameButton.setEffect(new DropShadow(10, Color.DARKGREEN));
 
         startGameButton.setOnMouseEntered(e -> startGameButton.setStyle("-fx-background-color: #45A049; -fx-text-fill: white; -fx-font-size: 18px; -fx-background-radius: 15; -fx-border-radius: 15;"));
         startGameButton.setOnMouseExited(e -> startGameButton.setStyle("-fx-background-color: #4CAF50; -fx-text-fill: white; -fx-font-size: 18px; -fx-background-radius: 15; -fx-border-radius: 15;"));
 
+        player1Selection.setOnAction(e -> validateSelections(player1Selection, player2Selection, startGameButton));
+        player2Selection.setOnAction(e -> validateSelections(player1Selection, player2Selection, startGameButton));
+
+        // Click or Enter Key
         startGameButton.setOnAction(e -> {
-            CheckersApp game = null;
-            Agent player1Agent = null;
-            Agent player2Agent = null;
+            if (!startGameButton.isDisabled()) {
+                startGame(player1Selection, player2Selection);
+            }
+        });
 
-            // Player 1 
-            switch (player1Selection.getValue()) {
-                case "Baseline AI":
-                    player1Agent = new BaselineAgent(true);
-                    break;
-                case "Minimax":
-                    player1Agent = new MinimaxAgent(true, 3);
-                    break;
-                case "Alpha-Beta Pruning":
-                    player1Agent = new AlphaBetaAgent(true, 3);
-                    break;
-                case "MCTS":
-                    player1Agent = new AgentMCTS(true);
+        startGameButton.setOnKeyPressed(e -> {
+            switch (e.getCode()) {
+                case ENTER: // Start game when ENTER is pressed
+                    if (!startGameButton.isDisabled()) {
+                        startGame(player1Selection, player2Selection);
+                    }
                     break;
                 default:
-                    break; // Human
+                    break;
             }
+        });
 
-            // Player
-            switch (player2Selection.getValue()) {
-                case "Baseline AI":
-                    player2Agent = new BaselineAgent(false);
+        player1Selection.setOnKeyPressed(e -> {
+            switch (e.getCode()) {
+                case DOWN:
+                    player2Selection.requestFocus(); // Navigate to player 2 selection
                     break;
-                case "Minimax":
-                    player2Agent = new MinimaxAgent(false, 3);
-                    break;
-                case "Alpha-Beta Pruning":
-                    player2Agent = new AlphaBetaAgent(false, 3);
-                    break;
-                case "MCTS":
-                    player2Agent = new AgentMCTS(false);
+                case ENTER:
+                    player2Selection.requestFocus(); // Navigate to player 2 selection
                     break;
                 default:
-                    break; // Human
+                    break;
             }
+        });
 
-            if (player1Agent != null && player2Agent != null) {
-                game = new CheckersApp(player1Agent, player2Agent);
-            } else if (player1Agent != null) {
-                game = new CheckersApp(player1Agent); // Player 1 AI, Player 2 Human
-            } else if (player2Agent != null) {
-                game = new CheckersApp(player2Agent); // Player 1 Human, Player 2 AI
-            } else {
-                game = new CheckersApp(); // Both Human
-            }
-
-            try {
-                game.start(new Stage());
-            } catch (Exception ex) {
-                ex.printStackTrace();
+        player2Selection.setOnKeyPressed(e -> {
+            switch (e.getCode()) {
+                case UP:
+                    player1Selection.requestFocus(); // Navigate back to player 1 selection
+                    break;
+                case ENTER:
+                    startGameButton.requestFocus(); // Navigate to start button
+                    break;
+                default:
+                    break;
             }
         });
 
@@ -131,6 +124,71 @@ public class GUI extends Application {
         selectionStage.setTitle("Game Mode Selection");
         selectionStage.setScene(selectionScene);
         selectionStage.show();
+    }
+
+    private void validateSelections(ComboBox<String> player1, ComboBox<String> player2, Button startButton) {
+        String p1 = player1.getValue();
+        String p2 = player2.getValue();
+        boolean valid = !p1.equals("Select Player 1") && !p2.equals("Select Player 2");
+        startButton.setDisable(!valid);
+    }
+
+    private void startGame(ComboBox<String> player1Selection, ComboBox<String> player2Selection) {
+        CheckersApp game = null;
+        Agent player1Agent = null;
+        Agent player2Agent = null;
+
+        // Player 1
+        switch (player1Selection.getValue()) {
+            case "Baseline AI":
+                player1Agent = new BaselineAgent(true);
+                break;
+            case "Minimax":
+                player1Agent = new MinimaxAgent(true, 3);
+                break;
+            case "Alpha-Beta Pruning":
+                player1Agent = new AlphaBetaAgent(true, 3);
+                break;
+            case "MCTS":
+                player1Agent = new AgentMCTS(true);
+                break;
+            default:
+                break; // Human
+        }
+
+        // Player 2 
+        switch (player2Selection.getValue()) {
+            case "Baseline AI":
+                player2Agent = new BaselineAgent(false);
+                break;
+            case "Minimax":
+                player2Agent = new MinimaxAgent(false, 3);
+                break;
+            case "Alpha-Beta Pruning":
+                player2Agent = new AlphaBetaAgent(false, 3);
+                break;
+            case "MCTS":
+                player2Agent = new AgentMCTS(false);
+                break;
+            default:
+                break; // Human
+        }
+
+        if (player1Agent != null && player2Agent != null) {
+            game = new CheckersApp(player1Agent, player2Agent);
+        } else if (player1Agent != null) {
+            game = new CheckersApp(player1Agent); // Player 1 AI, Player 2 Human
+        } else if (player2Agent != null) {
+            game = new CheckersApp(player2Agent); // Player 1 Human, Player 2 AI
+        } else {
+            game = new CheckersApp(); // Both Human
+        }
+
+        try {
+            game.start(new Stage());
+        } catch (Exception ex) {
+            ex.printStackTrace();
+        }
     }
 
     public static void main(String[] args) {
