@@ -133,6 +133,9 @@ public class GameState {
         movesPlayed.remove(move);
         currentTurn.removeMove(move);
         Piece piece = board[move.getToX()][move.getToY()].getPiece();
+        if (piece == null) {
+            throw new IllegalStateException("Piece to undo does not exist at the target position.");
+        }
         piece.undoMove(move);
         board[move.getFromX()][move.getFromY()].setPiece(piece);
         board[move.getToX()][move.getToY()].setPiece(null);
@@ -143,14 +146,18 @@ public class GameState {
             addCapturedPieceToLists(capturedPiece);
         }
         if (move.isTurnEnding()) {
+            if (turnsPlayed.isEmpty()) {
+                System.err.println("Warning: No turns left to undo.");
+                return false; // Indicate failure to undo
+            }
             currentTurn = turnsPlayed.get(turnsPlayed.size() - 1); // bug here when AB agent depth is 4
-            turnsPlayed.remove(currentTurn);
+            turnsPlayed.remove(turnsPlayed.size() - 1);
             switchTurn();
         }
         return true;
     }
 
-    
+
     private void removeCapturedPieceFromLists(Piece piece){
         if (piece.type.color.equals("white")) {
             whitePieces.remove(piece);

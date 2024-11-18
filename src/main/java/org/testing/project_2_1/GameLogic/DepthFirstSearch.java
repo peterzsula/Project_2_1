@@ -16,7 +16,9 @@ public class DepthFirstSearch {
     public static void dfs(GameState g, Piece piece, Turn currentTurn, int captureCount) {
         ArrayList<Move> captures = GameLogic.getCaptures(piece, g);
         if (captures.isEmpty()) {
-            currentTurn.getMoves().getLast().setTurnEnding(true);
+            if (!currentTurn.getMoves().isEmpty()) { // Ensure moves exist before setting the turn ending
+                currentTurn.getMoves().getLast().setTurnEnding(true);
+            }
             //TODO: add 2 kings rule
             if (captureCount > maxCaptures) {
                 result.clear();
