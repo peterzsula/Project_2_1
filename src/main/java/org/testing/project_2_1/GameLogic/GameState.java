@@ -312,7 +312,7 @@ public class GameState {
 
     // Helper method to check if move is available for king
     private boolean isMoveforKing(int x0, int y0, int newX, int newY) {
-        return (x0 == newX || y0 == newY || Math.abs(newX - x0) == Math.abs(newY - y0));
+        return ( Math.abs(newX - x0) == Math.abs(newY - y0)); //Adjusted for only normal diagonal moves
     }
 
     // Helper method to check if move is diagonal for normal pieces
@@ -376,8 +376,7 @@ public class GameState {
             int landingX = capturedX + dx;
             int landingY = capturedY + dy;
 
-            // Add error margin for vertical/horizontal captures
-            if (Math.abs(newX - landingX) <= 1 && Math.abs(newY - landingY) <= 1) {
+            if (Math.abs(newX - landingX) <= board.length && Math.abs(newY - landingY) <= board.length) {
                 return true;  // Immediately after the captured piece
             } else {
                 return false;  // Not immediately after
