@@ -108,6 +108,17 @@ public class GameState {
         isWhiteTurn = !isWhiteTurn;
     }
 
+    public boolean isGameOver() {
+        return whitePieces.isEmpty() || blackPieces.isEmpty();
+    }
+
+    public List<Piece> getAllPieces(){
+        List<Piece> pieces = new ArrayList<>();
+        pieces.addAll(whitePieces);
+        pieces.addAll(blackPieces);
+        return pieces;
+    }
+
     public boolean move(Move move) {
         movesPlayed.add(move);
         currentTurn.addMove(move);
@@ -146,13 +157,9 @@ public class GameState {
             board[capturedPiece.getX()][capturedPiece.getY()].setPiece(capturedPiece);
             addCapturedPieceToLists(capturedPiece);
         }
-        if (move.isTurnEnding()) {
-            if (turnsPlayed.isEmpty()) {
-                System.err.println("Warning: No turns left to undo.");
-                return false; // Indicate failure to undo
-            }
-            currentTurn = turnsPlayed.get(turnsPlayed.size() - 1); // bug here when AB agent depth is 4
-            turnsPlayed.remove(turnsPlayed.size() - 1);
+        if (move.isTurnEnding() && !turnsPlayed.isEmpty()) {
+            currentTurn = turnsPlayed.getLast(); // bug here when AB agent depth is 4
+            turnsPlayed.remove(currentTurn);
             switchTurn();
         }
         return true;
@@ -476,17 +483,5 @@ public class GameState {
         return currentTurn;
     }
 
-    public List<Piece> getAllPieces() {
-    List<Piece> pieces = new ArrayList<>();
-    for (int row = 0; row < board.length; row++) {
-        for (int col = 0; col < board[row].length; col++) {
-            Tile tile = board[row][col];
-            if (tile != null && tile.hasPiece()) {
-                pieces.add(tile.getPiece());
-            }
-        }
-    }
-    return pieces;
-}
 
 }

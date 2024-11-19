@@ -153,6 +153,7 @@ public class GUI extends Application {
                 player1Agent = new AgentMCTS(true);
                 break;
             default:
+                player1Agent = null;
                 break; // Human
         }
 
@@ -171,6 +172,7 @@ public class GUI extends Application {
                 player2Agent = new AgentMCTS(false);
                 break;
             default:
+                player2Agent = new AgentMCTS(false);
                 break; // Human
         }
 

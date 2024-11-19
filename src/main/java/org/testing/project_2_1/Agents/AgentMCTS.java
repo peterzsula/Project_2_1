@@ -5,6 +5,9 @@ import org.testing.project_2_1.GameLogic.GameState;
 import org.testing.project_2_1.Moves.Move;
 import org.testing.project_2_1.Moves.Turn;
 
+import javafx.animation.PauseTransition;
+import javafx.util.Duration;
+
 import java.util.ArrayList;
 import java.util.Random;
 
@@ -69,8 +72,13 @@ public class AgentMCTS implements Agent {
         Node bestChild = selectBestChild(root);
         if (bestChild != null && bestChild.move != null) {
             Move move = bestChild.move.getMoves().get(0); // Fixed access to the first move
-            gameLogic.takeMove(move);
-            System.out.println("Takes turn with move: " + move);
+            PauseTransition pause = new PauseTransition(Duration.seconds(Agent.delay));
+            pause.setOnFinished(event -> {
+            if (gameLogic.g.getIsWhiteTurn() == isWhite && !gameLogic.isGameOver(gameLogic.g)) {
+                gameLogic.takeMove(move);
+            }
+        });
+        pause.play();
         } else {
             System.out.println("No valid moves found.");
         }

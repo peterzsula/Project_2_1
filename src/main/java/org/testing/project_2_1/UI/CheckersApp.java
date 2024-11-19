@@ -172,7 +172,6 @@ public class CheckersApp extends Application {
     public void movePiece(int oldX, int oldY, Piece piece, int newX, int newY) {
         Move move = gameLogic.g.determineMoveType(oldX, oldY, newX, newY);
         piece.getPieceDrawer().clearHighlight();
-        System.out.println("Move: " + move);
 
         if (gameLogic.takeMove(move)) {
             piece.movePiece(move);
@@ -317,10 +316,7 @@ public class CheckersApp extends Application {
     }
     
     public void updateGlows() {
-        System.out.println("updateGlows() called. Total drawers: " + pieceDrawers.size());
         for (PieceDrawer drawer : pieceDrawers) {
-            Piece piece = drawer.getPiece(); // Now accessible
-            System.out.println("Updating glow for piece at: " + piece.getX() + ", " + piece.getY());
             drawer.updateGlow();
         }
     }

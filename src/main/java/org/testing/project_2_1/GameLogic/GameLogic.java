@@ -19,7 +19,6 @@ public class GameLogic {
     public Agent agent;
     public Agent opponent;
     public GameState g;   
-    private Tile[][] board;
 
 
     public GameLogic(CheckersApp app) {
@@ -59,7 +58,7 @@ public class GameLogic {
     }
 
     public Tile[][] getBoard() {
-        return board;
+        return g.getBoard();
     }
     
     public void restartGame(){
@@ -215,44 +214,20 @@ public class GameLogic {
         return availableMoves;
     }
     
-    /*public static List<Move> getLegalMoves(GameState g) {
-        List<Turn> availableTurns = getLegalTurns(g); 
-        List<Move> availableMoves = new ArrayList<>(); 
-        for (Turn turn : availableTurns) {
-            availableMoves.add(turn.getMoves().getFirst());
-        }
-        return availableMoves;
-    }*/
-
     public static List<Move> getLegalMoves(GameState g) {
         List<Turn> availableTurns = getLegalTurns(g); 
         List<Move> availableMoves = new ArrayList<>(); 
-    
         for (Turn turn : availableTurns) {
             availableMoves.add(turn.getMoves().getFirst());
-            System.out.println("Move found: From (" + turn.getMoves().getFirst().getFromX() + ", " + turn.getMoves().getFirst().getFromY() +
-                               ") to (" + turn.getMoves().getFirst().getToX() + ", " + turn.getMoves().getFirst().getToY() + ")");
         }
-    
-        System.out.println("Total legal moves: " + availableMoves.size());
         return availableMoves;
-    } 
+    }
 
-    /*public static ArrayList<Piece> getListOfPieces(GameState b) {
+    public static ArrayList<Piece> getListOfPieces(GameState b) {
         if (b.isWhiteTurn) {
             return b.getWhitePieces();
         }
         else {
-            return b.getBlackPieces();
-        }
-    }*/
-
-    public static ArrayList<Piece> getListOfPieces(GameState b) {
-        if (b.isWhiteTurn) {
-            //System.out.println("Returning white pieces: " + b.getWhitePieces());
-            return b.getWhitePieces();
-        } else {
-            //System.out.println("Returning black pieces: " + b.getBlackPieces());
             return b.getBlackPieces();
         }
     }
@@ -333,20 +308,6 @@ public class GameLogic {
         app.updateCaptureMessage(piece.getType().color + " must capture!");
         askForMove();
         return false;
-    }
-
-    public List<Piece> getAllPieces() {
-        List<Piece> pieces = new ArrayList<>();
-        Tile[][] board = getBoard(); 
-        for (int row = 0; row < board.length; row++) {
-            for (int col = 0; col < board[row].length; col++) {
-                Tile tile = board[row][col];
-                if (tile != null && tile.hasPiece()) {
-                    pieces.add(tile.getPiece()); 
-                }
-            }
-        }
-        return pieces;
     }
 
     private void movePiece(Move move) {

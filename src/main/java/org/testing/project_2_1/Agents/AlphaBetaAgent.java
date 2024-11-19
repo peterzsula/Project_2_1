@@ -34,7 +34,6 @@ public class AlphaBetaAgent implements Agent {
                 ArrayList<Turn> turns = GameLogic.getLegalTurns(gameLogic.g);
                 Turn bestTurn = getBestTurn(turns);
                 Move move = bestTurn.getMoves().remove(0);
-                System.out.println("Takes turn with move " + move);
                 gameLogic.takeMove(move);
             }
         });
