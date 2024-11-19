@@ -28,7 +28,7 @@ public class CheckersApp extends Application {
     public static final int TILE_SIZE = 60;
     public static final int SIZE = 10;
     public int noOfPlayers = 0;
-
+    public GameLogic gameLogic;
     private Label playerOneTimerLabel;
     private Label playerTwoTimerLabel;
     private Label captureMessageLabel;
@@ -38,18 +38,17 @@ public class CheckersApp extends Application {
     private Label evaluationScoreLabel;
     private double minObservedScore = -20;
     private double maxObservedScore = 20;
-    private Group tileGroup = new Group();
-    public Group pieceGroup = new Group();
-    private Group boardGroup = new Group();
-    public CapturedPiecesTracker capturedPiecesTracker = new CapturedPiecesTracker();
-    private List<PieceDrawer> pieceDrawers = new ArrayList<>();
+    private Group tileGroup;
+    public Group pieceGroup;
+    private Group boardGroup;
+    public CapturedPiecesTracker capturedPiecesTracker;
+    private List<PieceDrawer> pieceDrawers;
 
 
-    boolean isPlayerOneTurn = true;
+    boolean isPlayerOneTurn;
     private long previousPlayerOneTime;
     private long previousPlayerTwoTime;
-    private boolean wasPlayerOneTurnBeforeUndo;
-    public GameLogic gameLogic;
+    
 
     public Group getBoardGroup() {
         return boardGroup;
@@ -58,13 +57,14 @@ public class CheckersApp extends Application {
     public CheckersApp() {
         gameLogic = new GameLogic(this);
         noOfPlayers = 2;
-        evaluationBar = new ProgressBar(0.5);
+        setDefaultValues();
     }
 
     public CheckersApp(Agent agent) {
         gameLogic = new GameLogic(this, agent);
         agent.setGameLogic(gameLogic);
         noOfPlayers = 1;
+        setDefaultValues();
     }
 
     public CheckersApp(Agent agent1, Agent agent2) {
@@ -72,6 +72,20 @@ public class CheckersApp extends Application {
         agent1.setGameLogic(gameLogic);
         agent2.setGameLogic(gameLogic);
         noOfPlayers = 0;
+        setDefaultValues();
+    }
+
+    public void setDefaultValues(){
+        isPlayerOneTurn = gameLogic.g.getIsWhiteTurn();
+        evaluationBar = new ProgressBar(0.5);
+        capturedPiecesTracker = new CapturedPiecesTracker();
+        pieceDrawers = new ArrayList<>();
+        tileGroup = new Group();
+        pieceGroup = new Group();
+        boardGroup = new Group();
+        pieceGroup.getChildren().clear();
+        boardGroup.getChildren().clear();
+        
     }
 
     @Override
@@ -183,12 +197,10 @@ public class CheckersApp extends Application {
                 playerTwoTimer.stopCountdown();
                 playerOneTimer.startCountdown();
             }
-            isPlayerOneTurn = !isPlayerOneTurn; // Switch turn
         }
     }
 
     public void resetGUI() {
-        isPlayerOneTurn = true;
         playerOneTimer.reset();
         playerTwoTimer.reset();
         playerOneTimer.startCountdown();
@@ -265,8 +277,6 @@ public class CheckersApp extends Application {
 
         playerOneTimer.setTotalTime(previousPlayerOneTime * 1000);
         playerTwoTimer.setTotalTime(previousPlayerTwoTime * 1000);
-
-        isPlayerOneTurn = wasPlayerOneTurnBeforeUndo;
 
         if (isPlayerOneTurn) {
             playerOneTimer.startCountdown();

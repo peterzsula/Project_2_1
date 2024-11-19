@@ -50,10 +50,12 @@ public class CapturedPiecesTracker {
 
     public void decrementWhiteCaptured() {
         whiteCaptured--;
+        whiteCapturedLabel.setText(String.valueOf(whiteCaptured));
     }
 
     public void decrementBlackCaptured() {
         blackCaptured--;
+        blackCapturedLabel.setText(String.valueOf(blackCaptured));
     }
 
     public VBox getBlackWhiteCapturedDisplay() {

@@ -8,10 +8,6 @@ import org.testing.project_2_1.Moves.Turn;
 public class DepthFirstSearch {
     private static int maxCaptures;
     private static ArrayList<Turn> result;  
-
-    public static void resetMaxCaptures() {
-        maxCaptures = 0;
-    }
     
     public static void dfs(GameState g, Piece piece, Turn currentTurn, int captureCount) {
         ArrayList<Move> captures = GameLogic.getCaptures(piece, g);
@@ -50,5 +46,9 @@ public class DepthFirstSearch {
 
     public static void resetResult() {
         result = new ArrayList<Turn>();
+    }
+    
+    public static void resetMaxCaptures() {
+        maxCaptures = 0;
     }
 }

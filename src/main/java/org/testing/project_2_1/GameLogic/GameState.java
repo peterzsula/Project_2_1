@@ -18,6 +18,8 @@ public class GameState {
     private ArrayList<Move> movesPlayed;
     private ArrayList<Turn> turnsPlayed;
     private Turn currentTurn;
+    private List<Turn> possibleTurns;
+    private boolean isGameOver;
 
     public GameState(){
         isWhiteTurn = true;
@@ -108,8 +110,24 @@ public class GameState {
         isWhiteTurn = !isWhiteTurn;
     }
 
+    public void setGameOver(boolean isGameOver) {
+        this.isGameOver = isGameOver;
+        // TODO: Implement game over logic
+    }
+
     public boolean isGameOver() {
-        return whitePieces.isEmpty() || blackPieces.isEmpty();
+        if (whitePieces.isEmpty() || blackPieces.isEmpty()) {
+            isGameOver = true;
+        }
+        return isGameOver;
+    }
+
+    public void setPossibleTurns(List<Turn> possibleTurns) {
+        this.possibleTurns = possibleTurns;
+    }
+
+    public List<Turn> getPossibleTurns() {
+        return possibleTurns;
     }
 
     public List<Piece> getAllPieces(){
@@ -140,10 +158,8 @@ public class GameState {
         return true;
     }
     
-
     public boolean undoMove(Move move){
         movesPlayed.remove(move);
-        currentTurn.removeMove(move);
         Piece piece = board[move.getToX()][move.getToY()].getPiece();
         if (piece == null) {
             throw new IllegalStateException("Piece to undo does not exist at the target position.");
@@ -158,7 +174,7 @@ public class GameState {
             addCapturedPieceToLists(capturedPiece);
         }
         if (move.isTurnEnding() && !turnsPlayed.isEmpty()) {
-            currentTurn = turnsPlayed.getLast(); // bug here when AB agent depth is 4
+            currentTurn.getMoves().removeLast();
             turnsPlayed.remove(currentTurn);
             switchTurn();
         }

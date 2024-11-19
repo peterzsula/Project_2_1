@@ -78,6 +78,9 @@ public class Turn {
 
     public void removeMove(Move move) {
         moves.remove(move);
+        if (moves.isEmpty()) {
+            
+        }
     }
 
     public Move getLast() {
