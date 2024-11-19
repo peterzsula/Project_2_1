@@ -84,7 +84,7 @@ public class GameLogic {
 
     public void printAvailableCaptures(GameState g){
         ArrayList<Turn> availableTurns = getLegalTurns(g);
-        System.out.println("Nuber of available moves: " + availableTurns.size());
+        System.out.println("Number of available moves: " + availableTurns.size());
         for (Turn turn : availableTurns) {
             System.out.println(turn.getMoves().getFirst().toString());
         }
@@ -105,7 +105,6 @@ public class GameLogic {
         for (Piece piece : pieces) {
             ArrayList<Turn> pieceTurns = getLegalTurns(piece, g);
             for (Turn turn : pieceTurns) {
-                //TODO: add 2 kings rule
                 if (turn.getMoves().size() > maxCaptures) {
                     availableTurns.clear();
                     availableTurns.add(turn);
