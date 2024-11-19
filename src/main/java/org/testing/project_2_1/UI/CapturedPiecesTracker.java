@@ -73,9 +73,15 @@ public class CapturedPiecesTracker {
         }
     }
 
+    // Reset method to reset captured pieces counts and labels
     public void reset() {
-        // TODO Auto-generated method stub
-        throw new UnsupportedOperationException("Unimplemented method 'reset'");
-    }
+        blackCaptured = 0;
+        whiteCaptured = 0;
+        playerOneCapturedCount = 0;
+        playerTwoCapturedCount = 0;
 
+        // Reset the labels to "0"
+        blackCapturedLabel.setText(String.valueOf(blackCaptured));
+        whiteCapturedLabel.setText(String.valueOf(whiteCaptured));
+    }
 }

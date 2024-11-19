@@ -105,82 +105,86 @@ public class CheckersApp extends Application {
     public Parent createContent() {
         Pane boardPane = new Pane();
         boardPane.setPrefSize(SIZE * TILE_SIZE, SIZE * TILE_SIZE);
-
+    
         // Label to tell you when to capture
         captureMessageLabel = new Label();
         captureMessageLabel.setFont(new Font("Arial", 16));
         captureMessageLabel.setStyle("-fx-text-fill: red; -fx-font-weight: bold;");
-
+    
         // Initialize the evaluation bar
         evaluationBar = new ProgressBar(0.5);
         evaluationBar.setPrefWidth(200);
         evaluationBar.setStyle("-fx-accent: gray;");
-
+    
         // Label to display the evaluation score
         evaluationScoreLabel = new Label("Score: 0.0");
         evaluationScoreLabel.setFont(new Font("Arial", 14));
         evaluationScoreLabel.setStyle("-fx-text-fill: black; -fx-font-weight: bold;");
-
+    
         capturedPiecesTracker = new CapturedPiecesTracker();
-
+    
         playerOneTimerLabel = new Label("05:00");
         playerTwoTimerLabel = new Label("05:00");
-
+    
         playerOneTimer = new PlayerTimer(playerOneTimerLabel, 300_000, 5000);
         playerTwoTimer = new PlayerTimer(playerTwoTimerLabel, 300_000, 5000);
-
+    
         playerOneTimer.setTotalTime(300_000);
         playerTwoTimer.setTotalTime(300_000);
-
+    
         styleLabel(playerOneTimerLabel, 16, "black");
         styleLabel(playerTwoTimerLabel, 16, "black");
-
+    
         addPiecestoBoard(boardPane);
-
+    
         Label playerOneTitle = new Label("PLAYER 1");
         Label playerTwoTitle = new Label("PLAYER 2");
         Label playerOneTimeLabel = new Label("Time Remaining:");
         Label playerTwoTimeLabel = new Label("Time Remaining:");
         Label playerOneCapturedLabel = new Label("Captured Pieces:");
         Label playerTwoCapturedLabel = new Label("Captured Pieces:");
-
+    
+        // Reset Button
         Button resetButton = new Button("RESTART");
         resetButton.setOnAction(e -> {
-            gameLogic.restartGame();
-            resetGUI();
+            gameLogic.restartGame(); // Reset game logic.
+            resetGUI(); // Reset the GUI.
         });
+    
+        // Undo Button
         Button undoButton = new Button("UNDO");
         undoButton.setOnAction(e -> undoLastMove());
-
+    
         styleTitle(playerOneTitle);
         styleTitle(playerTwoTitle);
         styleInfoLabel(playerOneTimeLabel);
         styleInfoLabel(playerTwoTimeLabel);
         styleInfoLabel(playerOneCapturedLabel);
         styleInfoLabel(playerTwoCapturedLabel);
-
+    
         Label playerOneCapturedCount = capturedPiecesTracker.blackCapturedLabel;
         Label playerTwoCapturedCount = capturedPiecesTracker.whiteCapturedLabel;
-
+    
         VBox playerOneBox = new VBox(10, playerOneTitle, playerOneTimeLabel, playerOneTimerLabel,
                                      playerOneCapturedLabel, playerOneCapturedCount);
         VBox playerTwoBox = new VBox(10, playerTwoTitle, playerTwoTimeLabel, playerTwoTimerLabel,
                                      playerTwoCapturedLabel, playerTwoCapturedCount);
-
+    
         playerOneBox.setStyle("-fx-background-color: #f0f8ff; -fx-border-color: #b0b0b0; -fx-border-width: 2px; -fx-border-radius: 5px;");
         playerTwoBox.setStyle("-fx-background-color: #f0f8ff; -fx-border-color: #b0b0b0; -fx-border-width: 2px; -fx-border-radius: 5px;");
         playerOneBox.setPadding(new Insets(15));
         playerTwoBox.setPadding(new Insets(15));
-
+    
         VBox rightPanel = new VBox(20, playerOneBox, playerTwoBox, captureMessageLabel, evaluationBar, evaluationScoreLabel);
         rightPanel.setStyle("-fx-padding: 10 10 10 20;");
         rightPanel.setPrefWidth(260);
-
+    
         HBox root = new HBox();
         root.getChildren().addAll(boardPane, rightPanel, resetButton, undoButton);
         root.setSpacing(20);
         return root;
     }
+    
 
     public void movePiece(int oldX, int oldY, Piece piece, int newX, int newY) {
         Move move = gameLogic.g.determineMoveType(oldX, oldY, newX, newY);
@@ -200,10 +204,18 @@ public class CheckersApp extends Application {
     }
 
     public void resetGUI() {
+        if (pieceGroup == null) {
+            pieceGroup = new Group();
+        }
+        if (tileGroup == null) {
+            tileGroup = new Group();
+        }
+
         playerOneTimer.reset();
         playerTwoTimer.reset();
         playerOneTimer.startCountdown();
         playerTwoTimer.stopCountdown();
+ 
         pieceGroup.getChildren().clear();
 
         if (noOfPlayers == 2) {
@@ -216,10 +228,14 @@ public class CheckersApp extends Application {
 
         for (Tile[] row : gameLogic.g.getBoard()) {
             for (Tile tile : row) {
-                tileGroup.getChildren().add(tile.tileDrawer);
+                if (tile.tileDrawer != null) { 
+                    tileGroup.getChildren().add(tile.tileDrawer);
+                }
                 if (tile.hasPiece()) {
                     Piece piece = tile.getPiece();
-                    piece.setPieceDrawer(new PieceDrawer(piece, this));
+                    if (piece != null) {
+                        piece.setPieceDrawer(new PieceDrawer(piece, this));
+                    }
                 }
             }
         }
@@ -230,6 +246,10 @@ public class CheckersApp extends Application {
         else if (noOfPlayers == 1 && gameLogic.agent.isWhite() && isPlayerOneTurn) {
             gameLogic.agent.makeMove();
         }
+
+        evaluationBar.setProgress(0.5);
+        evaluationScoreLabel.setText("Score: 0.0");
+        capturedPiecesTracker.reset();
     }
 
     public void addPiecestoBoard(Pane boardPane) {
