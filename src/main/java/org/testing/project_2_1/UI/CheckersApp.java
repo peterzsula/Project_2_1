@@ -90,16 +90,30 @@ public class CheckersApp extends Application {
         primaryStage.setTitle("FRISIAN DRAUGHTS");
         primaryStage.setScene(scene);
         primaryStage.show();
+
         Image icon = new Image("pixel-frisian.png");
         primaryStage.getIcons().add(icon);
 
         playerOneTimer.startCountdown();
+
         if (noOfPlayers == 0 || (!isPlayerOneTurn && noOfPlayers == 1)) {
             gameLogic.agent.makeMove();
-        }
-        else if (noOfPlayers == 1 && gameLogic.agent.isWhite() && isPlayerOneTurn) {
+        } else if (noOfPlayers == 1 && gameLogic.agent.isWhite() && isPlayerOneTurn) {
             gameLogic.agent.makeMove();
         }
+    
+        // Ensure the application terminates when the window is closed
+        primaryStage.setOnCloseRequest(event -> {
+            if (playerOneTimer != null) {
+                playerOneTimer.stopCountdown();
+            }
+            if (playerTwoTimer != null) {
+                playerTwoTimer.stopCountdown();
+            }
+    
+            // Terminate the application
+            System.exit(0);
+        });
     }
 
     public Parent createContent() {
@@ -144,16 +158,20 @@ public class CheckersApp extends Application {
         Label playerOneCapturedLabel = new Label("Captured Pieces:");
         Label playerTwoCapturedLabel = new Label("Captured Pieces:");
     
-        // Reset Button
-        Button resetButton = new Button("RESTART");
+        // Simplified Reset Button
+        Button resetButton = new Button("Restart");
         resetButton.setOnAction(e -> {
-            gameLogic.restartGame(); // Reset game logic.
-            resetGUI(); // Reset the GUI.
+            gameLogic.restartGame(); // Reset game logic
+            resetGUI(); // Reset the GUI
         });
     
-        // Undo Button
-        Button undoButton = new Button("UNDO");
+        // Simplified Undo Button
+        Button undoButton = new Button("Undo");
         undoButton.setOnAction(e -> undoLastMove());
+    
+        // Place buttons in a horizontal box
+        HBox buttonBox = new HBox(10, resetButton, undoButton);
+        buttonBox.setPadding(new Insets(10)); // Add some spacing around the buttons
     
         styleTitle(playerOneTitle);
         styleTitle(playerTwoTitle);
@@ -165,27 +183,26 @@ public class CheckersApp extends Application {
         Label playerOneCapturedCount = capturedPiecesTracker.blackCapturedLabel;
         Label playerTwoCapturedCount = capturedPiecesTracker.whiteCapturedLabel;
     
-        VBox playerOneBox = new VBox(10, playerOneTitle, playerOneTimeLabel, playerOneTimerLabel,
-                                     playerOneCapturedLabel, playerOneCapturedCount);
-        VBox playerTwoBox = new VBox(10, playerTwoTitle, playerTwoTimeLabel, playerTwoTimerLabel,
-                                     playerTwoCapturedLabel, playerTwoCapturedCount);
+        VBox playerOneBox = new VBox(10, playerOneTitle, playerOneTimeLabel, playerOneTimerLabel, playerOneCapturedLabel, playerOneCapturedCount);
+        VBox playerTwoBox = new VBox(10, playerTwoTitle, playerTwoTimeLabel, playerTwoTimerLabel, playerTwoCapturedLabel, playerTwoCapturedCount);
     
         playerOneBox.setStyle("-fx-background-color: #f0f8ff; -fx-border-color: #b0b0b0; -fx-border-width: 2px; -fx-border-radius: 5px;");
         playerTwoBox.setStyle("-fx-background-color: #f0f8ff; -fx-border-color: #b0b0b0; -fx-border-width: 2px; -fx-border-radius: 5px;");
         playerOneBox.setPadding(new Insets(15));
         playerTwoBox.setPadding(new Insets(15));
     
-        VBox rightPanel = new VBox(20, playerOneBox, playerTwoBox, captureMessageLabel, evaluationBar, evaluationScoreLabel);
+        // Add all components to the right panel
+        VBox rightPanel = new VBox(20, playerOneBox, playerTwoBox, captureMessageLabel, evaluationBar, evaluationScoreLabel, buttonBox);
         rightPanel.setStyle("-fx-padding: 10 10 10 20;");
         rightPanel.setPrefWidth(260);
     
         HBox root = new HBox();
-        root.getChildren().addAll(boardPane, rightPanel, resetButton, undoButton);
+        root.getChildren().addAll(boardPane, rightPanel);
         root.setSpacing(20);
         return root;
     }
     
-
+       
     public void movePiece(int oldX, int oldY, Piece piece, int newX, int newY) {
         Move move = gameLogic.g.determineMoveType(oldX, oldY, newX, newY);
         piece.getPieceDrawer().clearHighlight();
