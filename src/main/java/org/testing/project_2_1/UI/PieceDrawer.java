@@ -113,28 +113,47 @@ public class PieceDrawer extends StackPane {
     }
 
     private void highlightMoves() {
-        clearHighlight();
+        clearHighlight(); // Remove any existing highlights
+    
         if (app.noOfPlayers == 0) { // Do not highlight moves for agents
             return;
         }
-
+    
+        // Ensure the piece is glowing (has available moves)
+        if (getEffect() != glowEffect) {
+            System.out.println("This piece is not glowing and cannot highlight moves.");
+            return;
+        }
+    
+        // Get all legal moves for this piece
         List<Move> availableMoves = GameLogic.getLegalMoves(piece, app.gameLogic.g);
+    
         if (availableMoves.isEmpty()) {
-            return;
+            System.out.println("No moves available for this piece.");
+            return; // No moves to highlight
         }
-
-        // If capture moves exist, highlight only captures
-        if (availableMoves.get(0).isCapture()) {
-            for (Move move : availableMoves) {
+    
+        // Check if there are any capture moves
+        List<Move> captureMoves = availableMoves.stream()
+                .filter(Move::isCapture)
+                .toList();
+    
+        if (!captureMoves.isEmpty()) {
+            // Highlight only capture moves in red
+            for (Move move : captureMoves) {
                 highlightTile(move.getToX(), move.getToY(), Color.RED);
+                System.out.println("Highlighting capture move to: (" + move.getToX() + ", " + move.getToY() + ") with color: Red (Capture)");
             }
-            return;
+            return; // Exit early to avoid highlighting normal moves
         }
-
+    
+        //Highlight normal moves in yellow if no capture moves exist
         for (Move move : availableMoves) {
             highlightTile(move.getToX(), move.getToY(), Color.YELLOW);
+            System.out.println("Highlighting normal move to: (" + move.getToX() + ", " + move.getToY() + ") with color: Yellow (Normal)");
         }
     }
+    
 
     private void highlightTile(int x, int y, Color color) {
         if (x >= 0 && x < SIZE && y >= 0 && y < SIZE) {
@@ -157,12 +176,12 @@ public class PieceDrawer extends StackPane {
     }
 
     public void updateGlow() {
-        System.out.println("Updating glow for piece at: " + piece.getX() + ", " + piece.getY());
+        //System.out.println("Updating glow for piece at: " + piece.getX() + ", " + piece.getY());
     
         // Ensure the piece belongs to the current player
         ArrayList<Piece> currentPlayerPieces = GameLogic.getListOfPieces(app.gameLogic.g);
         if (!currentPlayerPieces.contains(piece)) {
-            System.out.println("Piece does not belong to current player.");
+            //System.out.println("Piece does not belong to current player.");
             setEffect(null); 
             return;
         }
@@ -173,10 +192,10 @@ public class PieceDrawer extends StackPane {
             .anyMatch(move -> move.getFromX() == piece.getX() && move.getFromY() == piece.getY());
     
         if (canMove) {
-            System.out.println("Applying glow to piece at: " + piece.getX() + ", " + piece.getY());
+            //System.out.println("Applying glow to piece at: " + piece.getX() + ", " + piece.getY());
             setEffect(glowEffect); 
         } else {
-            System.out.println("Removing glow from piece at: " + piece.getX() + ", " + piece.getY());
+            //System.out.println("Removing glow from piece at: " + piece.getX() + ", " + piece.getY());
             setEffect(null); 
         }
     }
