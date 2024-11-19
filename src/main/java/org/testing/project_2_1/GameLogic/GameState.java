@@ -336,6 +336,10 @@ public class GameState {
         return Math.abs(newX - x0) == 1 && Math.abs(newY - y0) == 1;
     }
 
+    private boolean isMoveACaptureForKing(int x0, int y0, int newX, int newY) {
+        return ( x0==newX || y0==newY || Math.abs(newX - x0) == Math.abs(newY - y0)); //Adjusted for only normal diagonal moves
+    }
+
     // Check if the path for king movement (diagonal, horizontal, vertical) is clear
     private boolean isPathClearforKing(int x0, int y0, int newX, int newY) {
         int dx = Integer.compare(newX, x0);
@@ -356,7 +360,7 @@ public class GameState {
 
     // Check if there is a capturable piece on the path
     private boolean isCapturePathforKing(int x0, int y0, int newX, int newY) {
-        if (!isMoveforKing(x0, y0, newX, newY)) {
+        if (!isMoveACaptureForKing(x0, y0, newX, newY)) {
             return false;  // Not a move for the burger king
         }
 
@@ -387,25 +391,25 @@ public class GameState {
             x += dx;
             y += dy;
         }
-        // Ensure capturing piece can only land 1 square after the captured one
+        // Ensure capturing piece can only land in any tile behind the captured one
         if (capturedPiece != null) {
             int landingX = capturedX + dx;
             int landingY = capturedY + dy;
 
             if (Math.abs(newX - landingX) <= board.length && Math.abs(newY - landingY) <= board.length) {
-                return true;  // Immediately after the captured piece
+                return true;
             } else {
-                return false;  // Not immediately after
+                return false;
             }
         }
 
-        return false;  // No capturable piece wis found
+        return false;  // No capturable piece was found
     }
 
     // Return the piece to capture along the path
-    private Piece getCapturedPieceOnPathforKing(int x0, int y0, int newX, int newY) { // returned null when there was a capture
-        if (!isMoveforKing(x0, y0, newX, newY)) {
-            return null;  // Not a move for the burger king
+    private Piece getCapturedPieceOnPathforKing(int x0, int y0, int newX, int newY) {
+        if (!isMoveACaptureForKing(x0, y0, newX, newY)) {
+            return null;  // Not a capture-move for the burger king
         }
         int dx = Integer.compare(newX , x0);
         int dy = Integer.compare(newY , y0);
@@ -434,15 +438,15 @@ public class GameState {
             x += dx;
             y += dy;
         }
-        // Ensure capturing piece can only land 1 square after the captured one
+        // Ensure capturing piece can only land in any tile behind the captured one
         if (capturedPiece != null) {
             int landingX = capturedX + dx;
             int landingY = capturedY + dy;
 
-            if (Math.abs(newX - landingX) <= 1 && Math.abs(newY - landingY) <= 1) {
+            if (Math.abs(newX - landingX) <= board.length && Math.abs(newY - landingY) <= board.length) {
                 return capturedPiece;  // Valid capture
             } else {
-                return null;  // not immediately after
+                return null;
             }
         }
 
