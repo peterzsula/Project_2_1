@@ -1,0 +1,3 @@
+kings shouldn't be allowed to move sideways
+kings should be allowed to move to any square behind the piece it captures
+getLegalTurns should not allow to move a different piece after you have already moved one
