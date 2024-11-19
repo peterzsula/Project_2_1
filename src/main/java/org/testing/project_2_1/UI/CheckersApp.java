@@ -228,12 +228,17 @@ public class CheckersApp extends Application {
         if (tileGroup == null) {
             tileGroup = new Group();
         }
-
+    
         playerOneTimer.reset();
         playerTwoTimer.reset();
-        playerOneTimer.startCountdown();
-        playerTwoTimer.stopCountdown();
-
+        if (isPlayerOneTurn) {
+            playerOneTimer.startCountdown();
+            playerTwoTimer.stopCountdown();
+        } else {
+            playerTwoTimer.startCountdown();
+            playerOneTimer.stopCountdown();
+        }
+    
         pieceGroup.getChildren().clear();
     
         // Update the board with tiles and pieces
@@ -255,23 +260,27 @@ public class CheckersApp extends Application {
         }
     
         // Handle agent's first move if necessary
-        if (noOfPlayers == 0 || (!isPlayerOneTurn && noOfPlayers == 1)) {
-            System.out.println("Agent is making the first move...");
-            try {
-                gameLogic.agent.setGameLogic(gameLogic); // Set the game logic for the agent
-                gameLogic.agent.makeMove(); // Agent makes the first move
-            } catch (Exception e) {
-                e.printStackTrace();
-                System.out.println("Error during the agent's initial move.");
+        if (noOfPlayers == 1 && gameLogic.agent != null) {
+            gameLogic.agent.setGameLogic(gameLogic); // Ensure the agent is associated with the game logic
+    
+            if (gameLogic.g.getIsWhiteTurn() == gameLogic.agent.isWhite()) {
+                // Ensure the agent makes its first move if it's their turn
+                System.out.println("Agent is making the first move...");
+                try {
+                    gameLogic.agent.makeMove();
+                } catch (Exception e) {
+                    e.printStackTrace();
+                    System.out.println("Error during the agent's initial move.");
+                }
             }
         }
-  
+
         evaluationBar.setProgress(0.5);
         evaluationScoreLabel.setText("Score: 0.0");
 
         capturedPiecesTracker.reset();
-    }      
-    
+    }
+        
     public void addPiecestoBoard(Pane boardPane) {
         for (Tile[] row : gameLogic.g.getBoard()) {
             for (Tile tile : row) {
