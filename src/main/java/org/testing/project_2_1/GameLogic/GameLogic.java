@@ -3,6 +3,7 @@ package org.testing.project_2_1.GameLogic;
 import org.testing.project_2_1.Agents.Agent;
 import org.testing.project_2_1.Moves.*;
 import org.testing.project_2_1.UI.CheckersApp;
+import org.testing.project_2_1.UI.PieceDrawer;
 
 import static org.testing.project_2_1.UI.CheckersApp.SIZE;
 
@@ -84,7 +85,7 @@ public class GameLogic {
 
     public void printAvailableCaptures(GameState g){
         ArrayList<Turn> availableTurns = getLegalTurns(g);
-        System.out.println("Number of available moves: " + availableTurns.size());
+        System.out.println("Nuber of available moves: " + availableTurns.size());
         for (Turn turn : availableTurns) {
             System.out.println(turn.getMoves().getFirst().toString());
         }
@@ -105,6 +106,7 @@ public class GameLogic {
         for (Piece piece : pieces) {
             ArrayList<Turn> pieceTurns = getLegalTurns(piece, g);
             for (Turn turn : pieceTurns) {
+                //TODO: add 2 kings rule
                 if (turn.getMoves().size() > maxCaptures) {
                     availableTurns.clear();
                     availableTurns.add(turn);
@@ -316,9 +318,9 @@ public class GameLogic {
         }
         else if (move.isCapture()) {
             Capture capture = (Capture) move;
-            Piece otherPiece = g.getPieceAt(capture.getCaptureAtX(), capture.getCaptureAtY());
-            System.out.println(otherPiece.toString());
-            app.pieceGroup.getChildren().remove(otherPiece.getPieceDrawer());
+            Piece capturedPiece = g.getPieceAt(capture.getCaptureAtX(), capture.getCaptureAtY());
+            System.out.println(capturedPiece.toString());
+            app.pieceGroup.getChildren().remove(capturedPiece.getPieceDrawer());
             if (capture.getCapturedPiece().type.color.equals("white")) {
                 app.capturedPiecesTracker.capturePiece("Player 2");
             }
@@ -327,6 +329,27 @@ public class GameLogic {
             }
         }
         g.move(move);
+    }
+
+    
+    public void undoLastMove(GameState g) {
+        if (g.getMovesPlayed().isEmpty()) {
+            return;
+        }
+        Move move = g.getMovesPlayed().getLast();
+        g.undoMove(move);
+        if (move.isCapture()) {
+            Capture capture = (Capture) move;
+            Piece capturedPiece = g.getPieceAt(capture.getCaptureAtX(), capture.getCaptureAtY());
+            capturedPiece.setPieceDrawer(new PieceDrawer(capturedPiece, app));
+            if (capturedPiece.getType().color.equals("white")) {
+                app.capturedPiecesTracker.decrementWhiteCaptured();
+            }
+            else {
+                app.capturedPiecesTracker.decrementBlackCaptured();
+            }
+        }
+        askForMove();
     }
 
     public static Set<Piece> getPiecesTheathenedBy(ArrayList<Piece> pieces, GameState g) {
@@ -387,23 +410,6 @@ public class GameLogic {
             undoLastMove(g);
         }
     }   
-
-    public void undoLastMove(GameState g) {
-        Move move = g.getMovesPlayed().getLast();
-        g.undoMove(move);
-        if (move.isCapture()) {
-            Capture capture = (Capture) move;
-            Piece capturedPiece = capture.getCapturedPiece();
-            if (capturedPiece.getType().color.equals("white")) {
-                app.capturedPiecesTracker.decrementWhiteCaptured();
-            }
-            else {
-                app.capturedPiecesTracker.decrementBlackCaptured();
-            }
-            app.pieceGroup.getChildren().add(capturedPiece.getPieceDrawer());
-        }
-        askForMove();
-    }
 
     public double evaluateTurn(Turn turn, GameState originalGS) {
         GameState g0 = new GameState(originalGS);

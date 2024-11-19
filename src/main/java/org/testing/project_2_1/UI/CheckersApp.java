@@ -85,7 +85,7 @@ public class CheckersApp extends Application {
         boardGroup = new Group();
         pieceGroup.getChildren().clear();
         boardGroup.getChildren().clear();
-        
+
     }
 
     @Override
@@ -221,7 +221,6 @@ public class CheckersApp extends Application {
                 if (tile.hasPiece()) {
                     Piece piece = tile.getPiece();
                     piece.setPieceDrawer(new PieceDrawer(piece, this));
-                    pieceGroup.getChildren().add(piece.getPieceDrawer());
                 }
             }
         }
@@ -241,7 +240,6 @@ public class CheckersApp extends Application {
                     Piece piece = tile.getPiece();
                     PieceDrawer drawer = new PieceDrawer(piece, this);
                     piece.setPieceDrawer(drawer); // Associate the drawer with the piece
-                    pieceGroup.getChildren().add(drawer);
                     pieceDrawers.add(drawer); 
                 }
             }

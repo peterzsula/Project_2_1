@@ -159,7 +159,7 @@ public class GameState {
     }
     
     public boolean undoMove(Move move){
-        movesPlayed.remove(move);
+        movesPlayed.remove(move); //might be deprecated
         Piece piece = board[move.getToX()][move.getToY()].getPiece();
         if (piece == null) {
             throw new IllegalStateException("Piece to undo does not exist at the target position.");
@@ -174,8 +174,8 @@ public class GameState {
             addCapturedPieceToLists(capturedPiece);
         }
         if (move.isTurnEnding() && !turnsPlayed.isEmpty()) {
+            currentTurn = turnsPlayed.removeLast();
             currentTurn.getMoves().removeLast();
-            turnsPlayed.remove(currentTurn);
             switchTurn();
         }
         return true;
@@ -261,7 +261,7 @@ public class GameState {
             }
             if (isCapturePathforKing(x0, y0, newX, newY)) {
                 Piece capturedPiece = getCapturedPieceOnPathforKing(x0, y0, newX, newY);
-                return new Capture(x0, y0, piece, capturedPiece, newX, newY);
+                return new Capture(x0, y0, piece, capturedPiece, newX, newY); 
             }
         } else {
             // Normal piece logic
@@ -403,7 +403,7 @@ public class GameState {
     }
 
     // Return the piece to capture along the path
-    private Piece getCapturedPieceOnPathforKing(int x0, int y0, int newX, int newY) {
+    private Piece getCapturedPieceOnPathforKing(int x0, int y0, int newX, int newY) { // returned null when there was a capture
         if (!isMoveforKing(x0, y0, newX, newY)) {
             return null;  // Not a move for the burger king
         }

@@ -2,7 +2,6 @@ package org.testing.project_2_1.GameLogic;
 
 import static org.testing.project_2_1.UI.CheckersApp.SIZE;
 
-import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;

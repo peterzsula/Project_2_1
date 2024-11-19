@@ -40,7 +40,7 @@ public class PieceDrawer extends StackPane {
         }
         this.piece = piece;
         this.app = app;
-
+        app.pieceGroup.getChildren().add(this);
         drawPiece(piece.getType(), piece.getX(), piece.getY());
         updateGlow(); // Apply glow if this piece has possible moves
     }
