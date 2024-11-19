@@ -204,6 +204,7 @@ public class CheckersApp extends Application {
     }
 
     public void resetGUI() {
+        // Ensure pieceGroup and tileGroup are initialized
         if (pieceGroup == null) {
             pieceGroup = new Group();
         }
@@ -215,43 +216,45 @@ public class CheckersApp extends Application {
         playerTwoTimer.reset();
         playerOneTimer.startCountdown();
         playerTwoTimer.stopCountdown();
- 
+
         pieceGroup.getChildren().clear();
-
-        if (noOfPlayers == 2) {
-            new CheckersApp();
-        } else if (noOfPlayers == 1) {
-            new CheckersApp(gameLogic.agent);
-        } else if (noOfPlayers == 0) {
-            new CheckersApp(gameLogic.agent, gameLogic.opponent);
-        }
-
+    
+        // Update the board with tiles and pieces
         for (Tile[] row : gameLogic.g.getBoard()) {
             for (Tile tile : row) {
-                if (tile.tileDrawer != null) { 
+                if (tile.tileDrawer != null) {
                     tileGroup.getChildren().add(tile.tileDrawer);
                 }
                 if (tile.hasPiece()) {
                     Piece piece = tile.getPiece();
                     if (piece != null) {
-                        piece.setPieceDrawer(new PieceDrawer(piece, this));
+                        // Initialize or reassign the PieceDrawer if null
+                        if (piece.getPieceDrawer() == null) {
+                            piece.setPieceDrawer(new PieceDrawer(piece, this));
+                        }
                     }
                 }
             }
         }
-
+    
+        // Handle agent's first move if necessary
         if (noOfPlayers == 0 || (!isPlayerOneTurn && noOfPlayers == 1)) {
-            gameLogic.agent.makeMove();
+            System.out.println("Agent is making the first move...");
+            try {
+                gameLogic.agent.setGameLogic(gameLogic); // Set the game logic for the agent
+                gameLogic.agent.makeMove(); // Agent makes the first move
+            } catch (Exception e) {
+                e.printStackTrace();
+                System.out.println("Error during the agent's initial move.");
+            }
         }
-        else if (noOfPlayers == 1 && gameLogic.agent.isWhite() && isPlayerOneTurn) {
-            gameLogic.agent.makeMove();
-        }
-
+  
         evaluationBar.setProgress(0.5);
         evaluationScoreLabel.setText("Score: 0.0");
-        capturedPiecesTracker.reset();
-    }
 
+        capturedPiecesTracker.reset();
+    }      
+    
     public void addPiecestoBoard(Pane boardPane) {
         for (Tile[] row : gameLogic.g.getBoard()) {
             for (Tile tile : row) {
