@@ -21,7 +21,6 @@ import javafx.stage.Stage;
 import javafx.scene.text.Font;
 import javafx.scene.text.FontWeight;
 import javafx.scene.control.ProgressBar;
-import java.util.ArrayList;
 import java.util.List;
 
 public class CheckersApp extends Application {
@@ -42,7 +41,6 @@ public class CheckersApp extends Application {
     public Group pieceGroup;
     private Group boardGroup;
     public CapturedPiecesTracker capturedPiecesTracker;
-    private List<PieceDrawer> pieceDrawers;
 
 
     boolean isPlayerOneTurn;
@@ -79,13 +77,11 @@ public class CheckersApp extends Application {
         isPlayerOneTurn = gameLogic.g.getIsWhiteTurn();
         evaluationBar = new ProgressBar(0.5);
         capturedPiecesTracker = new CapturedPiecesTracker();
-        pieceDrawers = new ArrayList<>();
         tileGroup = new Group();
         pieceGroup = new Group();
         boardGroup = new Group();
         pieceGroup.getChildren().clear();
         boardGroup.getChildren().clear();
-
     }
 
     @Override
@@ -99,6 +95,9 @@ public class CheckersApp extends Application {
 
         playerOneTimer.startCountdown();
         if (noOfPlayers == 0 || (!isPlayerOneTurn && noOfPlayers == 1)) {
+            gameLogic.agent.makeMove();
+        }
+        else if (noOfPlayers == 1 && gameLogic.agent.isWhite() && isPlayerOneTurn) {
             gameLogic.agent.makeMove();
         }
     }
@@ -228,10 +227,12 @@ public class CheckersApp extends Application {
         if (noOfPlayers == 0 || (!isPlayerOneTurn && noOfPlayers == 1)) {
             gameLogic.agent.makeMove();
         }
+        else if (noOfPlayers == 1 && gameLogic.agent.isWhite() && isPlayerOneTurn) {
+            gameLogic.agent.makeMove();
+        }
     }
 
     public void addPiecestoBoard(Pane boardPane) {
-        pieceDrawers.clear(); // Clear the list to avoid duplicates
         for (Tile[] row : gameLogic.g.getBoard()) {
             for (Tile tile : row) {
                 tile.setTileDrawer(new TileDrawer(tile, this));
@@ -240,7 +241,6 @@ public class CheckersApp extends Application {
                     Piece piece = tile.getPiece();
                     PieceDrawer drawer = new PieceDrawer(piece, this);
                     piece.setPieceDrawer(drawer); // Associate the drawer with the piece
-                    pieceDrawers.add(drawer); 
                 }
             }
         }
@@ -324,8 +324,9 @@ public class CheckersApp extends Application {
     }
     
     public void updateGlows() {
-        for (PieceDrawer drawer : pieceDrawers) {
-            drawer.updateGlow();
+        List<Piece> pieces = gameLogic.g.getAllPieces();
+        for (Piece piece : pieces) {
+            piece.getPieceDrawer().updateGlow();
         }
     }
  

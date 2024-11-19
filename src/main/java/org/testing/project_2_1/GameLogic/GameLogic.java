@@ -248,7 +248,7 @@ public class GameLogic {
         if (g.getCurrentTurn().isEmpty()) {
             g.setPossibleTurns(getLegalTurns(g));
         }
-        else if (piece != g.getCurrentTurn().getLast().getPiece()) {
+        else if (piece != g.getPieceAt(g.getCurrentTurn().getLast().getToX(), g.getCurrentTurn().getLast().getToY())) {
             piece.abortMove();
             askForMove();
             return false;  
@@ -331,7 +331,6 @@ public class GameLogic {
         g.move(move);
     }
 
-    
     public void undoLastMove(GameState g) {
         if (g.getMovesPlayed().isEmpty()) {
             return;
@@ -478,7 +477,6 @@ public class GameLogic {
         }
         return max;
     }
-
 
     public static List<Piece> getMovablePieces(GameState g) {
     List<Piece> movablePieces = new ArrayList<>();
