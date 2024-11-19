@@ -492,6 +492,6 @@ public class GameLogic {
     }
 
     return movablePieces;
-}
+    }
 
 }

@@ -8,6 +8,7 @@ import javafx.scene.shape.Rectangle;
 public class TileDrawer extends Rectangle {
     Tile tile;
     CheckersApp app;
+    private boolean isHighlighted = false; // Tracks the highlight state
 
     public TileDrawer(Tile tile, CheckersApp app) {
         this.tile = tile;
@@ -15,24 +16,31 @@ public class TileDrawer extends Rectangle {
         drawTile();
     }
 
-    public void drawTile(){
+    public void drawTile() {
         setWidth(CheckersApp.TILE_SIZE);
         setHeight(CheckersApp.TILE_SIZE);
 
         relocate(tile.getX() * CheckersApp.TILE_SIZE, tile.getY() * CheckersApp.TILE_SIZE);
 
+        // Set the default tile color based on its type
         setFill(tile.isBlack() ? Color.valueOf("#D2B48C") : Color.valueOf("#FFFAF0"));
+        setStroke(null); // Ensure no border by default
     }
 
     public void highlight() {
-        // TODO Auto-generated method stub
-        throw new UnsupportedOperationException("Unimplemented method 'highlight'");
+        // Change the appearance of the tile to indicate a highlight
+        if (!isHighlighted) {
+            setStroke(Color.RED); // Add a red border
+            setStrokeWidth(3);
+            isHighlighted = true;
+        }
     }
 
     public void clearHighlight() {
-        // TODO Auto-generated method stub
-        throw new UnsupportedOperationException("Unimplemented method 'clearHighlight'");
+        // Revert the appearance of the tile to its default state
+        if (isHighlighted) {
+            setStroke(null); // Remove the border
+            isHighlighted = false;
+        }
     }
-    
-    
 }
