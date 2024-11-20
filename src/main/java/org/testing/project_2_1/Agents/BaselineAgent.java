@@ -5,7 +5,7 @@ import org.testing.project_2_1.Moves.Move;
 import org.testing.project_2_1.Moves.Turn;
 
 import javafx.util.Duration;
-import java.util.ArrayList;
+import java.util.List;
 import java.util.Random;
 
 import javafx.animation.PauseTransition;
@@ -33,7 +33,7 @@ public class BaselineAgent implements Agent {
         PauseTransition pause = new PauseTransition(Duration.seconds(Agent.delay));
         pause.setOnFinished(event -> {
         if (gameLogic.g.getIsWhiteTurn() == isWhite && !gameLogic.g.isGameOver()) {
-            ArrayList<Turn> legalTurns = GameLogic.getLegalTurns(gameLogic.g);
+            List<Turn> legalTurns = GameLogic.getLegalTurns(gameLogic.g);
             System.out.println("Legal moves: " + legalTurns.size());
             int randomIndex = new Random().nextInt(legalTurns.size());
             Turn turn = legalTurns.get(randomIndex);

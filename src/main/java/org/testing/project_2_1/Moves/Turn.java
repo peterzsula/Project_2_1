@@ -2,9 +2,10 @@ package org.testing.project_2_1.Moves;
 
 import java.util.ArrayList;
 import java.util.LinkedList;
+import java.util.List;
 
 public class Turn {
-    private LinkedList<Move> moves;
+    private List<Move> moves;
     private boolean isShot;
     private double evaluation;
 
@@ -27,11 +28,11 @@ public class Turn {
         }
     }
 
-    public LinkedList<Move> getMoves() {
+    public List<Move> getMoves() {
         return moves;
     }
 
-    public void setMoves(LinkedList<Move> moves) {
+    public void setMoves(List<Move> moves) {
         this.moves = moves;
     }
 

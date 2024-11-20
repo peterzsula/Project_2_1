@@ -15,7 +15,6 @@ public class GameState {
     protected boolean isWhiteTurn;
     private ArrayList<Piece> whitePieces;
     private ArrayList<Piece> blackPieces;
-    private ArrayList<Move> movesPlayed;
     private ArrayList<Turn> turnsPlayed;
     private Turn currentTurn;
     private List<Turn> possibleTurns;
@@ -25,16 +24,16 @@ public class GameState {
         isWhiteTurn = true;
         whitePieces = new ArrayList<Piece>();
         blackPieces = new ArrayList<Piece>();
-        movesPlayed = new ArrayList<Move>();
         turnsPlayed = new ArrayList<Turn>();
         currentTurn = new Turn();
+        possibleTurns = new ArrayList<Turn>();
         isGameOver = false;
         board = new Tile[SIZE][SIZE];
+
         for (int y = 0; y < SIZE; y++) {
             for (int x = 0; x < SIZE; x++) {
                 Tile tile = new Tile(x, y);
                 board[x][y] = tile;
-
                 if (y <= ((SIZE-2)/2)-1 && tile.isBlack()) {
                     Piece piece = new Piece(PieceType.BLACK, x, y);
                     tile.setPiece(piece);
@@ -44,22 +43,20 @@ public class GameState {
                     tile.setPiece(piece);
                     whitePieces.add(piece);
                 }
-
             }
         }
-
     }
 
     public GameState(GameState originalB) {
-        isWhiteTurn = true;
-        whitePieces = new ArrayList<Piece>();
-        blackPieces = new ArrayList<Piece>();
-        movesPlayed = new ArrayList<Move>();
-        turnsPlayed = new ArrayList<Turn>();
-        currentTurn = new Turn();
-        isGameOver = originalB.isGameOver;
+        this.whitePieces = new ArrayList<>(originalB.getWhitePieces());
+        this.blackPieces = new ArrayList<>(originalB.getBlackPieces());
+        this.turnsPlayed = new ArrayList<>(originalB.getTurnsPlayed());
+        this.currentTurn = new Turn(originalB.getCurrentTurn());
+        this.possibleTurns = new ArrayList<>(originalB.getPossibleTurns());
         this.isWhiteTurn = originalB.getIsWhiteTurn();
         this.board = new Tile[SIZE][SIZE];
+        this.isGameOver = originalB.isGameOver;
+
         for (int y = 0; y < SIZE; y++) {
             for (int x = 0; x < SIZE; x++) {
                 this.board[x][y] = new Tile(x, y);
@@ -67,24 +64,8 @@ public class GameState {
                     Piece originalPiece = originalB.board[x][y].getPiece();
                     Piece piece = new Piece(originalPiece.type, x, y);
                     this.board[x][y].setPiece(piece);
-                    if (piece.type == PieceType.WHITE || piece.type == PieceType.WHITEKING) {
-                        this.whitePieces.add(this.board[x][y].getPiece());
-                    } 
-                    else {
-                        this.blackPieces.add(this.board[x][y].getPiece());
-                    }
                 }
             }
-        }
-        // copy originalB.turnsPlayed to bCopy.turnsPlayed
-        this.turnsPlayed = new ArrayList<Turn>();
-        for (Turn turn : originalB.getTurnsPlayed()) {
-            Turn turnCopy = new Turn(turn);
-            turnsPlayed.add(turnCopy);
-        }
-        this.movesPlayed = new ArrayList<Move>();
-        for (Move move : originalB.getMovesPlayed()) {
-            movesPlayed.add(move);
         }
     }
 
@@ -98,10 +79,6 @@ public class GameState {
 
     public ArrayList<Piece> getBlackPieces() {
         return blackPieces;
-    }
-
-    public ArrayList<Move> getMovesPlayed() {
-        return movesPlayed;
     }
 
     public ArrayList<Turn> getTurnsPlayed() {
@@ -141,7 +118,6 @@ public class GameState {
     }
 
     public boolean move(Move move) {
-        movesPlayed.add(move);
         currentTurn.addMove(move);
         Piece piece = board[move.getFromX()][move.getFromY()].getPiece();
         piece.movePiece(move);
@@ -156,13 +132,18 @@ public class GameState {
         if (move.isTurnEnding()) {
             turnsPlayed.add(currentTurn);
             currentTurn = new Turn();
+            // possibleTurns = GameLogic.getLegalTurns(this);
             switchTurn();
         }
+        /* else if (!possibleTurns.getFirst().getMoves().isEmpty()) {
+            for (Turn turn : possibleTurns) {
+                turn.getMoves().removeFirst();
+            }
+        } */
         return true;
     }
     
     public boolean undoMove(Move move){
-        movesPlayed.remove(move); //might be deprecated
         Piece piece = board[move.getToX()][move.getToY()].getPiece();
         if (piece == null) {
             throw new IllegalStateException("Piece to undo does not exist at the target position.");
@@ -176,9 +157,13 @@ public class GameState {
             board[capturedPiece.getX()][capturedPiece.getY()].setPiece(capturedPiece);
             addCapturedPieceToLists(capturedPiece);
         }
+        /* or (Turn turn : possibleTurns) {
+            turn.getMoves().addFirst(move);
+        } */
         if (move.isTurnEnding() && !turnsPlayed.isEmpty()) {
             currentTurn = turnsPlayed.removeLast();
             currentTurn.getMoves().removeLast();
+            // possibleTurns = GameLogic.getLegalTurns(this);
             switchTurn();
         }
         return true;

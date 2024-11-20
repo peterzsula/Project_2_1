@@ -9,7 +9,6 @@ import static org.testing.project_2_1.UI.CheckersApp.SIZE;
 
 import java.util.ArrayList;
 import java.util.HashSet;
-import java.util.LinkedList;
 import java.util.List;
 import java.util.Set;
 
@@ -47,6 +46,7 @@ public class GameLogic {
         this.app = app;
         g = new GameState();
         new Pane();
+        g.setPossibleTurns(getLegalTurns(g)); // should be in GameState constructor
     }
 
     public boolean isGameOver(GameState board){
@@ -88,14 +88,17 @@ public class GameLogic {
     }
 
     public void printAvailableCaptures(GameState g){
-        ArrayList<Turn> availableTurns = getLegalTurns(g);
+        List<Turn> availableTurns = getLegalTurns(g);
         System.out.println("Nuber of available moves: " + availableTurns.size());
         for (Turn turn : availableTurns) {
             System.out.println(turn.getMoves().getFirst().toString());
         }
     }
 
-    public static ArrayList<Turn> getLegalTurns(GameState g) {
+    public static List<Turn> getLegalTurns(GameState g) {
+        if (!g.getCurrentTurn().isEmpty()) {
+            return g.getPossibleTurns();
+        }
         ArrayList<Move> availableMoves = getPossibleMoves(g);
         if (availableMoves.isEmpty()) {
             g.setGameOver(true);
@@ -248,7 +251,6 @@ public class GameLogic {
             askForMove();
             return false;
         }
-        
         if (g.getCurrentTurn().isEmpty()) {
             g.setPossibleTurns(getLegalTurns(g));
         }
@@ -336,10 +338,10 @@ public class GameLogic {
     }
 
     public void undoLastMove(GameState g) {
-        if (g.getMovesPlayed().isEmpty()) {
+        if (g.getTurnsPlayed().isEmpty()) {
             return;
         }
-        Move move = g.getMovesPlayed().getLast();
+        Move move = g.getTurnsPlayed().getLast().getLast();
         g.undoMove(move);
         if (move.isCapture()) {
             Capture capture = (Capture) move;
@@ -408,7 +410,7 @@ public class GameLogic {
 
     public void undoLastTurn(GameState g) {
         Turn turn = g.getTurnsPlayed().removeLast();
-        LinkedList<Move> moves = turn.getMoves();
+        List<Move> moves = turn.getMoves();
         for (int i = 0; i < moves.size(); i++) {
             undoLastMove(g);
         }
@@ -427,7 +429,7 @@ public class GameLogic {
                 return +100;
             }
         }
-        ArrayList<Turn> opponentsTurns = getLegalTurns(g0);
+        List<Turn> opponentsTurns = getLegalTurns(g0);
         double[] evaluations = new double[opponentsTurns.size()];
         for (int i = 0; i < opponentsTurns.size(); i++) {
             Turn oTurn = opponentsTurns.get(i);

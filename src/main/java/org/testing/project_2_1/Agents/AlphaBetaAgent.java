@@ -4,7 +4,8 @@ import org.testing.project_2_1.GameLogic.GameState;
 import org.testing.project_2_1.Moves.Move;
 import org.testing.project_2_1.Moves.Turn;
 
-import java.util.ArrayList;
+import java.util.List;
+
 import javafx.animation.PauseTransition;
 import javafx.util.Duration;
 
@@ -31,7 +32,7 @@ public class AlphaBetaAgent implements Agent {
         PauseTransition pause = new PauseTransition(Duration.seconds(Agent.delay));
         pause.setOnFinished(event -> {
             if (gameLogic.g.getIsWhiteTurn() == isWhite && !gameLogic.g.isGameOver()) {
-                ArrayList<Turn> turns = GameLogic.getLegalTurns(gameLogic.g);
+                List<Turn> turns = GameLogic.getLegalTurns(gameLogic.g);
                 Turn bestTurn = getBestTurn(turns);
                 Move move = bestTurn.getMoves().remove(0);
                 gameLogic.takeMove(move);
@@ -40,7 +41,7 @@ public class AlphaBetaAgent implements Agent {
         pause.play();
     }
 
-    private Turn getBestTurn(ArrayList<Turn> turns) {
+    private Turn getBestTurn(List<Turn> turns) {
         Turn bestTurn = null;
         int bestValue;
         if (isWhite) {
@@ -73,7 +74,7 @@ public class AlphaBetaAgent implements Agent {
             return (int) GameLogic.evaluateBoard(gameState);
         }
 
-        ArrayList<Turn> legalTurns = GameLogic.getLegalTurns(gameState);
+        List<Turn> legalTurns = GameLogic.getLegalTurns(gameState);
 
         if (maxPlayer) {
             int maxEval = Integer.MIN_VALUE;

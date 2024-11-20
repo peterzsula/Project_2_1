@@ -9,6 +9,7 @@ import javafx.animation.PauseTransition;
 import javafx.util.Duration;
 
 import java.util.ArrayList;
+import java.util.List;
 import java.util.Random;
 
 public class AgentMCTS implements Agent {
@@ -108,7 +109,7 @@ public class AgentMCTS implements Agent {
     }
 
     private void expansion(Node node) {
-        ArrayList<Turn> legalTurns = GameLogic.getLegalTurns(node.state);
+        List<Turn> legalTurns = GameLogic.getLegalTurns(node.state);
         for (Turn turn : legalTurns) {
             GameState newState = new GameState(node.state); // Clone the state for the child
             for (Move move : turn.getMoves()) {
@@ -124,7 +125,7 @@ public class AgentMCTS implements Agent {
         Random random = new Random();
 
         while (!gameLogic.isGameOver(simState)) {
-            ArrayList<Turn> legalTurns = GameLogic.getLegalTurns(simState);
+            List<Turn> legalTurns = GameLogic.getLegalTurns(simState);
 
             if (legalTurns.isEmpty()) {
                 break; // Exit simulation if no legal turns are available
