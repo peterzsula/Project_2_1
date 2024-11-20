@@ -17,10 +17,15 @@ public class MLBaseLine implements Agent {
 
     public MLBaseLine(boolean isWhite) {
         this.isWhite = isWhite;
+        this.maxDepth = 3;
+        this.ABpruning = new AlphaBetaAgent(isWhite, this.maxDepth);
     }
     
     public void setGameLogic(GameLogic gameLogic) {
         this.gameLogic = gameLogic;
+        if (this.ABpruning != null) {
+            this.ABpruning.setGameLogic(gameLogic);
+        }
     }
 
     @Override

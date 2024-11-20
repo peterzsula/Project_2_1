@@ -69,12 +69,13 @@ public class AlphaBetaAgent implements Agent {
         return bestTurn;
     }
 
-    public int minimaxPruning(GameState gameState, int depth, int alpha, int beta, boolean maxPlayer) {
+    public int minimaxPruning(GameState gameState, int depth, int alpha, int beta, boolean isMaxPlayerWhite) {
         if (depth == 0 || gameLogic.g.isGameOver()) {
             return (int) GameLogic.evaluateBoard(gameState);
         }
 
         List<Turn> legalTurns = GameLogic.getLegalTurns(gameState);
+        boolean maxPlayer = (gameState.getIsWhiteTurn() == isMaxPlayerWhite); // changed parameter to decrease complexity
 
         if (maxPlayer) {
             int maxEval = Integer.MIN_VALUE;
@@ -84,7 +85,7 @@ public class AlphaBetaAgent implements Agent {
                     newState.move(move);
                 }
 
-                int eval = minimaxPruning(newState, depth - 1, alpha, beta, false);
+                int eval = minimaxPruning(newState, depth - 1, alpha, beta, isMaxPlayerWhite);
                 maxEval = Math.max(maxEval, eval);
                 alpha = Math.max(alpha, eval);
                 if (beta <= alpha) { // Beta cutoff, pruning is done here
@@ -100,7 +101,7 @@ public class AlphaBetaAgent implements Agent {
                     newState.move(move);
                 }
 
-                int eval = minimaxPruning(newState, depth - 1, alpha, beta, true);
+                int eval = minimaxPruning(newState, depth - 1, alpha, beta, isMaxPlayerWhite);
                 minEval = Math.min(minEval, eval);
                 beta = Math.min(beta, eval);
                 if (beta <= alpha) { // Alpha cutoff, pruning is done here
