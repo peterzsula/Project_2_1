@@ -18,8 +18,6 @@ import javafx.scene.layout.Pane;
 public class GameLogic {
     public CheckersApp app;
     public Agent agent;
-    public AlphaBetaAgent ABpruning;
-
     public Agent opponent;
     public GameState g;   
 
@@ -419,17 +417,8 @@ public class GameLogic {
         }
     }
 
-    public double evaluateTurn(Turn turn, GameState originalGS, int depth, boolean isMaxPlayerWhite) {
-        GameState g0 = new GameState(originalGS);
-        for (Move move : turn.getMoves()) {
-            g0.move(move);
-        }
-
-        // Calls minimax with alpha-beta pruning from AlphaBetaAgent class
-        return ABpruning.minimaxPruning(g0, depth, Integer.MIN_VALUE, Integer.MAX_VALUE, isMaxPlayerWhite);
-    }
-
-    public static double findMin(double[] array) {
+    // TODO: Do we have to keep these two unused methods?
+    /* public static double findMin(double[] array) {
         if (array == null || array.length == 0) {
             throw new IllegalArgumentException("Array must not be null or empty.");
         }
@@ -454,7 +443,7 @@ public class GameLogic {
             }
         }
         return max;
-    }
+    } */
 
     public static List<Piece> getMovablePieces(GameState g) {
     List<Piece> movablePieces = new ArrayList<>();

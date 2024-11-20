@@ -2,6 +2,7 @@ package org.testing.project_2_1.Agents;
 import java.util.List;
 
 import org.testing.project_2_1.GameLogic.GameLogic;
+import org.testing.project_2_1.GameLogic.GameState;
 import org.testing.project_2_1.Moves.*;
 
 import javafx.animation.PauseTransition;
@@ -9,6 +10,8 @@ import javafx.util.Duration;
 
 public class MLBaseLine implements Agent {
     private GameLogic gameLogic;
+    private AlphaBetaAgent ABpruning;
+
     private boolean isWhite;
     private int maxDepth; // used for evaluateturn()
 
@@ -33,7 +36,7 @@ public class MLBaseLine implements Agent {
         if (gameLogic.g.getIsWhiteTurn() == isWhite && !gameLogic.isGameOver(gameLogic.g)) {
             List<Turn> turns = GameLogic.getLegalTurns(gameLogic.g);
             for (Turn turn : turns) {
-                turn.setEvaluation(gameLogic.evaluateTurn(turn, gameLogic.g, maxDepth, !isWhite));
+                turn.setEvaluation(evaluateTurn(turn, gameLogic.g, maxDepth, !isWhite));
             }
             Turn bestTurn = getBestTurn(turns);
             Move move = bestTurn.getMoves().remove(0);
@@ -68,6 +71,15 @@ public class MLBaseLine implements Agent {
         return bestTurn;
     }
 
+    public double evaluateTurn(Turn turn, GameState originalGS, int depth, boolean isMaxPlayerWhite) {
+        GameState g0 = new GameState(originalGS);
+        for (Move move : turn.getMoves()) {
+            g0.move(move);
+        }
+
+        // Calls minimax with alpha-beta pruning from AlphaBetaAgent class
+        return ABpruning.minimaxPruning(g0, depth, Integer.MIN_VALUE, Integer.MAX_VALUE, isMaxPlayerWhite);
+    }
     @Override
     public void simulate() {
         // TODO Auto-generated method stub
