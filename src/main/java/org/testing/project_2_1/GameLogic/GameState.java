@@ -28,6 +28,7 @@ public class GameState {
         movesPlayed = new ArrayList<Move>();
         turnsPlayed = new ArrayList<Turn>();
         currentTurn = new Turn();
+        isGameOver = false;
         board = new Tile[SIZE][SIZE];
         for (int y = 0; y < SIZE; y++) {
             for (int x = 0; x < SIZE; x++) {
@@ -56,6 +57,7 @@ public class GameState {
         movesPlayed = new ArrayList<Move>();
         turnsPlayed = new ArrayList<Turn>();
         currentTurn = new Turn();
+        isGameOver = originalB.isGameOver;
         this.isWhiteTurn = originalB.getIsWhiteTurn();
         this.board = new Tile[SIZE][SIZE];
         for (int y = 0; y < SIZE; y++) {
