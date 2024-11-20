@@ -96,9 +96,9 @@ public class GameLogic {
     }
 
     public static List<Turn> getLegalTurns(GameState g) {
-        if (!g.getCurrentTurn().isEmpty()) {
-            return g.getPossibleTurns();
-        }
+        // if (!g.getCurrentTurn().isEmpty()) {
+        //     return g.getPossibleTurns();
+        // }
         ArrayList<Move> availableMoves = getPossibleMoves(g);
         if (availableMoves.isEmpty()) {
             g.setGameOver(true);
