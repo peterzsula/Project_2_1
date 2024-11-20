@@ -1,6 +1,7 @@
 package org.testing.project_2_1.GameLogic;
 
 import org.testing.project_2_1.Agents.Agent;
+import org.testing.project_2_1.Agents.AlphaBetaAgent;
 import org.testing.project_2_1.Moves.*;
 import org.testing.project_2_1.UI.CheckersApp;
 import org.testing.project_2_1.UI.PieceDrawer;
@@ -17,6 +18,8 @@ import javafx.scene.layout.Pane;
 public class GameLogic {
     public CheckersApp app;
     public Agent agent;
+    public AlphaBetaAgent ABpruning;
+
     public Agent opponent;
     public GameState g;   
 
@@ -414,47 +417,16 @@ public class GameLogic {
         for (int i = 0; i < moves.size(); i++) {
             undoLastMove(g);
         }
-    }   
+    }
 
-    public double evaluateTurn(Turn turn, GameState originalGS) {
+    public double evaluateTurn(Turn turn, GameState originalGS, int depth, boolean isMaxPlayerWhite) {
         GameState g0 = new GameState(originalGS);
         for (Move move : turn.getMoves()) {
             g0.move(move);
         }
-        if (isGameOver(g0)) {
-            if (g0.getIsWhiteTurn()) {
-                return -100;
-            }
-            else {
-                return +100;
-            }
-        }
-        List<Turn> opponentsTurns = getLegalTurns(g0);
-        double[] evaluations = new double[opponentsTurns.size()];
-        for (int i = 0; i < opponentsTurns.size(); i++) {
-            Turn oTurn = opponentsTurns.get(i);
-            GameState g = new GameState(g0);
-            for (Move move : oTurn.getMoves()) {
-                g.move(move);
-                if (isGameOver(g0)) {
-                    if (g0.getIsWhiteTurn()) {
-                        return -100;
-                    }
-                    else {
-                        return +100;
-                    }
-                }
-            }
-            evaluations[i] = evaluateBoard(g);
-        }
-        double evaluation = 0;
-        if (originalGS.getIsWhiteTurn()) {
-            evaluation = findMax(evaluations);
-        }
-        else {
-            evaluation = findMin(evaluations);
-        }
-        return evaluation;
+
+        // Calls minimax with alpha-beta pruning from AlphaBetaAgent class
+        return ABpruning.minimaxPruning(g0, depth, Integer.MIN_VALUE, Integer.MAX_VALUE, isMaxPlayerWhite);
     }
 
     public static double findMin(double[] array) {

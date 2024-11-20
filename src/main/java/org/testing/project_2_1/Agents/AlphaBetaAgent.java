@@ -69,7 +69,7 @@ public class AlphaBetaAgent implements Agent {
         return bestTurn;
     }
 
-    private int minimaxPruning(GameState gameState, int depth, int alpha, int beta, boolean maxPlayer) {
+    public int minimaxPruning(GameState gameState, int depth, int alpha, int beta, boolean maxPlayer) {
         if (depth == 0 || gameLogic.g.isGameOver()) {
             return (int) GameLogic.evaluateBoard(gameState);
         }

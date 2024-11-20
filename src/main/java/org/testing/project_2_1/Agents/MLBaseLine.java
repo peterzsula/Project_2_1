@@ -10,6 +10,7 @@ import javafx.util.Duration;
 public class MLBaseLine implements Agent {
     private GameLogic gameLogic;
     private boolean isWhite;
+    private int maxDepth; // used for evaluateturn()
 
     public MLBaseLine(boolean isWhite) {
         this.isWhite = isWhite;
@@ -32,7 +33,7 @@ public class MLBaseLine implements Agent {
         if (gameLogic.g.getIsWhiteTurn() == isWhite && !gameLogic.isGameOver(gameLogic.g)) {
             List<Turn> turns = GameLogic.getLegalTurns(gameLogic.g);
             for (Turn turn : turns) {
-                turn.setEvaluation(gameLogic.evaluateTurn(turn, gameLogic.g));
+                turn.setEvaluation(gameLogic.evaluateTurn(turn, gameLogic.g, maxDepth, !isWhite));
             }
             Turn bestTurn = getBestTurn(turns);
             Move move = bestTurn.getMoves().remove(0);
