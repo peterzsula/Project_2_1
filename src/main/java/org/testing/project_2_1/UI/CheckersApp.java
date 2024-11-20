@@ -258,9 +258,11 @@ public class CheckersApp extends Application {
                 }
             }
         }
-    
+        if (noOfPlayers == 0 || (!isPlayerOneTurn && noOfPlayers == 1)) {
+            gameLogic.agent.makeMove();
+        }
         // Handle agent's first move if necessary
-        if (noOfPlayers == 1 && gameLogic.agent != null) {
+        else if (noOfPlayers == 1 && gameLogic.agent != null) {
             gameLogic.agent.setGameLogic(gameLogic); // Ensure the agent is associated with the game logic
     
             if (gameLogic.g.getIsWhiteTurn() == gameLogic.agent.isWhite()) {

@@ -48,14 +48,14 @@ public class GameState {
     }
 
     public GameState(GameState originalB) {
-        this.whitePieces = new ArrayList<>(originalB.getWhitePieces());
-        this.blackPieces = new ArrayList<>(originalB.getBlackPieces());
-        this.turnsPlayed = new ArrayList<>(originalB.getTurnsPlayed());
+        this.whitePieces = new ArrayList<>();
+        this.blackPieces = new ArrayList<>();
+        this.turnsPlayed = new ArrayList<>();
         this.currentTurn = new Turn(originalB.getCurrentTurn());
         this.possibleTurns = new ArrayList<>(originalB.getPossibleTurns());
         this.isWhiteTurn = originalB.getIsWhiteTurn();
         this.board = new Tile[SIZE][SIZE];
-        this.isGameOver = originalB.isGameOver;
+        this.isGameOver = false;
 
         for (int y = 0; y < SIZE; y++) {
             for (int x = 0; x < SIZE; x++) {
@@ -64,8 +64,21 @@ public class GameState {
                     Piece originalPiece = originalB.board[x][y].getPiece();
                     Piece piece = new Piece(originalPiece.type, x, y);
                     this.board[x][y].setPiece(piece);
+                    if (piece.type == PieceType.WHITE || piece.type == PieceType.WHITEKING) {
+                        this.whitePieces.add(this.board[x][y].getPiece());
+                    } 
+                    else {
+                        this.blackPieces.add(this.board[x][y].getPiece());
+                    }
                 }
             }
+        }
+        for (Turn turn : originalB.getTurnsPlayed()) {
+            Turn turnCopy = new Turn(turn);
+            turnsPlayed.add(turnCopy);
+        }
+        for (Turn turn : originalB.possibleTurns) {
+            possibleTurns.add(new Turn(turn));
         }
     }
 
@@ -157,7 +170,7 @@ public class GameState {
             board[capturedPiece.getX()][capturedPiece.getY()].setPiece(capturedPiece);
             addCapturedPieceToLists(capturedPiece);
         }
-        /* or (Turn turn : possibleTurns) {
+        /* (Turn turn : possibleTurns) {
             turn.getMoves().addFirst(move);
         } */
         if (move.isTurnEnding() && !turnsPlayed.isEmpty()) {
