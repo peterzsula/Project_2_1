@@ -32,7 +32,7 @@ public class BaselineAgent implements Agent {
         System.out.println("Baseline agent making move");
         PauseTransition pause = new PauseTransition(Duration.seconds(Agent.delay));
         pause.setOnFinished(event -> {
-        if (gameLogic.g.getIsWhiteTurn() == isWhite && !gameLogic.isGameOver(gameLogic.g)) {
+        if (gameLogic.g.getIsWhiteTurn() == isWhite && !gameLogic.g.isGameOver()) {
             ArrayList<Turn> legalTurns = GameLogic.getLegalTurns(gameLogic.g);
             System.out.println("Legal moves: " + legalTurns.size());
             int randomIndex = new Random().nextInt(legalTurns.size());

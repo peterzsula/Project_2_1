@@ -118,6 +118,7 @@ public class GameState {
     public boolean isGameOver() {
         if (whitePieces.isEmpty() || blackPieces.isEmpty()) {
             isGameOver = true;
+            System.out.println("Game Over");
         }
         return isGameOver;
     }

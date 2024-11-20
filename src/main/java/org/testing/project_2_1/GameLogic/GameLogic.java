@@ -65,6 +65,10 @@ public class GameLogic {
     }
 
     private void askForMove() {
+        if (g.isGameOver()) {
+            System.out.println("Game over");
+            return;
+        }
         app.updateGlows();
         app.updateEvaluationBar();
         System.out.println();

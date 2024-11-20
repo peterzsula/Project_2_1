@@ -30,7 +30,7 @@ public class AlphaBetaAgent implements Agent {
         System.out.println("Alpha-Beta agent making move");
         PauseTransition pause = new PauseTransition(Duration.seconds(Agent.delay));
         pause.setOnFinished(event -> {
-            if (gameLogic.g.getIsWhiteTurn() == isWhite && !gameLogic.isGameOver(gameLogic.g)) {
+            if (gameLogic.g.getIsWhiteTurn() == isWhite && !gameLogic.g.isGameOver()) {
                 ArrayList<Turn> turns = GameLogic.getLegalTurns(gameLogic.g);
                 Turn bestTurn = getBestTurn(turns);
                 Move move = bestTurn.getMoves().remove(0);
@@ -69,7 +69,7 @@ public class AlphaBetaAgent implements Agent {
     }
 
     private int minimaxPruning(GameState gameState, int depth, int alpha, int beta, boolean maxPlayer) {
-        if (depth == 0 || gameLogic.isGameOver(gameState)) {
+        if (depth == 0 || gameLogic.g.isGameOver()) {
             return (int) GameLogic.evaluateBoard(gameState);
         }
 
