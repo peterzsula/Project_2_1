@@ -19,7 +19,12 @@ public class GameLogic {
     public CheckersApp app;
     public Agent agent;
     public Agent opponent;
-    public GameState g;   
+    public GameState g;
+    private static final int SEVEN_MOVE_LIMIT = 7;
+    private static final int MAX_PIECES_FOR_DRAW_RULES = 3;
+
+    private int sevenMoveCounter = 0;
+    private boolean isSevenMoveRuleActive = false;
 
 
     public GameLogic(CheckersApp app) {
@@ -32,7 +37,7 @@ public class GameLogic {
         this.agent = agent.reset();
         this.opponent = null;
         this.agent.setGameLogic(this);
-        setStandardValues(app); 
+        setStandardValues(app);
     }
 
     public GameLogic(CheckersApp app, Agent agent1, Agent agent2) {
@@ -50,17 +55,39 @@ public class GameLogic {
         g.setPossibleTurns(getLegalTurns(g)); // should be in GameState constructor
     }
 
-    public boolean isGameOver(GameState board){
+    public boolean isGameOver(GameState board) {
+
         if (board.getWhitePieces().size() == 0 || board.getBlackPieces().size() == 0) {
+            return true; // standard game-ending conditions
+        }
+
+        // handbook, 2i: seven-move-rule draw
+        if (checkSevenMoveRule(board)) {
             return true;
         }
+
+        // handbook, 2j-I draw: one king vs one king
+        if (isOneKingDraw(board)) {
+            return true;
+        }
+
+        // handbook 2j-II draw: long diagonal control
+        if (isLongDiagonalDraw(board)) {
+            return true;
+        }
+
+        // handbook, 2j-III draw: 47-15 diagonal control
+        if (isOtherDiagonalDraw(board)) {
+            return true;
+        }
+
         return false;
     }
 
     public Tile[][] getBoard() {
         return g.getBoard();
     }
-    
+
     public void restartGame(){
         setStandardValues(app);
     }
@@ -88,6 +115,12 @@ public class GameLogic {
         }
     }
 
+
+    /**
+     * modified to prioritize capture moves based on capture values as per rules in game
+     */
+    public static ArrayList<Turn> getLegalTurns(GameState originalGS) {
+        ArrayList<Move> availableMoves = getLegalMoves(originalGS);
     public void printAvailableCaptures(GameState g){
         List<Turn> availableTurns = getLegalTurns(g);
         System.out.println("Nuber of available moves: " + availableTurns.size());
@@ -112,6 +145,8 @@ public class GameLogic {
         Set<Piece> pieces = Piece.movesToPieces(availableMoves);
         int maxCaptures = 0;
         for (Piece piece : pieces) {
+            GameState b = new GameState(originalGS);
+            ArrayList<Move> pieceMoves = getLegalMoves(originalGS);
             ArrayList<Turn> pieceTurns = getLegalTurns(piece, g);
             for (Turn turn : pieceTurns) {
                 //TODO: add 2 kings rule
@@ -126,6 +161,33 @@ public class GameLogic {
             }
         }
 
+            DepthFirstSearch.resetMaxCaptures();
+            DepthFirstSearch.resetResult();
+            Turn initialTurn = new Turn();
+            DepthFirstSearch.dfs(b, piece, initialTurn, 0);
+
+            ArrayList<Turn> pieceTurns = DepthFirstSearch.getResult();
+
+            for (Turn turn : pieceTurns) {
+                if (!turn.getMoves().isEmpty() && turn.getMoves().getFirst().isCapture()) {
+                    int menCount = turn.getMenCount();
+                    int kingCount = turn.getKingCount();
+                    double turnValue = calculateCaptureValue(menCount, kingCount);
+
+                    if (turnValue > highestValue) {
+                        highestValue = turnValue;
+                        bestCaptureTurn = turn;
+                    }
+                }
+            }
+        }
+
+        if (bestCaptureTurn != null) {
+            availableTurns.clear();
+            availableTurns.add(bestCaptureTurn);
+        }
+
+        return availableTurns.isEmpty() ? Turn.copyMovesToTurns(availableMoves) : availableTurns;
         return availableTurns;
     }
 
@@ -143,6 +205,7 @@ public class GameLogic {
         return result;
     }
 
+
     public static ArrayList<Move> getCaptures(GameState g) {
         ArrayList<Move> availableCaptures = new ArrayList<>();
         ArrayList<Piece> pieces = getListOfPieces(g);
@@ -151,7 +214,7 @@ public class GameLogic {
         }
         return availableCaptures;
     }
-    
+
     public static ArrayList<Move> getCaptures(Piece piece, GameState g) {
         ArrayList<Move> availableCaptures = new ArrayList<>();
         // TODO: instead of iterating over all black tiles, iterate over all tiles where the piece can move
@@ -182,10 +245,10 @@ public class GameLogic {
             } else {
                 availableMoves.addAll(currentMoves);
             }
-        }   
+        }
         if (!availableCaptures.isEmpty()) {
             return availableCaptures;
-        } 
+        }
         return availableMoves;
     }
 
@@ -197,7 +260,7 @@ public class GameLogic {
             int startCol = (row % 2 == 0) ? 1 : 0;
             for (int col = startCol; col < SIZE; col += 2){
                 Move move = g.determineMoveType(piece.getX(), piece.getY(), row, col);
-                if (move.isNormal() && availableCaptures.isEmpty()) { 
+                if (move.isNormal() && availableCaptures.isEmpty()) {
                     availableMoves.add(move);
                 } else if (move.isCapture()) {
                     availableCaptures.add(move);
@@ -206,24 +269,33 @@ public class GameLogic {
         }
         if (availableCaptures.size() > 0) {
             return availableCaptures;
-        } 
+        }
         return availableMoves;
     }
 
+    public void printAvailableCaptures(GameState g){
+        ArrayList<Turn> availableTurns = getLegalTurns(g);
+
+        if (availableTurns.isEmpty()) {
+            System.out.println("No available captures.");
+            return;
+        }
+
+        System.out.println("Number of available moves: " + availableTurns.size());
     public static List<Move> getLegalMoves(Piece piece, GameState g) {
         List<Turn> availableTurns = getLegalTurns(piece, g); // Fetch all legal turns for the piece
         List<Move> availableMoves = new ArrayList<>();
-    
+
         for (Turn turn : availableTurns) {
             availableMoves.add(turn.getMoves().getFirst()); // Add the first move of each turn
         }
-    
+
         return availableMoves;
     }
-    
+
     public static List<Move> getLegalMoves(GameState g) {
-        List<Turn> availableTurns = getLegalTurns(g); 
-        List<Move> availableMoves = new ArrayList<>(); 
+        List<Turn> availableTurns = getLegalTurns(g);
+        List<Move> availableMoves = new ArrayList<>();
         for (Turn turn : availableTurns) {
             availableMoves.add(turn.getMoves().getFirst());
         }
@@ -238,7 +310,7 @@ public class GameLogic {
             return b.getBlackPieces();
         }
     }
-    
+
     public void takeTurn(Turn turn) {
         for (Move move : turn.getMoves()) {
             takeMove(move);
@@ -246,6 +318,14 @@ public class GameLogic {
     }
 
     public boolean takeMove(Move move) {
+        Piece piece = move.getPiece();
+
+        // TODO i have to think of more specific circumstances to apply the three-move rule, temp. disabled
+        /*
+        if (!isMoveAllowedByThreeMoveRule(piece, move)) {
+            return false;
+        } */
+
         Piece piece = g.getPieceAt(move.getFromX(), move.getFromY());
         if (move.isInvalid()) {
             piece.abortMove();
@@ -258,10 +338,19 @@ public class GameLogic {
         else if (piece != g.getPieceAt(g.getCurrentTurn().getLast().getToX(), g.getCurrentTurn().getLast().getToY())) {
             piece.abortMove();
             askForMove();
-            return false;  
+            return false;
         }
+
+        ArrayList<Turn> legalTurns = getLegalTurns(g);
+        if (move.isNormal() && !legalTurns.get(0).isShot()) {
+            System.out.println("No available captures, making normal move");
+            movePiece(move, g);
+
+            piece.incrementNCMoveCount();
+
+            switchTurn();
         List<Turn> legalTurns = g.getPossibleTurns();
-        
+
         // Handle normal moves when no captures are available
         if (move.isNormal() && !legalTurns.getFirst().isShot()) {
             System.out.println("No available captures, making normal move");
@@ -269,7 +358,7 @@ public class GameLogic {
             askForMove();
             return true;
         }
-    
+
         int i = g.getCurrentTurn().getMoves().size();
         // Handle capture moves
         for (Turn turn : legalTurns) {
@@ -280,9 +369,16 @@ public class GameLogic {
                 }
                 movePiece(move);
                 app.updateCaptureMessage(" ");
-    
+
+                if (move.isCapture()) {
+                    piece.resetNCMoveCount();
+                }
+
+
                 // If the turn ends after the move
                 if (curMove.isTurnEnding()) {
+                    System.out.println("Made all available captures");
+                    switchTurn();
                     System.out.println("Made all available captures");
                     askForMove();
                     return true;
@@ -294,7 +390,7 @@ public class GameLogic {
                 }
             }
         }
-    
+
         // Handle cases where the current turn is empty
         if (g.getCurrentTurn().isEmpty()) {
             piece.abortMove();
@@ -302,16 +398,20 @@ public class GameLogic {
             askForMove();
             return false;
         }
-    
+
+
         // Handle cases where additional captures are available
         if (g.getCurrentTurn().getLast().isCapture()) {
             piece.abortMove();
             app.updateCaptureMessage(" ");
+            System.out.println("can take again");
+            return true;
             System.out.println("Can take again");
             askForMove();
             return true;
         }
-    
+
+
         // Default case: no valid move
         piece.abortMove();
         app.updateCaptureMessage(piece.getType().color + " must capture!");
@@ -319,6 +419,9 @@ public class GameLogic {
         return false;
     }
 
+
+    private void movePiece(Move move, GameState g) {
+        g.move(move);
     private void movePiece(Move move) {
         if (move.isInvalid()) {
             move.getPiece().abortMove();
@@ -374,12 +477,12 @@ public class GameLogic {
 
     public static double evaluateBoard(GameState g) {
         // page 8 of Machine Learning by Tom M. Mitchell
-        // xl: the number of black pieces on the board 
-        // x2: the number of white pieces on the board 
-        // x3: the number of black kings on the board 
-        // x4: the number of white kings on the board 
-        // x5: the number of black pieces threatened by white (i.e., which can be captured on white's next turn) 
-        // X6: the number of white pieces threatened by black 
+        // xl: the number of black pieces on the board
+        // x2: the number of white pieces on the board
+        // x3: the number of black kings on the board
+        // x4: the number of white kings on the board
+        // x5: the number of black pieces threatened by white (i.e., which can be captured on white's next turn)
+        // X6: the number of white pieces threatened by black
         // w1, w2, w3, w4, w5, w6: weights for the six features
         int x1 = 0, x2 = 0, x3 = 0, x4 = 0, x5 = 0, x6 = 0;
         // evaluation positive for white, negative for black
@@ -400,7 +503,7 @@ public class GameLogic {
                 x4++;
             }
         }
-            
+
         Set<Piece> threatenedPieces = getPiecesTheathenedBy(g.getWhitePieces(), g);
         x5 = threatenedPieces.size();
         threatenedPieces.clear();
@@ -430,5 +533,169 @@ public class GameLogic {
 
     return movablePieces;
     }
+
+    public static double findMax(double[] array) {
+        if (array == null || array.length == 0) {
+            throw new IllegalArgumentException("Array must not be null or empty.");
+        }
+
+        double max = array[0];
+        for (int i = 1; i < array.length; i++) {
+            if (array[i] > max) {
+                max = array[i];
+            }
+        }
+        return max;
+    }
+
+    /**
+     * as per game rules: 2 pawns > 1 king, alternate equation:
+     * capture value = amount of men + (amount of kings * 2) - 0.5
+     */
+    public static double calculateCaptureValue(int menCount, int kingCount) {
+        if (kingCount == 1 && menCount == 2) {
+            return 3.0;
+        } else {
+            return menCount + (kingCount * 2.0) - 0.5;
+        }
+    }
+
+    private boolean isKing(Piece piece) {
+        return piece.getType() == PieceType.BLACKKING || piece.getType() == PieceType.WHITEKING;
+    }
+
+    private int countKings(ArrayList<Piece> pieces) {
+        int kingCount = 0;
+        for (Piece piece : pieces) {
+            if (piece.getType() == PieceType.BLACKKING || piece.getType() == PieceType.WHITEKING) {
+                kingCount++;
+            }
+        }
+        return kingCount;
+    }
+
+    private int countTotalPieces(GameState board) {
+        return board.getWhitePieces().size() + board.getBlackPieces().size();
+    }
+
+    private boolean shouldApplyThreeMoveRule() {
+        return g.getWhitePieces().stream().anyMatch(p -> p.type == PieceType.WHITE) ||
+                g.getBlackPieces().stream().anyMatch(p -> p.type == PieceType.BLACK);
+    }
+
+    private boolean isMoveAllowedByThreeMoveRule(Piece piece, Move move) {
+        if (shouldApplyThreeMoveRule() && piece.hasReachedNCMoveLimit() && move.isNormal()) {
+            System.out.println("This king has reached its limit of three non-capturing moves. Please select a different piece.");
+            piece.abortMove();
+            return false;
+        }
+        return true;
+    }
+
+    private boolean isOneKingDraw(GameState board) {
+        if (board.getWhitePieces().size() == 1 && board.getBlackPieces().size() == 1) {
+            Piece whitePiece = board.getWhitePieces().get(0);
+            Piece blackPiece = board.getBlackPieces().get(0);
+
+            if (isKing(whitePiece) && isKing(blackPiece)) {
+                // Check if neither king can make a capture
+                if (getCaptures(whitePiece, board).isEmpty() && getCaptures(blackPiece, board).isEmpty()) {
+                    // Check for special case of coordinates (4, 6) and (0, 0)
+                    if ((whitePiece.getX() == 4 && whitePiece.getY() == 6 && blackPiece.getX() == 0 && blackPiece.getY() == 0) ||
+                            (whitePiece.getX() == 0 && whitePiece.getY() == 0 && blackPiece.getX() == 4 && blackPiece.getY() == 6)) {
+                        System.out.println("Draw not possible: The player on turn loses.");
+                        return false; // Player on turn loses in this specific situation
+                    }
+                    System.out.println("Draw: One king vs one king.");
+                    return true;
+                }
+            }
+        }
+        return false;
+    }
+
+    private boolean checkSevenMoveRule(GameState board) {
+        int whiteKings = countKings(board.getWhitePieces());
+        int blackKings = countKings(board.getBlackPieces());
+
+        if (!isSevenMoveRuleActive && whiteKings == 2 && blackKings == 1) {
+            isSevenMoveRuleActive = true;
+            sevenMoveCounter = 0;
+        } else if (!isSevenMoveRuleActive && whiteKings == 1 && blackKings == 2) {
+            isSevenMoveRuleActive = true;
+            sevenMoveCounter = 0;
+        }
+
+        if (isSevenMoveRuleActive) {
+            sevenMoveCounter++;
+            if (sevenMoveCounter > SEVEN_MOVE_LIMIT) {
+                System.out.println("Seven-move rule invoked: The game is a draw.");
+                return true; // Declare draw
+            }
+        }
+
+        return false; // Continue the game
+    }
+
+    private boolean isDiagonalControlled(GameState board, int startX, int startY, int endX, int endY, String color) {
+        boolean startControlled = false;
+        boolean endControlled = false;
+
+        for (Piece piece : getListOfPieces(board)) {
+            if (piece.getX() == startX && piece.getY() == startY && piece.getType().color.equals(color)) {
+                startControlled = true;
+            }
+            if (piece.getX() == endX && piece.getY() == endY && piece.getType().color.equals(color)) {
+                endControlled = true;
+            }
+            if (startControlled && endControlled) {
+                return true; // Both ends of the diagonal are controlled
+            }
+        }
+        return false;
+    }
+
+
+    private boolean isLongDiagonalDraw(GameState board) {
+        if (countTotalPieces(board) > MAX_PIECES_FOR_DRAW_RULES) {
+            return false;
+        }
+
+        boolean isWhiteControlling = isDiagonalControlled(board, 7, 0, 0, 7, "white");
+        boolean isBlackControlling = isDiagonalControlled(board, 7, 0, 0, 7, "black");
+
+        if (isWhiteControlling && board.getBlackPieces().size() == 1 && board.getWhitePieces().size() > 1) {
+            System.out.println("Draw: White cannot cross the long diagonal (7, 0) to (0, 7).");
+            return true;
+        }
+
+        if (isBlackControlling && board.getWhitePieces().size() == 1 && board.getBlackPieces().size() > 1) {
+            System.out.println("Draw: Black cannot cross the long diagonal (7, 0) to (0, 7).");
+            return true;
+        }
+
+        return false;
+    }
+
+    private boolean isOtherDiagonalDraw(GameState board) {
+        if (countTotalPieces(board) > MAX_PIECES_FOR_DRAW_RULES) {
+            return false;
+        }
+
+        // Check for diagonal (7, 6) to (4, 5) and (0, 3) to (3, 6)
+        if (isDiagonalControlled(board, 7, 6, 4, 5, "black") || isDiagonalControlled(board, 0, 3, 3, 6, "black")) {
+            System.out.println("Draw: Black controls the diagonal, and white cannot cross.");
+            return true;
+        }
+
+        if (isDiagonalControlled(board, 7, 6, 4, 5, "white") || isDiagonalControlled(board, 0, 3, 3, 6, "white")) {
+            System.out.println("Draw: White controls the diagonal, and black cannot cross.");
+            return true;
+        }
+
+        return false;
+    }
+
+
 
 }
