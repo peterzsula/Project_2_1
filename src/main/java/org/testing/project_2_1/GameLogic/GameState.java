@@ -115,6 +115,56 @@ public class GameState {
         return isGameOver;
     }
 
+    public int countPieces() {
+        return whitePieces.size() + blackPieces.size();
+    }
+
+    public int evaluate() {
+        if (isGameOver()) {
+            if ((isWhiteTurn && whitePieces.isEmpty()) || (!isWhiteTurn && blackPieces.isEmpty())) {
+                return -1;
+            } else {
+                return 1;
+            }
+        }
+
+        int score = 0;
+
+        for (Piece piece : whitePieces) {
+            if (piece.getType() == PieceType.BLACKKING || piece.getType() == PieceType.WHITEKING) {
+                score += 3;
+            } else {
+                score += 1;
+            }
+        }
+
+        for (Piece piece : blackPieces) {
+            if (piece.getType() == PieceType.BLACKKING || piece.getType() == PieceType.WHITEKING) {
+                score -= 3;
+            } else {
+                score -= 1;
+            }
+        }
+
+        if (isWhiteTurn) {
+            if (score > 0) {
+                return 1; // Favorable position for white
+            } else if (score < 0) {
+                return -1;
+            } else {
+                return 0;
+            }
+        } else {
+            if (score < 0) {
+                return 1; // Favorable position for black
+            } else if (score > 0) {
+                return -1;
+            } else {
+                return 0;
+            }
+        }
+    }
+
     public void setPossibleTurns(List<Turn> possibleTurns) {
         this.possibleTurns = possibleTurns;
     }
