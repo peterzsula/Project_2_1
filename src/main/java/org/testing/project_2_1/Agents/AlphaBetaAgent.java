@@ -14,10 +14,12 @@ public class AlphaBetaAgent implements Agent {
     private GameLogic gameLogic;
     private boolean isWhite;
     private int maxDepth;
+    private Turn currentTurn;
 
     public AlphaBetaAgent(boolean isWhite, int maxDepth) {
         this.isWhite = isWhite;
         this.maxDepth = maxDepth;
+        currentTurn = new Turn();
     }
 
     public void setGameLogic(GameLogic gameLogic) {
@@ -35,17 +37,18 @@ public class AlphaBetaAgent implements Agent {
         PauseTransition pause = new PauseTransition(Duration.seconds(Agent.delay));
         pause.setOnFinished(event -> {
             if (gameLogic.g.getIsWhiteTurn() == isWhite && !gameLogic.g.isGameOver()) {
-                List<Turn> turns = GameLogic.getLegalTurns(gameLogic.g);
-                Turn bestTurn;
-                bestTurn = getBestTurn(turns); // I toggled off PN Search for now
+                List<Turn> turns = gameLogic.g.getLegalTurns();
+                if (currentTurn.isEmpty()) {
+                    currentTurn = getBestTurn(turns);
+                }
                 /* if (isEndgame(gameLogic.g)) {
                     System.out.println("Endgame detected, using Proof-Number Search");
                     bestTurn = getBestTurnPNSearch();
                 } else {
                     bestTurn = getBestTurn(turns);
                 } */
-                if (bestTurn != null && !bestTurn.getMoves().isEmpty()) {
-                    Move move = bestTurn.getMoves().remove(0);
+                if (currentTurn != null && !currentTurn.getMoves().isEmpty()) {
+                    Move move = currentTurn.getMoves().removeFirst();
                     gameLogic.takeMove(move);
                 }
             }
@@ -87,7 +90,7 @@ public class AlphaBetaAgent implements Agent {
             return (int) GameLogic.evaluateBoard(gameState);
         }
 
-        List<Turn> legalTurns = GameLogic.getLegalTurns(gameState);
+        List<Turn> legalTurns = gameState.getLegalTurns();
         boolean maxPlayer = (gameState.getIsWhiteTurn() == isMaxPlayerWhite);
 
         if (maxPlayer) {
@@ -143,7 +146,7 @@ public class AlphaBetaAgent implements Agent {
         } else if (root.disproof == 0) {
             return findBestTurnPNSearch(root);
         } else {
-            List<Turn> turns = GameLogic.getLegalTurns(currentState);
+            List<Turn> turns = currentState.getLegalTurns();
             return getBestTurn(turns);
         }
     }
@@ -190,5 +193,11 @@ public class AlphaBetaAgent implements Agent {
     @Override
     public void simulate() {
         throw new UnsupportedOperationException("Unimplemented method 'simulate'");
+    }
+
+    @Override
+    public void pause() {
+        // TODO Auto-generated method stub
+        throw new UnsupportedOperationException("Unimplemented method 'pause'");
     }
 }

@@ -12,16 +12,18 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Random;
 
+
 public class AgentMCTS implements Agent {
     private GameLogic gameLogic;
     private boolean isWhite;
-    private static final int SIMULATIONS = 1000; // Number of simulations per move
+    private static final int SIMULATIONS = 20; // Number of simulations per move
     private static final double EXPLORATION_CONSTANT = Math.sqrt(2); // UCB1 constant
+    private Turn currentTurn;
 
     // Node class for MCTS
     private static class Node {
         GameState state;
-        Turn move; // The move leading to this state
+        Turn turn; // The move leading to this state
         Node parent;
         ArrayList<Node> children;
         int visits;
@@ -29,7 +31,7 @@ public class AgentMCTS implements Agent {
 
         Node(GameState state, Turn move, Node parent) {
             this.state = state;
-            this.move = move;
+            this.turn = move;
             this.parent = parent;
             this.children = new ArrayList<>();
             this.visits = 0;
@@ -39,6 +41,7 @@ public class AgentMCTS implements Agent {
 
     public AgentMCTS(boolean isWhite) {
         this.isWhite = isWhite;
+        currentTurn = new Turn();
     }
 
     @Override
@@ -71,8 +74,11 @@ public class AgentMCTS implements Agent {
 
         // Choose the best move
         Node bestChild = selectBestChild(root);
-        if (bestChild != null && bestChild.move != null) {
-            Move move = bestChild.move.getMoves().get(0); // Fixed access to the first move
+        if (bestChild != null && bestChild.turn != null) {
+            if (currentTurn.isEmpty()) {
+                currentTurn = bestChild.turn;
+            }
+            Move move = currentTurn.getMoves().removeFirst();
             PauseTransition pause = new PauseTransition(Duration.seconds(Agent.delay));
             pause.setOnFinished(event -> {
             if (gameLogic.g.getIsWhiteTurn() == isWhite && !gameLogic.isGameOver(gameLogic.g)) {
@@ -109,7 +115,7 @@ public class AgentMCTS implements Agent {
     }
 
     private void expansion(Node node) {
-        List<Turn> legalTurns = GameLogic.getLegalTurns(node.state);
+        List<Turn> legalTurns = node.state.getLegalTurns();
         for (Turn turn : legalTurns) {
             GameState newState = new GameState(node.state); // Clone the state for the child
             for (Move move : turn.getMoves()) {
@@ -125,7 +131,7 @@ public class AgentMCTS implements Agent {
         Random random = new Random();
 
         while (!gameLogic.isGameOver(simState)) {
-            List<Turn> legalTurns = GameLogic.getLegalTurns(simState);
+            List<Turn> legalTurns = simState.getLegalTurns();
 
             if (legalTurns.isEmpty()) {
                 break; // Exit simulation if no legal turns are available
@@ -182,6 +188,14 @@ public class AgentMCTS implements Agent {
     public void simulate() {
         throw new UnsupportedOperationException("Unimplemented method 'simulate'");
     }
+
+    @Override
+    public void pause() {
+        // TODO Auto-generated method stub
+        throw new UnsupportedOperationException("Unimplemented method 'pause'");
+    }
+
+    
 }
 
 

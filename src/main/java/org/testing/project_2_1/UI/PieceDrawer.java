@@ -56,7 +56,7 @@ public class PieceDrawer extends StackPane {
         bg.setTranslateY((TILE_SIZE - TILE_SIZE * 0.26 * 2) / 2 + TILE_SIZE * 0.07);
 
         Ellipse ellipse = new Ellipse(TILE_SIZE * 0.3125, TILE_SIZE * 0.26);
-        ellipse.setFill(type == PieceType.BLACK
+        ellipse.setFill(type.color == "black"
                 ? Color.valueOf("#808080") : Color.valueOf("#fff9f4"));
         ellipse.setStroke(Color.BLACK);
         ellipse.setStrokeWidth(TILE_SIZE * 0.03);
@@ -123,7 +123,7 @@ public class PieceDrawer extends StackPane {
         }
     
         // Get all legal moves for this piece
-        List<Move> availableMoves = GameLogic.getLegalMoves(piece, app.gameLogic.g);
+        List<Move> availableMoves = app.gameLogic.g.getLegalMoves(piece);
     
         if (availableMoves.isEmpty()) {
             return; // No moves to highlight
@@ -172,14 +172,14 @@ public class PieceDrawer extends StackPane {
     public void updateGlow() {
     
         // Ensure the piece belongs to the current player
-        ArrayList<Piece> currentPlayerPieces = GameLogic.getListOfPieces(app.gameLogic.g);
+        ArrayList<Piece> currentPlayerPieces = app.gameLogic.g.getListOfPieces();
         if (!currentPlayerPieces.contains(piece)) {
             setEffect(null); 
             return;
         }
     
         // Check if the piece has available moves
-        List<Move> availableMoves = GameLogic.getLegalMoves(app.gameLogic.g);
+        List<Move> availableMoves = app.gameLogic.g.getLegalMoves();
         boolean canMove = availableMoves.stream()
             .anyMatch(move -> move.getFromX() == piece.getX() && move.getFromY() == piece.getY());
     

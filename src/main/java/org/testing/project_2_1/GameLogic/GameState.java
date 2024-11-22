@@ -2,7 +2,9 @@ package org.testing.project_2_1.GameLogic;
 import static org.testing.project_2_1.UI.CheckersApp.SIZE;
 
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
 import org.testing.project_2_1.Moves.Capture;
 import org.testing.project_2_1.Moves.InvalidMove;
@@ -553,5 +555,183 @@ public class GameState {
         return currentTurn;
     }
 
+    public boolean isDraw() {
+        return turnsPlayed.size() >= 100;
+    }
 
+    // returns 1 if white wins, -1 if black wins, 100 if game is draw, 0 if game is not over
+    public int getWinner() {
+        if (isDraw()) {
+            return 100;
+        }
+        if (isGameOver && blackPieces.isEmpty()) {
+            return 1;
+        }
+        if (isGameOver && whitePieces.isEmpty()) {
+            return -1;
+        }
+        return 0;
+    }
+
+
+    // Old GameLogic Methods
+
+    public List<Turn> getLegalTurns() {
+        // if (!g.getCurrentTurn().isEmpty()) {
+        //     return g.getPossibleTurns();
+        // }
+        ArrayList<Move> availableMoves = getPossibleMoves();
+        if (availableMoves.isEmpty()) {
+            setGameOver(true);
+            return new ArrayList<>();
+        }
+        if (availableMoves.get(0).isNormal()) {
+            return Turn.copyMovesToTurns(availableMoves);
+        }
+        ArrayList<Turn> availableTurns = new ArrayList<>();
+        Set<Piece> pieces = Piece.movesToPieces(availableMoves);
+        int maxCaptures = 0;
+        for (Piece piece : pieces) {
+            ArrayList<Turn> pieceTurns = getLegalTurns(piece);
+            for (Turn turn : pieceTurns) {
+                //TODO: add 2 kings rule
+                if (turn.getMoves().size() > maxCaptures) {
+                    availableTurns.clear();
+                    availableTurns.add(turn);
+                    maxCaptures = turn.getMoves().size();
+                }
+                else if (turn.getMoves().size() == maxCaptures) {
+                    availableTurns.add(turn);
+                }
+            }
+        }
+
+        return availableTurns;
+    }
+
+    public ArrayList<Turn> getLegalTurns(Piece piece) {
+        GameState g = new GameState(this);
+        ArrayList<Move> availableMoves = g.getPossibleMoves(piece);
+        if (availableMoves.get(0).isNormal()) {
+            return Turn.copyMovesToTurns(availableMoves);
+        }
+        DepthFirstSearch.resetMaxCaptures();
+        DepthFirstSearch.resetResult();
+        Turn initialTurn = new Turn();
+        DepthFirstSearch.dfs(g, piece, initialTurn, 0);
+        ArrayList<Turn> result = DepthFirstSearch.getResult();
+        return result;
+    }
+
+    public ArrayList<Move> getCaptures() {
+        ArrayList<Move> availableCaptures = new ArrayList<>();
+        ArrayList<Piece> pieces = getListOfPieces();
+        for (Piece piece : pieces) {
+            availableCaptures.addAll(getCaptures(piece));
+        }
+        return availableCaptures;
+    }
+    
+    public ArrayList<Move> getCaptures(Piece piece) {
+        ArrayList<Move> availableCaptures = new ArrayList<>();
+        // TODO: instead of iterating over all black tiles, iterate over all tiles where the piece can move
+        for (int row = 0; row < SIZE; row++) {
+            int startCol = (row % 2 == 0) ? 1 : 0;
+            for (int col = startCol; col < SIZE; col += 2){
+                Move move = determineMoveType(piece.getX(), piece.getY(), row, col);
+                if (move.isCapture()) {
+                    availableCaptures.add(move);
+                }
+            }
+        }
+        return availableCaptures;
+    }
+
+    private ArrayList<Move> getPossibleMoves() {
+        ArrayList<Move> availableMoves = new ArrayList<>();
+        ArrayList<Move> availableCaptures = new ArrayList<>();
+        ArrayList<Move> currentMoves = new ArrayList<>();
+        ArrayList<Piece> pieces = getListOfPieces();
+        for (Piece piece : pieces) {
+            //TODO: instead of iterating over all black tiles, iterate over all tiles where the piece can move
+            currentMoves = getPossibleMoves(piece);
+            if (currentMoves.isEmpty()) {
+                continue;
+            } else if (currentMoves.get(0).isCapture()) {
+                availableCaptures.addAll(currentMoves);
+            } else {
+                availableMoves.addAll(currentMoves);
+            }
+        }   
+        if (!availableCaptures.isEmpty()) {
+            return availableCaptures;
+        } 
+        return availableMoves;
+    }
+
+    public ArrayList<Move> getPossibleMoves(Piece piece) {
+        ArrayList<Move> availableMoves = new ArrayList<>();
+        ArrayList<Move> availableCaptures = new ArrayList<>();
+        // TODO: instead of iterating over all black tiles, iterate over all tiles where the piece can move
+        for (int row = 0; row < SIZE; row++) {
+            int startCol = (row % 2 == 0) ? 1 : 0;
+            for (int col = startCol; col < SIZE; col += 2){
+                Move move = determineMoveType(piece.getX(), piece.getY(), row, col);
+                if (move.isNormal() && availableCaptures.isEmpty()) { 
+                    availableMoves.add(move);
+                } else if (move.isCapture()) {
+                    availableCaptures.add(move);
+                }
+            }
+        }
+        if (availableCaptures.size() > 0) {
+            return availableCaptures;
+        } 
+        return availableMoves;
+    }
+
+        public Set<Piece> getPiecesTheathenedBy(ArrayList<Piece> pieces) {
+        //TODO: instead of getLegalMoves, iterate over all legal Turns
+        Set<Piece> threatenedPieces = new HashSet<>();
+        for (Piece piece : pieces) {
+            for (Move move : getPossibleMoves(piece)) {
+                if (move.isCapture()) {
+                    Capture captureMove = (Capture) move;
+                    threatenedPieces.add(captureMove.getCapturedPiece());
+                }
+            }
+        }
+        return threatenedPieces;
+    }
+
+    public List<Move> getLegalMoves(Piece piece) {
+        List<Turn> availableTurns = getLegalTurns(piece); // Fetch all legal turns for the piece
+        List<Move> availableMoves = new ArrayList<>();
+    
+        for (Turn turn : availableTurns) {
+            availableMoves.add(turn.getMoves().getFirst()); // Add the first move of each turn
+        }
+    
+        return availableMoves;
+    }
+    
+    public List<Move> getLegalMoves() {
+        List<Turn> availableTurns = getLegalTurns(); 
+        List<Move> availableMoves = new ArrayList<>(); 
+        for (Turn turn : availableTurns) {
+            availableMoves.add(turn.getMoves().getFirst());
+        }
+        return availableMoves;
+    }
+
+    public ArrayList<Piece> getListOfPieces() {
+        if (isWhiteTurn) {
+            return getWhitePieces();
+        }
+        else {
+            return getBlackPieces();
+        }
+    }
+
+    // end of old GameLogic methods
 }

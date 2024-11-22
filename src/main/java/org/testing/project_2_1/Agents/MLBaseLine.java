@@ -11,6 +11,7 @@ import javafx.util.Duration;
 public class MLBaseLine implements Agent {
     private GameLogic gameLogic;
     private AlphaBetaAgent ABpruning;
+    private Turn currentTurn;
 
     private boolean isWhite;
     private int maxDepth; // used for evaluateturn()
@@ -19,6 +20,7 @@ public class MLBaseLine implements Agent {
         this.isWhite = isWhite;
         this.maxDepth = 3;
         this.ABpruning = new AlphaBetaAgent(isWhite, this.maxDepth);
+        currentTurn = new Turn();
     }
     
     public void setGameLogic(GameLogic gameLogic) {
@@ -39,13 +41,15 @@ public class MLBaseLine implements Agent {
         PauseTransition pause = new PauseTransition(Duration.seconds(Agent.delay));
         pause.setOnFinished(event -> {
         if (gameLogic.g.getIsWhiteTurn() == isWhite && !gameLogic.isGameOver(gameLogic.g)) {
-            List<Turn> turns = GameLogic.getLegalTurns(gameLogic.g);
+            List<Turn> turns = gameLogic.g.getLegalTurns();
             for (Turn turn : turns) {
                 turn.setEvaluation(evaluateTurn(turn, gameLogic.g, maxDepth, !isWhite));
             }
-            Turn bestTurn = getBestTurn(turns);
-            Move move = bestTurn.getMoves().remove(0);
-            System.out.println("taking turn with evaluation " + bestTurn.getEvaluation() + " " + move.toString());
+            if (currentTurn.isEmpty()) {
+                currentTurn = getBestTurn(turns);
+            }
+            Move move = currentTurn.getMoves().removeFirst();
+            System.out.println("taking turn with evaluation " + currentTurn.getEvaluation() + " " + move.toString());
             gameLogic.takeMove(move);
         }
     });
@@ -89,6 +93,12 @@ public class MLBaseLine implements Agent {
     public void simulate() {
         // TODO Auto-generated method stub
         throw new UnsupportedOperationException("Unimplemented method 'simulate'");
+    }
+
+    @Override
+    public void pause() {
+        // TODO Auto-generated method stub
+        throw new UnsupportedOperationException("Unimplemented method 'pause'");
     }
     
 }

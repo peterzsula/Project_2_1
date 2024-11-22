@@ -10,7 +10,7 @@ public class DepthFirstSearch {
     private static ArrayList<Turn> result;  
     
     public static void dfs(GameState g, Piece piece, Turn currentTurn, int captureCount) {
-        ArrayList<Move> captures = GameLogic.getCaptures(piece, g);
+        ArrayList<Move> captures = g.getCaptures(piece);
         if (captures.isEmpty()) {
             if (!currentTurn.getMoves().isEmpty()) { // Ensure moves exist before setting the turn ending
                 currentTurn.getMoves().getLast().setTurnEnding(true);

@@ -12,12 +12,14 @@ import javafx.util.Duration;
 public class MinimaxAgent implements Agent {
     private GameLogic gameLogic;
     private boolean isWhite;
+    private Turn currentTurn;
 
     private int maxDepth;
 
     public MinimaxAgent(boolean isWhite, int maxDepth) {
         this.isWhite=isWhite;
         this.maxDepth=maxDepth;
+        currentTurn = new Turn();
     }
 
     public void setGameLogic(GameLogic gameLogic) { this.gameLogic = gameLogic; }
@@ -32,9 +34,11 @@ public class MinimaxAgent implements Agent {
         PauseTransition pause = new PauseTransition(Duration.seconds(Agent.delay));
         pause.setOnFinished(event -> {
             if (gameLogic.g.getIsWhiteTurn() == isWhite && !gameLogic.isGameOver(gameLogic.g)) {
-                List<Turn> turns = GameLogic.getLegalTurns(gameLogic.g);
-                Turn bestTurn = getBestTurn(turns);
-                Move move = bestTurn.getMoves().remove(0);
+                List<Turn> turns = gameLogic.g.getLegalTurns();
+                if (currentTurn.isEmpty()) {
+                    currentTurn = getBestTurn(turns);
+                }
+                Move move = currentTurn.getMoves().removeFirst();
                 System.out.println("Takes turn with move " + move);
                 gameLogic.takeMove(move);
             }
@@ -75,7 +79,7 @@ public class MinimaxAgent implements Agent {
             return (int) GameLogic.evaluateBoard(gameState);
         }
 
-        List<Turn> legalTurns = GameLogic.getLegalTurns(gameState);
+        List<Turn> legalTurns = gameState.getLegalTurns();
 
         if (maxPlayer) {
             int maxEval = Integer.MIN_VALUE;
@@ -111,6 +115,12 @@ public class MinimaxAgent implements Agent {
     public void simulate() {
         // TODO Auto-generated method stub
         throw new UnsupportedOperationException("Unimplemented method 'simulate'");
+    }
+
+    @Override
+    public void pause() {
+        // TODO Auto-generated method stub
+        throw new UnsupportedOperationException("Unimplemented method 'pause'");
     }
 }
 
