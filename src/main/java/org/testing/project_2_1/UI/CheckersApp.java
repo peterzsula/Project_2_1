@@ -42,11 +42,9 @@ public class CheckersApp extends Application {
     private Group boardGroup;
     public CapturedPiecesTracker capturedPiecesTracker;
 
-
     boolean isPlayerOneTurn;
     private long previousPlayerOneTime;
     private long previousPlayerTwoTime;
-    
 
     public Group getBoardGroup() {
         return boardGroup;
@@ -168,9 +166,12 @@ public class CheckersApp extends Application {
         // Simplified Undo Button
         Button undoButton = new Button("Undo");
         undoButton.setOnAction(e -> undoLastMove());
+
+        Button pauseButton = new Button("Pause/Resume");
+        pauseButton.setOnAction(e -> {pauseAgents();});
     
         // Place buttons in a horizontal box
-        HBox buttonBox = new HBox(10, resetButton, undoButton);
+        HBox buttonBox = new HBox(10, resetButton, undoButton, pauseButton);
         buttonBox.setPadding(new Insets(10)); // Add some spacing around the buttons
     
         styleTitle(playerOneTitle);
@@ -203,6 +204,15 @@ public class CheckersApp extends Application {
     }
     
        
+    private void pauseAgents() {
+        if (gameLogic.agent != null) {
+            gameLogic.agent.pause();
+        }
+        if (gameLogic.opponent != null) {
+            gameLogic.opponent.pause();
+        }
+    }
+
     public void movePiece(int oldX, int oldY, Piece piece, int newX, int newY) {
         Move move = gameLogic.g.determineMoveType(oldX, oldY, newX, newY);
         piece.getPieceDrawer().clearHighlight();

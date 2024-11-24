@@ -146,7 +146,7 @@ public class PNSearch { // Regular Proof-Number Search (see "Winands and van den
     }
 
     public void generateAllChildren(Node node) {
-        List<Turn> possibleTurns = GameLogic.getLegalTurns(node.state);
+        List<Turn> possibleTurns = node.state.getLegalTurns();
         int childType = (node.type == Node.AND_NODE) ? Node.OR_NODE : Node.AND_NODE;
         for (Turn turn : possibleTurns) {
             GameState newState = new GameState(node.state);
