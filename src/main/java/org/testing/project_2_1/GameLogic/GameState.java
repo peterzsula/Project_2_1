@@ -12,7 +12,7 @@ import org.testing.project_2_1.Moves.Turn;
 
 public class GameState {
     protected Tile[][] board;
-    protected boolean isWhiteTurn;
+    public boolean isWhiteTurn; // Needed for something in the test
     private ArrayList<Piece> whitePieces;
     private ArrayList<Piece> blackPieces;
     private ArrayList<Turn> turnsPlayed;

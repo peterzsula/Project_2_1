@@ -14,6 +14,7 @@ public class AlphaBetaAgent implements Agent {
     private GameLogic gameLogic;
     private boolean isWhite;
     private int maxDepth;
+    private int nodesVisited = 0; // Counter for runtime profiling
 
     public AlphaBetaAgent(boolean isWhite, int maxDepth) {
         this.isWhite = isWhite;
@@ -27,6 +28,14 @@ public class AlphaBetaAgent implements Agent {
     @Override
     public boolean isWhite() {
         return isWhite;
+    }
+
+    public int getNodesVisited() {
+        return nodesVisited;
+    }
+
+    public void resetNodeCounter() {
+        nodesVisited = 0; // Reset the counter for new runs
     }
 
     @Override
@@ -83,6 +92,8 @@ public class AlphaBetaAgent implements Agent {
     }
 
     public int minimaxPruning(GameState gameState, int depth, int alpha, int beta, boolean isMaxPlayerWhite) {
+        nodesVisited++; // Increment node counter
+
         if (depth == 0 || gameState.isGameOver()) {
             return (int) GameLogic.evaluateBoard(gameState);
         }
@@ -180,6 +191,65 @@ public class AlphaBetaAgent implements Agent {
             }
         }
         return bestTurn;
+    }
+
+    // Using this for the Complexity tests
+    // PLEASE, DO NOT REMOVE ANYTHING
+    public void profileMemoryUsage(GameState gameState, int depth, boolean isMaxPlayerWhite) {
+        Runtime runtime = Runtime.getRuntime();
+
+        // Trigger garbage collection for clean measurement
+        runtime.gc();
+
+        // Memory usage before running the algorithm
+        long memoryBefore = runtime.totalMemory() - runtime.freeMemory();
+
+        // Run the algorithm
+        minimaxPruning(gameState, depth, Integer.MIN_VALUE, Integer.MAX_VALUE, isMaxPlayerWhite);
+
+        // Memory usage after running the algorithm
+        long memoryAfter = runtime.totalMemory() - runtime.freeMemory();
+
+        // Calculate memory used
+        long memoryUsed = memoryAfter - memoryBefore;
+        System.out.println("Memory used: " + memoryUsed + " bytes");
+    }
+
+    public int minimaxPlain(GameState gameState, int depth, boolean isMaxPlayerWhite) {
+        nodesVisited++; // Increment node counter
+
+        if (depth == 0 || gameState.isGameOver()) {
+            return (int) GameLogic.evaluateBoard(gameState);
+        }
+
+        List<Turn> legalTurns = GameLogic.getLegalTurns(gameState);
+        boolean maxPlayer = (gameState.getIsWhiteTurn() == isMaxPlayerWhite);
+
+        if (maxPlayer) {
+            int maxEval = Integer.MIN_VALUE;
+            for (Turn turn : legalTurns) {
+                GameState newState = new GameState(gameState);
+                for (Move move : turn.getMoves()) {
+                    newState.move(move);
+                }
+
+                int eval = minimaxPlain(newState, depth - 1, isMaxPlayerWhite);
+                maxEval = Math.max(maxEval, eval);
+            }
+            return maxEval;
+        } else {
+            int minEval = Integer.MAX_VALUE;
+            for (Turn turn : legalTurns) {
+                GameState newState = new GameState(gameState);
+                for (Move move : turn.getMoves()) {
+                    newState.move(move);
+                }
+
+                int eval = minimaxPlain(newState, depth - 1, isMaxPlayerWhite);
+                minEval = Math.min(minEval, eval);
+            }
+            return minEval;
+        }
     }
 
     @Override
