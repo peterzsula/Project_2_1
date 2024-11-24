@@ -72,13 +72,14 @@ public class BaselineAgent implements Agent {
 
     @Override
     public void simulate() {
-        if (currentTurn.isEmpty()) {
-            List<Turn> legalTurns = gameState.getLegalTurns();
+        List<Turn> legalTurns = gameState.getLegalTurns();
+        if ( gameState.getWinner() == 0) {
             int randomIndex = new Random().nextInt(legalTurns.size());
             currentTurn = legalTurns.get(randomIndex);
         }
-        Move move = currentTurn.getMoves().removeFirst();
-        gameState.move(move);
+        while (!currentTurn.isEmpty() && gameState.getWinner() == 0) {
+            gameState.move(currentTurn.getMoves().removeFirst());
+        }        
     }
 
     @Override

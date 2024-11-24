@@ -21,6 +21,7 @@ public class GameState {
     private Turn currentTurn;
     private List<Turn> possibleTurns;
     private boolean isGameOver;
+    private int winner;
 
     public GameState(){
         isWhiteTurn = true;
@@ -31,6 +32,7 @@ public class GameState {
         possibleTurns = new ArrayList<Turn>();
         isGameOver = false;
         board = new Tile[SIZE][SIZE];
+        winner = 0;
 
         for (int y = 0; y < SIZE; y++) {
             for (int x = 0; x < SIZE; x++) {
@@ -58,6 +60,7 @@ public class GameState {
         this.isWhiteTurn = originalB.getIsWhiteTurn();
         this.board = new Tile[SIZE][SIZE];
         this.isGameOver = false;
+        winner = 0;
 
         for (int y = 0; y < SIZE; y++) {
             for (int x = 0; x < SIZE; x++) {
@@ -104,15 +107,14 @@ public class GameState {
         isWhiteTurn = !isWhiteTurn;
     }
 
-    public void setGameOver(boolean isGameOver) {
+    public void setGameOver(boolean isGameOver, int winner) {
         this.isGameOver = isGameOver;
-        // TODO: Implement game over logic
+        this.winner = winner;
     }
 
     public boolean isGameOver() {
         if (whitePieces.isEmpty() || blackPieces.isEmpty()) {
             isGameOver = true;
-            System.out.println("Game Over");
         }
         return isGameOver;
     }
@@ -561,13 +563,16 @@ public class GameState {
 
     // returns 1 if white wins, -1 if black wins, 100 if game is draw, 0 if game is not over
     public int getWinner() {
+        if (winner != 0) {
+            return winner;
+        }
         if (isDraw()) {
             return 100;
         }
-        if (isGameOver && blackPieces.isEmpty()) {
+        if (blackPieces.isEmpty()) {
             return 1;
         }
-        if (isGameOver && whitePieces.isEmpty()) {
+        if (whitePieces.isEmpty()) {
             return -1;
         }
         return 0;
@@ -582,7 +587,7 @@ public class GameState {
         // }
         ArrayList<Move> availableMoves = getPossibleMoves();
         if (availableMoves.isEmpty()) {
-            setGameOver(true);
+            setGameOver(true, isWhiteTurn ? -1 : 1);
             return new ArrayList<>();
         }
         if (availableMoves.get(0).isNormal()) {
