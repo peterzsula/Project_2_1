@@ -345,7 +345,7 @@ public class CheckersApp extends Application {
     }
 
     public void updateEvaluationBar() {
-        double evaluationScore = GameLogic.evaluateBoard(gameLogic.g); // Get current evaluation
+        double evaluationScore = gameLogic.g.evaluateBoard(); // Get current evaluation
         updateObservedRange(evaluationScore);
         double normalizedScore = normalizeEvaluation(evaluationScore);
 

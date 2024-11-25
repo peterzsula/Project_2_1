@@ -738,5 +738,42 @@ public class GameState {
         }
     }
 
+    public double evaluateBoard() {
+        // page 8 of Machine Learning by Tom M. Mitchell
+        // xl: the number of black pieces on the board 
+        // x2: the number of white pieces on the board 
+        // x3: the number of black kings on the board 
+        // x4: the number of white kings on the board 
+        // x5: the number of black pieces threatened by white (i.e., which can be captured on white's next turn) 
+        // X6: the number of white pieces threatened by black 
+        // w1, w2, w3, w4, w5, w6: weights for the six features
+        int x1 = 0, x2 = 0, x3 = 0, x4 = 0, x5 = 0, x6 = 0;
+        // evaluation positive for white, negative for black
+        double w1 = -1, w2 = 1, w3 = -3, w4 = 3, w5 = 1, w6 = -1;
+
+        for (Piece piece : getBlackPieces()) {
+            if (piece.type == PieceType.BLACK) {
+                x1++;
+            } else {
+                x3++;
+            }
+        }
+
+        for (Piece piece : getWhitePieces()) {
+            if (piece.type == PieceType.WHITE) {
+                x2++;
+            } else {
+                x4++;
+            }
+        }
+            
+        Set<Piece> threatenedPieces = getPiecesTheathenedBy(getWhitePieces());
+        x5 = threatenedPieces.size();
+        threatenedPieces.clear();
+        threatenedPieces = getPiecesTheathenedBy(getBlackPieces());
+        x6 = threatenedPieces.size();
+        return w1 * x1 + w2 * x2 + w3 * x3 + w4 * x4 + w5 * x5 + w6 * x6;
+    }
+
     // end of old GameLogic methods
 }

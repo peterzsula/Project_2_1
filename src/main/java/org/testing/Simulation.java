@@ -11,7 +11,7 @@ public class Simulation {
         int whiteWins = 0;
         int blackWins = 0;
         int draws = 0;
-        int simulations = 10000;
+        int simulations = 100;
 
         long totalWhiteThinkingTime = 0;
         long totalBlackThinkingTime = 0;
