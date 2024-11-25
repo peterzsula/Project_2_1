@@ -13,7 +13,7 @@ public class Simulation {
         int blackWins = 0;
         int draws = 0;
         long startTime = System.nanoTime();
-        final int SIMULATIONS = 100;
+        final int SIMULATIONS = 10;
 
 
         long totalWhiteThinkingTime = 0;

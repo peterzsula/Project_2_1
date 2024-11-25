@@ -89,7 +89,7 @@ public class AlphaBetaAgent implements Agent {
 
     private boolean isEndgame(GameState gameState) {
         int totalPieces = gameState.countPieces();
-        int endgameThreshold = 10;
+        int endgameThreshold = 15;
         return totalPieces <= endgameThreshold;
     }
 
@@ -102,13 +102,10 @@ public class AlphaBetaAgent implements Agent {
             bestValue = Integer.MAX_VALUE;
         }
     
-        List<Turn> shuffledTurns = new ArrayList<>(turns);
-        Collections.shuffle(shuffledTurns); // Shuffle the turn before evaluation to avoid obtaining exact same outcome every game
-        
-        // Creating a separate list for best turns
-        List<Turn> bestTurns = new ArrayList<>();
-        
-        for (Turn turn : shuffledTurns) {
+        // List<Turn> shuffledTurns = new ArrayList<>(turns);
+        // Collections.shuffle(shuffledTurns); // Shuffle the turn before evaluation to avoid obtaining exact same outcome every game
+                
+        for (Turn turn : turns) {
             GameState newState = new GameState(gameState);
             for (Move move : turn.getMoves()) {
                 newState.move(move);
@@ -119,27 +116,20 @@ public class AlphaBetaAgent implements Agent {
             if (isWhite) {
                 if (boardValue > bestValue) {
                     bestValue = boardValue;
-                    bestTurns.clear();
-                    bestTurns.add(turn);
+                    bestTurn = turn;
                 } else if (boardValue == bestValue) {
-                    bestTurns.add(turn);
+                    bestTurn = turn;
                 }
             } else {
                 if (boardValue < bestValue) {
                     bestValue = boardValue;
-                    bestTurns.clear();
-                    bestTurns.add(turn);
+                    bestTurn = (turn);
                 } else if (boardValue == bestValue) {
-                    bestTurns.add(turn);
+                    bestTurn = turn;
                 }
             }
         }
         
-        // Randomization between equally-valued moves
-        if (!bestTurns.isEmpty()) {
-            int randomIndex = (int)(Math.random() * bestTurns.size());
-            bestTurn = bestTurns.get(randomIndex);
-        }
         return bestTurn;
     }
 
