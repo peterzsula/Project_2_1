@@ -107,8 +107,15 @@ public class MinimaxAgent implements Agent {
             return minEval;
         }
     }
+
+    @Override
     public Agent reset() {
         return new MinimaxAgent(isWhite,maxDepth);
+    }
+
+    @Override
+    public Agent resetSimulation() {
+        return new MinimaxAgent(isWhite, gameState);
     }
 
     @Override

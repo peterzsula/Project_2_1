@@ -185,6 +185,11 @@ public class AgentMCTS implements Agent {
     }
 
     @Override
+    public Agent resetSimulation() {
+        return new AgentMCTS(isWhite, gameState);
+    }
+
+    @Override
     public void simulate() {
         throw new UnsupportedOperationException("Unimplemented method 'simulate'");
     }

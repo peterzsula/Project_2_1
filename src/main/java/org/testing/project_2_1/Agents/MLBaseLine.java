@@ -61,6 +61,11 @@ public class MLBaseLine implements Agent {
         return new MLBaseLine(isWhite);
     }
 
+    @Override
+    public Agent resetSimulation() { 
+        throw new UnsupportedOperationException("Unimplemented method 'resetSimulation'");
+        }
+
     private Turn getBestTurn(List<Turn> turns) {
         Turn bestTurn = turns.get(0);
         if (isWhite) {

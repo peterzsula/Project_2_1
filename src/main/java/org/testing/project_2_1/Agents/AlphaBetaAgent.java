@@ -6,6 +6,11 @@ import org.testing.project_2_1.GameLogic.GameState;
 import org.testing.project_2_1.Moves.Move;
 import org.testing.project_2_1.Moves.Turn;
 
+<<<<<<< Updated upstream
+=======
+import java.util.ArrayList;
+import java.util.Collections;
+>>>>>>> Stashed changes
 import java.util.List;
 import javafx.animation.PauseTransition;
 import javafx.util.Duration;
@@ -75,14 +80,22 @@ public class AlphaBetaAgent implements Agent {
         Turn bestTurn = null;
         int bestValue = isWhite ? Integer.MIN_VALUE : Integer.MAX_VALUE;
 
+<<<<<<< Updated upstream
         for (Turn turn : turns) {
             GameState newState = new GameState(gameLogic.g);
+=======
+        List<Turn> shuffledTurns = new ArrayList<>(turns);
+        Collections.shuffle(shuffledTurns); // Shuffle the turn before evaluation to avoid obtaining exact same outcome every game
+        for (Turn turn : shuffledTurns) {
+            GameState newState = new GameState(gameState);
+>>>>>>> Stashed changes
             for (Move move : turn.getMoves()) {
                 newState.move(move);
             }
 
             int boardValue = minimaxPruning(newState, maxDepth, Integer.MIN_VALUE, Integer.MAX_VALUE, !isWhite);
 
+<<<<<<< Updated upstream
             if (isWhite && boardValue > bestValue) {
                 bestValue = boardValue;
                 bestTurn = turn;
@@ -91,6 +104,31 @@ public class AlphaBetaAgent implements Agent {
                 bestTurn = turn;
             }
         }
+=======
+            if (isWhite) {
+                if (boardValue > bestValue) {
+                    bestValue = boardValue;
+                    shuffledTurns.clear();
+                    shuffledTurns.add(turn);
+                } else if (boardValue == bestValue) {
+                    shuffledTurns.add(turn);
+                }
+            } else {
+                if (boardValue < bestValue) {
+                    bestValue = boardValue;
+                    shuffledTurns.clear();
+                    shuffledTurns.add(turn);
+                } else if (boardValue == bestValue) {
+                    shuffledTurns.add(turn);
+                }
+            }
+        }
+        // Randomization between equally-valued moves
+        if (!shuffledTurns.isEmpty()) {
+            int randomIndex = (int)(Math.random() * shuffledTurns.size());
+            bestTurn = shuffledTurns.get(randomIndex);
+        }
+>>>>>>> Stashed changes
         return bestTurn;
     }
 
@@ -257,13 +295,36 @@ public class AlphaBetaAgent implements Agent {
 
     @Override
     public Agent reset() {
-        return new AlphaBetaAgent(isWhite, maxDepth);
+        return new AlphaBetaAgent(isWhite,maxDepth);
+    }
+
+    @Override
+<<<<<<< Updated upstream
+    public void simulate() {
+        throw new UnsupportedOperationException("Unimplemented method 'simulate'");
+    }
+=======
+    public Agent resetSimulation() {
+        return new AlphaBetaAgent(isWhite, gameState);
     }
 
     @Override
     public void simulate() {
-        throw new UnsupportedOperationException("Unimplemented method 'simulate'");
+        if (gameState.getWinner() == 0) {
+            List<Turn> turns = gameState.getLegalTurns();
+            if (!turns.isEmpty()) {
+                Turn bestTurn;
+                    bestTurn = getBestTurnABP(turns);
+                if (bestTurn != null && !bestTurn.getMoves().isEmpty()) {
+                    for (Move move : bestTurn.getMoves()) {
+                        gameState.move(move);
+                    }
+                }
+            }
+        }
     }
+
+>>>>>>> Stashed changes
 
     @Override
     public void pause() {
