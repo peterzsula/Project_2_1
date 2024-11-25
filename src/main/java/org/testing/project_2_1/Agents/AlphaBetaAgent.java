@@ -89,8 +89,8 @@ public class AlphaBetaAgent implements Agent {
 
     private boolean isEndgame(GameState gameState) {
         int totalPieces = gameState.countPieces();
-        int endgameThreshold = 8;
-        return totalPieces < endgameThreshold;
+        int endgameThreshold = 10;
+        return totalPieces <= endgameThreshold;
     }
 
     private Turn getBestTurnABP(List<Turn> turns) {
