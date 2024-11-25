@@ -85,7 +85,7 @@ public class Turn {
     }
 
     public Move getLast() {
-        return moves.getLast();
+        return moves.get(moves.size() - 1);
     }
 
     public boolean isEmpty() {

@@ -54,7 +54,7 @@ public class MinimaxAgent implements Agent {
                 if (currentTurn.isEmpty()) {
                     currentTurn = getBestTurn(turns);
                 }
-                Move move = currentTurn.getMoves().removeFirst();
+                Move move = currentTurn.getMoves().remove(0);
                 System.out.println("Takes turn with move " + move);
                 gameLogic.takeMove(move);
             }
@@ -134,7 +134,10 @@ public class MinimaxAgent implements Agent {
             currentTurn = getBestTurn(legalTurns);
         }
         while (!currentTurn.isEmpty() && gameState.getWinner() == 0) {
-            gameState.move(currentTurn.getMoves().removeFirst());
+            List<Move> moves = currentTurn.getMoves();
+            if (!moves.isEmpty()) {
+                gameState.move(moves.remove(0));
+            }
         }
     }
 

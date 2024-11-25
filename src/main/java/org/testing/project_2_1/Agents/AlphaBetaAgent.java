@@ -12,8 +12,10 @@ import javafx.util.Duration;
 
 public class AlphaBetaAgent implements Agent {
     private GameLogic gameLogic;
+    private GameState gameState;
     private boolean isWhite;
     private int maxDepth;
+    private final int defaultDepth = 3;
     private Turn currentTurn;
 
     public AlphaBetaAgent(boolean isWhite, int maxDepth) {
@@ -22,8 +24,20 @@ public class AlphaBetaAgent implements Agent {
         currentTurn = new Turn();
     }
 
+    public AlphaBetaAgent(boolean isWhite, GameState gameState){
+        this.isWhite = isWhite;
+        this.gameState = gameState;
+        currentTurn = new Turn();
+        maxDepth = defaultDepth;
+    }
+
     public void setGameLogic(GameLogic gameLogic) {
         this.gameLogic = gameLogic;
+    }
+
+    @Override
+    public void setGameState(GameState gameState) {
+        this.gameState = gameState;
     }
 
     @Override
@@ -41,14 +55,14 @@ public class AlphaBetaAgent implements Agent {
                 if (currentTurn.isEmpty()) {
                     currentTurn = getBestTurn(turns);
                 }
-                /* if (isEndgame(gameLogic.g)) {
+                 if (isEndgame(gameLogic.g)) {
                     System.out.println("Endgame detected, using Proof-Number Search");
-                    bestTurn = getBestTurnPNSearch();
+                    currentTurn = getBestTurnPNSearch();
                 } else {
-                    bestTurn = getBestTurn(turns);
-                } */
+                    currentTurn = getBestTurn(turns);
+                }
                 if (currentTurn != null && !currentTurn.getMoves().isEmpty()) {
-                    Move move = currentTurn.getMoves().removeFirst();
+                    Move move = currentTurn.getMoves().remove(0);
                     gameLogic.takeMove(move);
                 }
             }
@@ -87,7 +101,7 @@ public class AlphaBetaAgent implements Agent {
 
     public int minimaxPruning(GameState gameState, int depth, int alpha, int beta, boolean isMaxPlayerWhite) {
         if (depth == 0 || gameState.isGameOver()) {
-            return (int) GameLogic.evaluateBoard(gameState);
+            return (int) gameState.evaluateBoard();
         }
 
         List<Turn> legalTurns = gameState.getLegalTurns();
@@ -192,7 +206,16 @@ public class AlphaBetaAgent implements Agent {
 
     @Override
     public void simulate() {
-        throw new UnsupportedOperationException("Unimplemented method 'simulate'");
+        List<Turn> legalTurns = gameState.getLegalTurns();
+        if (gameState.getWinner() == 0) {
+            currentTurn = getBestTurn(legalTurns);
+        }
+        while (!currentTurn.isEmpty() && gameState.getWinner() == 0) {
+            List<Move> moves = currentTurn.getMoves();
+            if (!moves.isEmpty()) {
+                gameState.move(moves.remove(0));
+            }
+        }
     }
 
     @Override

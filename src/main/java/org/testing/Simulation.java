@@ -6,8 +6,8 @@ import org.testing.project_2_1.GameLogic.GameState;
 public class Simulation {
     public static void main(String[] args) {
         GameState gameState = new GameState();
-        Agent white = new MinimaxAgent(true, gameState);
-        Agent black = new MinimaxAgent(false, gameState);
+        Agent white = new AlphaBetaAgent(true, gameState);
+        Agent black = new AlphaBetaAgent(false, gameState);
         int whiteWins = 0;
         int blackWins = 0;
         int draws = 0;
