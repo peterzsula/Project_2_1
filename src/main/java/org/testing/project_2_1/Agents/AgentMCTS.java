@@ -15,6 +15,7 @@ import java.util.Random;
 
 public class AgentMCTS implements Agent {
     private GameLogic gameLogic;
+    private GameState gameState;
     private boolean isWhite;
     private static final int SIMULATIONS = 20; // Number of simulations per move
     private static final double EXPLORATION_CONSTANT = Math.sqrt(2); // UCB1 constant
@@ -44,6 +45,12 @@ public class AgentMCTS implements Agent {
         currentTurn = new Turn();
     }
 
+    public AgentMCTS(boolean isWhite, GameState gameState) {
+        this.isWhite = isWhite;
+        this.gameState = gameState;
+        currentTurn = new Turn();
+    }
+
     @Override
     public boolean isWhite() {
         return isWhite;
@@ -52,6 +59,12 @@ public class AgentMCTS implements Agent {
     @Override
     public void setGameLogic(GameLogic gameLogic) {
         this.gameLogic = gameLogic;
+        this.gameState = gameLogic.g;
+    }
+
+    @Override
+    public void setGameState(GameState gameState) {
+        this.gameState = gameState;
     }
 
     @Override
@@ -59,12 +72,12 @@ public class AgentMCTS implements Agent {
         System.out.println("Monte Carlo Tree Search agent making move");
 
         // Create the root node
-        Node root = new Node(new GameState(gameLogic.g), null, null);
+        Node root = new Node(new GameState(gameState), null, null);
 
         // Perform MCTS simulations
         for (int i = 0; i < SIMULATIONS; i++) {
             Node selectedNode = selection(root);
-            if (!gameLogic.isGameOver(selectedNode.state)) {
+            if (!selectedNode.state.isGameOver()) {
                 expansion(selectedNode);
                 Node nodeToSimulate = selectedNode.children.isEmpty() ? selectedNode : getRandomChild(selectedNode);
                 double result = simulation(nodeToSimulate.state);
@@ -78,14 +91,14 @@ public class AgentMCTS implements Agent {
             if (currentTurn.isEmpty()) {
                 currentTurn = bestChild.turn;
             }
-            Move move = currentTurn.getMoves().removeFirst();
+            Move move = currentTurn.getMoves().remove(0);
             PauseTransition pause = new PauseTransition(Duration.seconds(Agent.delay));
             pause.setOnFinished(event -> {
-            if (gameLogic.g.getIsWhiteTurn() == isWhite && !gameLogic.isGameOver(gameLogic.g)) {
-                gameLogic.takeMove(move);
-            }
-        });
-        pause.play();
+                if (gameState.getIsWhiteTurn() == isWhite && !gameState.isGameOver()) {
+                    gameLogic.takeMove(move);
+                }
+            });
+            pause.play();
         } else {
             System.out.println("No valid moves found.");
         }
@@ -130,7 +143,7 @@ public class AgentMCTS implements Agent {
         GameState simState = new GameState(state); // Deep copy for simulation
         Random random = new Random();
 
-        while (!gameLogic.isGameOver(simState)) {
+        while (!simState.isGameOver()) {
             List<Turn> legalTurns = simState.getLegalTurns();
 
             if (legalTurns.isEmpty()) {
@@ -144,7 +157,7 @@ public class AgentMCTS implements Agent {
         }
 
         // Return a simulated result
-        return GameLogic.evaluateBoard(simState) * (isWhite ? 1 : -1);
+        return simState.evaluateBoard(); // Positive value if white wins, negative if black wins no need to multiply by -1
     }
 
 
@@ -186,7 +199,32 @@ public class AgentMCTS implements Agent {
 
     @Override
     public void simulate() {
-        throw new UnsupportedOperationException("Unimplemented method 'simulate'");
+        Node root = new Node(new GameState(gameState), null, null);
+
+        // Perform MCTS simulations
+        for (int i = 0; i < SIMULATIONS; i++) {
+            Node selectedNode = selection(root);
+            if (!selectedNode.state.isGameOver()) {
+                expansion(selectedNode);
+                Node nodeToSimulate = selectedNode.children.isEmpty() ? selectedNode : getRandomChild(selectedNode);
+                double result = simulation(nodeToSimulate.state);
+                backpropagation(nodeToSimulate, result);
+            }
+        }
+
+        // Choose the best move
+        Node bestChild = selectBestChild(root);
+        if (bestChild != null && bestChild.turn != null) {
+            if (currentTurn.isEmpty()) {
+                currentTurn = bestChild.turn;
+            }
+            while (!currentTurn.isEmpty() && gameState.getWinner() == 0) {
+                List<Move> moves = currentTurn.getMoves();
+                if (!moves.isEmpty()) {
+                    gameState.move(moves.remove(0));
+                }
+            }
+        }
     }
 
     @Override
@@ -195,7 +233,5 @@ public class AgentMCTS implements Agent {
         throw new UnsupportedOperationException("Unimplemented method 'pause'");
     }
 
-    
 }
-
 

@@ -11,7 +11,6 @@ import static org.testing.project_2_1.UI.CheckersApp.TILE_SIZE;
 
 import org.testing.project_2_1.GameLogic.Piece;
 import org.testing.project_2_1.GameLogic.PieceType;
-import org.testing.project_2_1.GameLogic.GameLogic;
 import org.testing.project_2_1.Moves.Move;
 
 import java.util.ArrayList;
@@ -22,7 +21,7 @@ public class PieceDrawer extends StackPane {
     private Piece piece;
     private CheckersApp app;
     private List<Rectangle> highlightedTiles = new ArrayList<>();
-    private static DropShadow glowEffect; 
+    private static DropShadow glowEffect;
 
     static {
         glowEffect = new DropShadow();
@@ -84,21 +83,21 @@ public class PieceDrawer extends StackPane {
 
         setOnMouseReleased(e -> {
             if (app.noOfPlayers > 0) { // Human player interacting
-                clearHighlight(); 
-        
+                clearHighlight();
+
                 int newX = (int) Math.floor(e.getSceneX() / TILE_SIZE);
                 int newY = (int) Math.floor(e.getSceneY() / TILE_SIZE);
-        
+
                 Move move = app.gameLogic.g.determineMoveType(oldX, oldY, newX, newY);
                 if (move == null || move.isInvalid()) {
                     abortMove();
                     return;
                 }
-        
+
                 boolean success = app.gameLogic.takeMove(move);
                 if (success) {
                     piece.movePiece(move);
-        
+
                     // Force game state update and glow recalculation
                     app.updateGlows();
                 } else {
@@ -106,34 +105,34 @@ public class PieceDrawer extends StackPane {
                 }
             }
         });
-        
-        
+
+
     }
 
     private void highlightMoves() {
         clearHighlight(); // Remove any existing highlights
-    
+
         if (app.noOfPlayers == 0) { // Do not highlight moves for agents
             return;
         }
-    
+
         // Ensure the piece is glowing (has available moves)
         if (getEffect() != glowEffect) {
             return;
         }
-    
+
         // Get all legal moves for this piece
         List<Move> availableMoves = app.gameLogic.g.getLegalMoves(piece);
-    
+
         if (availableMoves.isEmpty()) {
             return; // No moves to highlight
         }
-    
+
         // Check if there are any capture moves
         List<Move> captureMoves = availableMoves.stream()
                 .filter(Move::isCapture)
                 .toList();
-    
+
         if (!captureMoves.isEmpty()) {
             // Highlight only capture moves in red
             for (Move move : captureMoves) {
@@ -141,13 +140,13 @@ public class PieceDrawer extends StackPane {
             }
             return; // Exit early to avoid highlighting normal moves
         }
-    
+
         //Highlight normal moves in yellow if no capture moves exist
         for (Move move : availableMoves) {
             highlightTile(move.getToX(), move.getToY(), Color.YELLOW);
         }
     }
-    
+
 
     private void highlightTile(int x, int y, Color color) {
         if (x >= 0 && x < SIZE && y >= 0 && y < SIZE) {
@@ -170,26 +169,26 @@ public class PieceDrawer extends StackPane {
     }
 
     public void updateGlow() {
-    
+
         // Ensure the piece belongs to the current player
         ArrayList<Piece> currentPlayerPieces = app.gameLogic.g.getListOfPieces();
         if (!currentPlayerPieces.contains(piece)) {
-            setEffect(null); 
+            setEffect(null);
             return;
         }
-    
+
         // Check if the piece has available moves
         List<Move> availableMoves = app.gameLogic.g.getLegalMoves();
         boolean canMove = availableMoves.stream()
-            .anyMatch(move -> move.getFromX() == piece.getX() && move.getFromY() == piece.getY());
-    
+                .anyMatch(move -> move.getFromX() == piece.getX() && move.getFromY() == piece.getY());
+
         if (canMove) {
-            setEffect(glowEffect); 
+            setEffect(glowEffect);
         } else {
-            setEffect(null); 
+            setEffect(null);
         }
     }
- 
+
     public void move(int x, int y) {
         relocate(x * TILE_SIZE, y * TILE_SIZE);
     }

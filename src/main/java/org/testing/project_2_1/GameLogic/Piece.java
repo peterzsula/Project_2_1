@@ -13,7 +13,7 @@ public class Piece {
     public PieceType type;
     private int x, y;
     private PieceDrawer pieceDrawer;
-    private int consequtiveMovesPerKing;
+    //private int consequtiveMovesPerKing;
 
     public Piece(PieceType type, int x, int y) {
         this.type = type;
@@ -42,7 +42,7 @@ public class Piece {
 
     public void movePiece(Move move){
         x = move.getToX();
-        y = move.getToY(); 
+        y = move.getToY();
         if (pieceDrawer != null) {
             pieceDrawer.move(move.getToX(), move.getToY());
         }
@@ -53,10 +53,10 @@ public class Piece {
         x = move.getFromX();
         y = move.getFromY();
         if (pieceDrawer != null) {
-            pieceDrawer.move(move.getFromX(), move.getFromY()); 
+            pieceDrawer.move(move.getFromX(), move.getFromY());
         }
         handleKingDemotion(move);
-    }  
+    }
 
     private void handleKingPromotion(Move move) {
         int newY = move.getToY();
@@ -81,14 +81,14 @@ public class Piece {
             if (type.color.equals("white")){
                 type = PieceType.WHITEKING;
                 if (pieceDrawer != null) {
-                    pieceDrawer.promoteToKing(); 
+                    pieceDrawer.promoteToKing();
                 }
             }
         }
         else if (type.color.equals("black")){
             type = PieceType.BLACKKING;
             if (pieceDrawer != null) {
-                pieceDrawer.promoteToKing(); 
+                pieceDrawer.promoteToKing();
             }
         }
     }
@@ -98,7 +98,7 @@ public class Piece {
             if (type.color.equals("white")){
                 type = PieceType.WHITE;
                 if (pieceDrawer != null) {
-                    pieceDrawer.demoteToNormal();   
+                    pieceDrawer.demoteToNormal();
                 }
             }
             else if (type.color.equals("black")){

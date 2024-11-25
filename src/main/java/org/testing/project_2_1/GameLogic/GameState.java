@@ -14,13 +14,14 @@ import org.testing.project_2_1.Moves.Turn;
 
 public class GameState {
     protected Tile[][] board;
-    public boolean isWhiteTurn; // Needed for something in the test
+    protected boolean isWhiteTurn;
     private ArrayList<Piece> whitePieces;
     private ArrayList<Piece> blackPieces;
     private ArrayList<Turn> turnsPlayed;
     private Turn currentTurn;
     private List<Turn> possibleTurns;
     private boolean isGameOver;
+    private int winner;
 
     public GameState(){
         isWhiteTurn = true;
@@ -31,6 +32,7 @@ public class GameState {
         possibleTurns = new ArrayList<Turn>();
         isGameOver = false;
         board = new Tile[SIZE][SIZE];
+        winner = 0;
 
         for (int y = 0; y < SIZE; y++) {
             for (int x = 0; x < SIZE; x++) {
@@ -58,6 +60,7 @@ public class GameState {
         this.isWhiteTurn = originalB.getIsWhiteTurn();
         this.board = new Tile[SIZE][SIZE];
         this.isGameOver = false;
+        winner = 0;
 
         for (int y = 0; y < SIZE; y++) {
             for (int x = 0; x < SIZE; x++) {
@@ -68,7 +71,7 @@ public class GameState {
                     this.board[x][y].setPiece(piece);
                     if (piece.type == PieceType.WHITE || piece.type == PieceType.WHITEKING) {
                         this.whitePieces.add(this.board[x][y].getPiece());
-                    } 
+                    }
                     else {
                         this.blackPieces.add(this.board[x][y].getPiece());
                     }
@@ -104,15 +107,14 @@ public class GameState {
         isWhiteTurn = !isWhiteTurn;
     }
 
-    public void setGameOver(boolean isGameOver) {
+    public void setGameOver(boolean isGameOver, int winner) {
         this.isGameOver = isGameOver;
-        // TODO: Implement game over logic
+        this.winner = winner;
     }
 
     public boolean isGameOver() {
         if (whitePieces.isEmpty() || blackPieces.isEmpty()) {
             isGameOver = true;
-            System.out.println("Game Over");
         }
         return isGameOver;
     }
@@ -207,7 +209,7 @@ public class GameState {
         } */
         return true;
     }
-    
+
     public boolean undoMove(Move move){
         Piece piece = board[move.getToX()][move.getToY()].getPiece();
         if (piece == null) {
@@ -226,8 +228,9 @@ public class GameState {
             turn.getMoves().addFirst(move);
         } */
         if (move.isTurnEnding() && !turnsPlayed.isEmpty()) {
-            currentTurn = turnsPlayed.removeLast();
-            currentTurn.getMoves().removeLast();
+            currentTurn = turnsPlayed.remove(turnsPlayed.size() - 1);
+            List<Move> moves = currentTurn.getMoves();
+            moves.remove(moves.size() - 1);
             // possibleTurns = GameLogic.getLegalTurns(this);
             switchTurn();
         }
@@ -270,43 +273,43 @@ public class GameState {
     public boolean getIsWhiteTurn() {
         return isWhiteTurn;
     }
-    
+
     public Move determineMoveType(int x0, int y0, int newX, int newY) {
         // Check for out-of-bounds coordinates
         if (!isValidPosition(x0, y0) || !isValidPosition(newX, newY)) {
             System.out.println("Invalid board coordinates: (" + x0 + ", " + y0 + ") to (" + newX + ", " + newY + ")");
             return new InvalidMove(x0, y0, null, newX, newY);
         }
-    
+
         Tile startTile = board[x0][y0];
         Tile targetTile = board[newX][newY];
-    
+
         // Check if start tile or piece is null
         if (startTile == null || !startTile.hasPiece()) {
             System.out.println("No piece at starting position: (" + x0 + ", " + y0 + ")");
             return new InvalidMove(x0, y0, null, newX, newY);
         }
-    
+
         Piece piece = startTile.getPiece();
-    
+
         // Check if it's the correct player's turn
         if (isWhiteTurn != piece.getType().color.equals("white")) {
             //System.out.println("It's not the correct player's turn for piece at: (" + x0 + ", " + y0 + ")");
             return new InvalidMove(x0, y0, piece, newX, newY);
         }
-    
+
         // Check if the target tile is empty
         if (targetTile == null || targetTile.hasPiece()) {
             //System.out.println("Target tile is not empty: (" + newX + ", " + newY + ")");
             return new InvalidMove(x0, y0, piece, newX, newY);
         }
-    
+
         // Check if the target tile is black
         if (!targetTile.isBlack()) {
             //System.out.println("Target tile is not black: (" + newX + ", " + newY + ")");
             return new InvalidMove(x0, y0, piece, newX, newY);
         }
-    
+
         // King logic
         if (piece.getType() == PieceType.BLACKKING || piece.getType() == PieceType.WHITEKING) {
             if (isMoveforKing(x0, y0, newX, newY) && isPathClearforKing(x0, y0, newX, newY)) {
@@ -314,7 +317,7 @@ public class GameState {
             }
             if (isCapturePathforKing(x0, y0, newX, newY)) {
                 Piece capturedPiece = getCapturedPieceOnPathforKing(x0, y0, newX, newY);
-                return new Capture(x0, y0, piece, capturedPiece, newX, newY); 
+                return new Capture(x0, y0, piece, capturedPiece, newX, newY);
             }
         } else {
             // Normal piece logic
@@ -331,10 +334,10 @@ public class GameState {
                 return checkDiagonalCapture(x0, y0, newX, newY, piece);
             }
         }
-    
+
         return new InvalidMove(x0, y0, piece, newX, newY);
     }
-    
+
     // Helper methods for capture logic
     private Move checkHorizontalCapture(int x0, int y0, int newX, int newY, Piece piece) {
         int x1 = (newX + x0) / 2;
@@ -347,7 +350,7 @@ public class GameState {
         }
         return new InvalidMove(x0, y0, piece, newX, newY);
     }
-    
+
     private Move checkVerticalCapture(int x0, int y0, int newX, int newY, Piece piece) {
         int y1 = (newY + y0) / 2;
         Tile halfWay = board[x0][y1];
@@ -359,7 +362,7 @@ public class GameState {
         }
         return new InvalidMove(x0, y0, piece, newX, newY);
     }
-    
+
     private Move checkDiagonalCapture(int x0, int y0, int newX, int newY, Piece piece) {
         int x1 = (newX + x0) / 2;
         int y1 = (newY + y0) / 2;
@@ -372,12 +375,12 @@ public class GameState {
         }
         return new InvalidMove(x0, y0, piece, newX, newY);
     }
-    
+
     // Helper method to validate positions
     private boolean isValidPosition(int x, int y) {
         return x >= 0 && x < board.length && y >= 0 && y < board[0].length;
     }
-    
+
 
     // Helper method to check if move is available for king
     private boolean isMoveforKing(int x0, int y0, int newX, int newY) {
@@ -397,10 +400,10 @@ public class GameState {
     private boolean isPathClearforKing(int x0, int y0, int newX, int newY) {
         int dx = Integer.compare(newX, x0);
         int dy = Integer.compare(newY, y0);
-    
+
         int x = x0 + dx;
         int y = y0 + dy;
-    
+
         while (x != newX || y != newY) {
             if (board[x][y].hasPiece()) {
                 return false;  // Path is blocked
@@ -409,7 +412,7 @@ public class GameState {
             y += dy;
         }
         return true;
-    } 
+    }
 
     // Check if there is a capturable piece on the path
     private boolean isCapturePathforKing(int x0, int y0, int newX, int newY) {
@@ -561,28 +564,33 @@ public class GameState {
 
     // returns 1 if white wins, -1 if black wins, 100 if game is draw, 0 if game is not over
     public int getWinner() {
+        if (winner != 0) {
+            return winner;
+        }
         if (isDraw()) {
-            return 100;
+            winner = 100;
+            return winner;
         }
-        if (isGameOver && blackPieces.isEmpty()) {
-            return 1;
+        if (blackPieces.isEmpty()) {
+            winner = 1;
+            return winner;
         }
-        if (isGameOver && whitePieces.isEmpty()) {
-            return -1;
+        if (whitePieces.isEmpty()) {
+            winner = -1;
+            return winner;
         }
         return 0;
     }
 
 
     // Old GameLogic Methods
-
     public List<Turn> getLegalTurns() {
         // if (!g.getCurrentTurn().isEmpty()) {
         //     return g.getPossibleTurns();
         // }
         ArrayList<Move> availableMoves = getPossibleMoves();
         if (availableMoves.isEmpty()) {
-            setGameOver(true);
+            setGameOver(true, isWhiteTurn ? -1 : 1);
             return new ArrayList<>();
         }
         if (availableMoves.get(0).isNormal()) {
@@ -631,7 +639,7 @@ public class GameState {
         }
         return availableCaptures;
     }
-    
+
     public ArrayList<Move> getCaptures(Piece piece) {
         ArrayList<Move> availableCaptures = new ArrayList<>();
         // TODO: instead of iterating over all black tiles, iterate over all tiles where the piece can move
@@ -662,10 +670,10 @@ public class GameState {
             } else {
                 availableMoves.addAll(currentMoves);
             }
-        }   
+        }
         if (!availableCaptures.isEmpty()) {
             return availableCaptures;
-        } 
+        }
         return availableMoves;
     }
 
@@ -677,7 +685,7 @@ public class GameState {
             int startCol = (row % 2 == 0) ? 1 : 0;
             for (int col = startCol; col < SIZE; col += 2){
                 Move move = determineMoveType(piece.getX(), piece.getY(), row, col);
-                if (move.isNormal() && availableCaptures.isEmpty()) { 
+                if (move.isNormal() && availableCaptures.isEmpty()) {
                     availableMoves.add(move);
                 } else if (move.isCapture()) {
                     availableCaptures.add(move);
@@ -686,11 +694,11 @@ public class GameState {
         }
         if (availableCaptures.size() > 0) {
             return availableCaptures;
-        } 
+        }
         return availableMoves;
     }
 
-        public Set<Piece> getPiecesTheathenedBy(ArrayList<Piece> pieces) {
+    public Set<Piece> getPiecesTheathenedBy(ArrayList<Piece> pieces) {
         //TODO: instead of getLegalMoves, iterate over all legal Turns
         Set<Piece> threatenedPieces = new HashSet<>();
         for (Piece piece : pieces) {
@@ -707,19 +715,19 @@ public class GameState {
     public List<Move> getLegalMoves(Piece piece) {
         List<Turn> availableTurns = getLegalTurns(piece); // Fetch all legal turns for the piece
         List<Move> availableMoves = new ArrayList<>();
-    
+
         for (Turn turn : availableTurns) {
-            availableMoves.add(turn.getMoves().getFirst()); // Add the first move of each turn
+            availableMoves.add(turn.getMoves().get(0)); // Add the first move of each turn
         }
-    
+
         return availableMoves;
     }
-    
+
     public List<Move> getLegalMoves() {
-        List<Turn> availableTurns = getLegalTurns(); 
-        List<Move> availableMoves = new ArrayList<>(); 
+        List<Turn> availableTurns = getLegalTurns();
+        List<Move> availableMoves = new ArrayList<>();
         for (Turn turn : availableTurns) {
-            availableMoves.add(turn.getMoves().getFirst());
+            availableMoves.add(turn.getMoves().get(0));
         }
         return availableMoves;
     }
@@ -731,6 +739,43 @@ public class GameState {
         else {
             return getBlackPieces();
         }
+    }
+
+    public double evaluateBoard() {
+        // page 8 of Machine Learning by Tom M. Mitchell
+        // xl: the number of black pieces on the board
+        // x2: the number of white pieces on the board
+        // x3: the number of black kings on the board
+        // x4: the number of white kings on the board
+        // x5: the number of black pieces threatened by white (i.e., which can be captured on white's next turn)
+        // X6: the number of white pieces threatened by black
+        // w1, w2, w3, w4, w5, w6: weights for the six features
+        int x1 = 0, x2 = 0, x3 = 0, x4 = 0, x5 = 0, x6 = 0;
+        // evaluation positive for white, negative for black
+        double w1 = -1, w2 = 1, w3 = -3, w4 = 3, w5 = 1, w6 = -1;
+
+        for (Piece piece : getBlackPieces()) {
+            if (piece.type == PieceType.BLACK) {
+                x1++;
+            } else {
+                x3++;
+            }
+        }
+
+        for (Piece piece : getWhitePieces()) {
+            if (piece.type == PieceType.WHITE) {
+                x2++;
+            } else {
+                x4++;
+            }
+        }
+
+        Set<Piece> threatenedPieces = getPiecesTheathenedBy(getWhitePieces());
+        x5 = threatenedPieces.size();
+        threatenedPieces.clear();
+        threatenedPieces = getPiecesTheathenedBy(getBlackPieces());
+        x6 = threatenedPieces.size();
+        return w1 * x1 + w2 * x2 + w3 * x3 + w4 * x4 + w5 * x5 + w6 * x6;
     }
 
     // end of old GameLogic methods

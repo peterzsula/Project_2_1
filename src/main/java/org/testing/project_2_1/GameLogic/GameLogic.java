@@ -5,8 +5,6 @@ import org.testing.project_2_1.Moves.*;
 import org.testing.project_2_1.UI.CheckersApp;
 import org.testing.project_2_1.UI.PieceDrawer;
 
-import static org.testing.project_2_1.UI.CheckersApp.SIZE;
-
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
@@ -18,7 +16,7 @@ public class GameLogic {
     public CheckersApp app;
     public Agent agent;
     public Agent opponent;
-    public GameState g;   
+    public GameState g;
 
 
     public GameLogic(CheckersApp app) {
@@ -31,7 +29,7 @@ public class GameLogic {
         this.agent = agent.reset();
         this.opponent = null;
         this.agent.setGameLogic(this);
-        setStandardValues(app); 
+        setStandardValues(app);
     }
 
     public GameLogic(CheckersApp app, Agent agent1, Agent agent2) {
@@ -59,7 +57,7 @@ public class GameLogic {
     public Tile[][] getBoard() {
         return g.getBoard();
     }
-    
+
     public void restartGame(){
         setStandardValues(app);
     }
@@ -91,12 +89,12 @@ public class GameLogic {
         List<Turn> availableTurns = g.getLegalTurns();
         System.out.println("Nuber of available moves: " + availableTurns.size());
         for (Turn turn : availableTurns) {
-            System.out.println(turn.getMoves().getFirst().toString());
+            System.out.println(turn.getMoves().get(0).toString());
         }
     }
 
-    
-    
+
+
     public void takeTurn(Turn turn) {
         for (Move move : turn.getMoves()) {
             takeMove(move);
@@ -116,18 +114,18 @@ public class GameLogic {
         else if (piece != g.getPieceAt(g.getCurrentTurn().getLast().getToX(), g.getCurrentTurn().getLast().getToY())) {
             piece.abortMove();
             askForMove();
-            return false;  
+            return false;
         }
         List<Turn> legalTurns = g.getPossibleTurns();
-        
+
         // Handle normal moves when no captures are available
-        if (move.isNormal() && !legalTurns.getFirst().isShot()) {
+        if (move.isNormal() && !legalTurns.get(0).isShot()) {
             System.out.println("No available captures, making normal move");
             movePiece(move);
             askForMove();
             return true;
         }
-    
+
         int i = g.getCurrentTurn().getMoves().size();
         // Handle capture moves
         for (Turn turn : legalTurns) {
@@ -138,7 +136,7 @@ public class GameLogic {
                 }
                 movePiece(move);
                 app.updateCaptureMessage(" ");
-    
+
                 // If the turn ends after the move
                 if (curMove.isTurnEnding()) {
                     System.out.println("Made all available captures");
@@ -152,7 +150,7 @@ public class GameLogic {
                 }
             }
         }
-    
+
         // Handle cases where the current turn is empty
         if (g.getCurrentTurn().isEmpty()) {
             piece.abortMove();
@@ -160,7 +158,7 @@ public class GameLogic {
             askForMove();
             return false;
         }
-    
+
         // Handle cases where additional captures are available
         if (g.getCurrentTurn().getLast().isCapture()) {
             piece.abortMove();
@@ -169,7 +167,7 @@ public class GameLogic {
             askForMove();
             return true;
         }
-    
+
         // Default case: no valid move
         piece.abortMove();
         app.updateCaptureMessage(piece.getType().color + " must capture!");
@@ -190,7 +188,7 @@ public class GameLogic {
                 app.capturedPiecesTracker.capturePiece("Player 2");
             }
             else {
-            app.capturedPiecesTracker.capturePiece("Player 1");
+                app.capturedPiecesTracker.capturePiece("Player 1");
             }
         }
         g.move(move);
@@ -200,7 +198,7 @@ public class GameLogic {
         if (g.getTurnsPlayed().isEmpty()) {
             return;
         }
-        Move move = g.getTurnsPlayed().getLast().getLast();
+        Move move = g.getTurnsPlayed().get(g.getTurnsPlayed().size() - 1).getLast();
         g.undoMove(move);
         if (move.isCapture()) {
             Capture capture = (Capture) move;
@@ -216,45 +214,8 @@ public class GameLogic {
         askForMove();
     }
 
-    public static double evaluateBoard(GameState g) {
-        // page 8 of Machine Learning by Tom M. Mitchell
-        // xl: the number of black pieces on the board 
-        // x2: the number of white pieces on the board 
-        // x3: the number of black kings on the board 
-        // x4: the number of white kings on the board 
-        // x5: the number of black pieces threatened by white (i.e., which can be captured on white's next turn) 
-        // X6: the number of white pieces threatened by black 
-        // w1, w2, w3, w4, w5, w6: weights for the six features
-        int x1 = 0, x2 = 0, x3 = 0, x4 = 0, x5 = 0, x6 = 0;
-        // evaluation positive for white, negative for black
-        double w1 = -1, w2 = 1, w3 = -3, w4 = 3, w5 = 1, w6 = -1;
-
-        for (Piece piece : g.getBlackPieces()) {
-            if (piece.type == PieceType.BLACK) {
-                x1++;
-            } else {
-                x3++;
-            }
-        }
-
-        for (Piece piece : g.getWhitePieces()) {
-            if (piece.type == PieceType.WHITE) {
-                x2++;
-            } else {
-                x4++;
-            }
-        }
-            
-        Set<Piece> threatenedPieces = g.getPiecesTheathenedBy(g.getWhitePieces());
-        x5 = threatenedPieces.size();
-        threatenedPieces.clear();
-        threatenedPieces = g.getPiecesTheathenedBy(g.getBlackPieces());
-        x6 = threatenedPieces.size();
-        return w1 * x1 + w2 * x2 + w3 * x3 + w4 * x4 + w5 * x5 + w6 * x6;
-    }
-
     public void undoLastTurn(GameState g) {
-        Turn turn = g.getTurnsPlayed().removeLast();
+        Turn turn = g.getTurnsPlayed().remove(g.getTurnsPlayed().size() - 1);
         List<Move> moves = turn.getMoves();
         for (int i = 0; i < moves.size(); i++) {
             undoLastMove(g);
@@ -262,22 +223,17 @@ public class GameLogic {
     }
 
     public static List<Piece> getMovablePieces(GameState g) {
-    List<Piece> movablePieces = new ArrayList<>();
-    List<Piece> allPieces = g.getAllPieces();
+        List<Piece> movablePieces = new ArrayList<>();
+        List<Piece> allPieces = g.getAllPieces();
 
-    for (Piece piece : allPieces) {
-        List<Move> moves = g.getPossibleMoves(piece);
-        if (!moves.isEmpty()) {
-            movablePieces.add(piece);
+        for (Piece piece : allPieces) {
+            List<Move> moves = g.getPossibleMoves(piece);
+            if (!moves.isEmpty()) {
+                movablePieces.add(piece);
+            }
         }
-    }
 
-    return movablePieces;
-    }
-
-    public static List<Turn> getLegalTurns(GameState gameState) {
-        // TODO Auto-generated method stub
-        throw new UnsupportedOperationException("Unimplemented method 'getLegalTurns'");
+        return movablePieces;
     }
 
 }

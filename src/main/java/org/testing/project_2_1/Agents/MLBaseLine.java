@@ -22,11 +22,19 @@ public class MLBaseLine implements Agent {
         this.ABpruning = new AlphaBetaAgent(isWhite, this.maxDepth);
         currentTurn = new Turn();
     }
-    
+
     public void setGameLogic(GameLogic gameLogic) {
         this.gameLogic = gameLogic;
         if (this.ABpruning != null) {
             this.ABpruning.setGameLogic(gameLogic);
+        }
+    }
+
+    @Override
+    public void setGameState(GameState gameState) {
+        this.gameLogic.g = gameState;
+        if (this.ABpruning != null) {
+            this.ABpruning.setGameState(gameState);
         }
     }
 
@@ -40,20 +48,20 @@ public class MLBaseLine implements Agent {
         System.out.println("MachineLearning agent making move");
         PauseTransition pause = new PauseTransition(Duration.seconds(Agent.delay));
         pause.setOnFinished(event -> {
-        if (gameLogic.g.getIsWhiteTurn() == isWhite && !gameLogic.isGameOver(gameLogic.g)) {
-            List<Turn> turns = gameLogic.g.getLegalTurns();
-            for (Turn turn : turns) {
-                turn.setEvaluation(evaluateTurn(turn, gameLogic.g, maxDepth, !isWhite));
+            if (gameLogic.g.getIsWhiteTurn() == isWhite && !gameLogic.isGameOver(gameLogic.g)) {
+                List<Turn> turns = gameLogic.g.getLegalTurns();
+                for (Turn turn : turns) {
+                    turn.setEvaluation(evaluateTurn(turn, gameLogic.g, maxDepth, !isWhite));
+                }
+                if (currentTurn.isEmpty()) {
+                    currentTurn = getBestTurn(turns);
+                }
+                Move move = currentTurn.getMoves().remove(0);
+                System.out.println("taking turn with evaluation " + currentTurn.getEvaluation() + " " + move.toString());
+                gameLogic.takeMove(move);
             }
-            if (currentTurn.isEmpty()) {
-                currentTurn = getBestTurn(turns);
-            }
-            Move move = currentTurn.getMoves().removeFirst();
-            System.out.println("taking turn with evaluation " + currentTurn.getEvaluation() + " " + move.toString());
-            gameLogic.takeMove(move);
-        }
-    });
-    pause.play();
+        });
+        pause.play();
     }
 
     @Override
@@ -100,5 +108,5 @@ public class MLBaseLine implements Agent {
         // TODO Auto-generated method stub
         throw new UnsupportedOperationException("Unimplemented method 'pause'");
     }
-    
+
 }

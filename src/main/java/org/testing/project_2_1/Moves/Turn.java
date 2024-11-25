@@ -66,26 +66,26 @@ public class Turn {
     public String toString() {
         return "Turn [noOfMoves=" + moves.size() + ", isShot=" + isShot + moves.toString() + "]";
     }
-    
+
     public static ArrayList<Turn> copyMovesToTurns(ArrayList<Move> moves) {
         ArrayList<Turn> turns = new ArrayList<Turn>();
         for (Move move : moves) {
-                Turn turn = new Turn();
-                turn.addMove(move);
-                turns.add(turn);
-            }
+            Turn turn = new Turn();
+            turn.addMove(move);
+            turns.add(turn);
+        }
         return turns;
     }
 
     public void removeMove(Move move) {
         moves.remove(move);
         if (moves.isEmpty()) {
-            
+
         }
     }
 
     public Move getLast() {
-        return moves.getLast();
+        return moves.get(moves.size() - 1);
     }
 
     public boolean isEmpty() {
