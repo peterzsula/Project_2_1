@@ -31,6 +31,14 @@ public class MLBaseLine implements Agent {
     }
 
     @Override
+    public void setGameState(GameState gameState) {
+        this.gameLogic.g = gameState;
+        if (this.ABpruning != null) {
+            this.ABpruning.setGameState(gameState);
+        }
+    }
+
+    @Override
     public boolean isWhite() {
         return isWhite;
     }
@@ -48,7 +56,7 @@ public class MLBaseLine implements Agent {
             if (currentTurn.isEmpty()) {
                 currentTurn = getBestTurn(turns);
             }
-            Move move = currentTurn.getMoves().removeFirst();
+            Move move = currentTurn.getMoves().remove(0);
             System.out.println("taking turn with evaluation " + currentTurn.getEvaluation() + " " + move.toString());
             gameLogic.takeMove(move);
         }

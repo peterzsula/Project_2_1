@@ -1,6 +1,7 @@
 package org.testing.project_2_1.Agents;
 
 import org.testing.project_2_1.GameLogic.GameLogic;
+import org.testing.project_2_1.GameLogic.GameState;
 
 public class Human implements Agent{
 
@@ -22,6 +23,12 @@ public class Human implements Agent{
         throw new UnsupportedOperationException("Unimplemented method 'setGameLogic'");
     }
 
+     @Override
+    public void setGameState(GameState gameState) {
+        // TODO Auto-generated method stub
+        throw new UnsupportedOperationException("Unimplemented method 'setGameState'");
+    }
+    
     @Override
     public Agent reset() {
         // TODO Auto-generated method stub

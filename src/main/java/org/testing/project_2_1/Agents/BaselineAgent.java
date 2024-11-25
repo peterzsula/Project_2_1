@@ -56,7 +56,7 @@ public class BaselineAgent implements Agent {
                 int randomIndex = new Random().nextInt(legalTurns.size());
                 currentTurn = legalTurns.get(randomIndex);
             }
-            Move move = currentTurn.getMoves().removeFirst();
+            Move move = currentTurn.getMoves().remove(0);
             System.out.println("Take turn with move " + move);
             gameLogic.takeMove(move);
             gameLogic.g.evaluateBoard();
@@ -78,7 +78,10 @@ public class BaselineAgent implements Agent {
             currentTurn = legalTurns.get(randomIndex);
         }
         while (!currentTurn.isEmpty() && gameState.getWinner() == 0) {
-            gameState.move(currentTurn.getMoves().removeFirst());
+            List<Move> moves = currentTurn.getMoves();
+            if (!moves.isEmpty()) {
+                gameState.move(moves.remove(0));
+            }
         }        
     }
 
