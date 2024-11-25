@@ -6,39 +6,55 @@ import org.testing.project_2_1.GameLogic.GameState;
 public class Simulation {
     public static void main(String[] args) {
         GameState gameState = new GameState();
-        Agent white = new BaselineAgent(true, gameState);
-        Agent black = new BaselineAgent(false, gameState);
+        Agent white = new MinimaxAgent(true, gameState);
+        Agent black = new MinimaxAgent(false, gameState);
         int whiteWins = 0;
         int blackWins = 0;
         int draws = 0;
-        int simulations = 100;
+        final int SIMULATIONS = 10;
 
         long totalWhiteThinkingTime = 0;
         long totalBlackThinkingTime = 0;
 
-        for (int i = 0; i < simulations; i++) {
+        long totalWhiteMemoryUsage = 0;
+        long totalBlackMemoryUsage = 0;
+
+        Runtime runtime = Runtime.getRuntime();
+
+        for (int i = 0; i < SIMULATIONS; i++) {
             while (gameState.getWinner() == 0) {
+                // Measure time and memory for White
+                runtime.gc(); // Suggest garbage collection before measuring
+                long whiteStartMemory = runtime.totalMemory() - runtime.freeMemory();
                 long whiteStartTime = System.nanoTime();
+
                 white.simulate();
+
                 long whiteEndTime = System.nanoTime();
+                long whiteEndMemory = runtime.totalMemory() - runtime.freeMemory();
                 totalWhiteThinkingTime += (whiteEndTime - whiteStartTime);
+                totalWhiteMemoryUsage += (whiteEndMemory - whiteStartMemory);
 
                 if (gameState.getWinner() != 0) break;
 
+                // Measure time and memory for Black
+                runtime.gc();
+                long blackStartMemory = runtime.totalMemory() - runtime.freeMemory();
                 long blackStartTime = System.nanoTime();
+
                 black.simulate();
+
                 long blackEndTime = System.nanoTime();
+                long blackEndMemory = runtime.totalMemory() - runtime.freeMemory();
                 totalBlackThinkingTime += (blackEndTime - blackStartTime);
+                totalBlackMemoryUsage += (blackEndMemory - blackStartMemory);
             }
 
             if (gameState.getWinner() == 1) {
-                //System.out.println("White wins");
                 whiteWins++;
             } else if (gameState.getWinner() == -1) {
-                //System.out.println("Black wins");
                 blackWins++;
             } else {
-                //System.out.println("Draw");
                 draws++;
             }
 
@@ -54,7 +70,10 @@ public class Simulation {
         System.out.println("Black wins: " + blackWins);
         System.out.println("Draws: " + draws);
 
-        System.out.println("White total thinking time: " + totalWhiteThinkingTime / 1_000_000 + " ms");
-        System.out.println("Black total thinking time: " + totalBlackThinkingTime / 1_000_000 + " ms");
+        System.out.println("White average thinking time: " + (totalWhiteThinkingTime / 1_000_000) / SIMULATIONS + " ms");
+        System.out.println("Black average thinking time: " + (totalBlackThinkingTime / 1_000_000) / SIMULATIONS + " ms");
+
+        System.out.println("White average memory usage: " + (totalWhiteMemoryUsage / 1_024) / SIMULATIONS + " KB");
+        System.out.println("Black average memory usage: " + (totalBlackMemoryUsage / 1_024) / SIMULATIONS + " KB");
     }
 }

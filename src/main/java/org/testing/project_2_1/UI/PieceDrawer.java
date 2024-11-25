@@ -11,7 +11,6 @@ import static org.testing.project_2_1.UI.CheckersApp.TILE_SIZE;
 
 import org.testing.project_2_1.GameLogic.Piece;
 import org.testing.project_2_1.GameLogic.PieceType;
-import org.testing.project_2_1.GameLogic.GameLogic;
 import org.testing.project_2_1.Moves.Move;
 
 import java.util.ArrayList;

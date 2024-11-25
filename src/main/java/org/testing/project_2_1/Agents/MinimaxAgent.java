@@ -5,15 +5,15 @@ import org.testing.project_2_1.Moves.Move;
 import org.testing.project_2_1.Moves.Turn;
 
 import java.util.List;
-
 import javafx.animation.PauseTransition;
 import javafx.util.Duration;
 
 public class MinimaxAgent implements Agent {
     private GameLogic gameLogic;
+    private GameState gameState;
     private boolean isWhite;
     private Turn currentTurn;
-
+    private final int defaultDepth = 3;
     private int maxDepth;
 
     public MinimaxAgent(boolean isWhite, int maxDepth) {
@@ -22,7 +22,23 @@ public class MinimaxAgent implements Agent {
         currentTurn = new Turn();
     }
 
-    public void setGameLogic(GameLogic gameLogic) { this.gameLogic = gameLogic; }
+    public MinimaxAgent(boolean isWhite, GameState gameState){
+        this.isWhite = isWhite;
+        this.gameState = gameState;
+        currentTurn = new Turn();
+        maxDepth = defaultDepth;
+    }
+
+    public void setGameLogic(GameLogic gameLogic) { 
+        this.gameLogic = gameLogic;
+        this.gameState = gameLogic.g;
+    }
+
+    @Override
+    public void setGameState(GameState gameState) {
+        this.gameState = gameState;
+    }
+
     @Override
     public boolean isWhite() {
         return isWhite;
@@ -56,7 +72,7 @@ public class MinimaxAgent implements Agent {
         }
 
         for (Turn turn : turns) {
-            GameState newState = new GameState(gameLogic.g);
+            GameState newState = new GameState(gameState);
             for (Move move : turn.getMoves()) {
                 newState.move(move);
             }
@@ -75,8 +91,8 @@ public class MinimaxAgent implements Agent {
     }
 
     private int minimax(GameState gameState, int depth, boolean maxPlayer) {
-        if (depth == 0 || gameLogic.isGameOver(gameState)) {
-            return (int) GameLogic.evaluateBoard(gameState);
+        if (depth == 0 || gameState.isGameOver()) {
+            return (int) gameState.evaluateBoard();
         }
 
         List<Turn> legalTurns = gameState.getLegalTurns();
@@ -113,8 +129,13 @@ public class MinimaxAgent implements Agent {
 
     @Override
     public void simulate() {
-        // TODO Auto-generated method stub
-        throw new UnsupportedOperationException("Unimplemented method 'simulate'");
+        List<Turn> legalTurns = gameState.getLegalTurns();
+        if (gameState.getWinner() == 0) {
+            currentTurn = getBestTurn(legalTurns);
+        }
+        while (!currentTurn.isEmpty() && gameState.getWinner() == 0) {
+            gameState.move(currentTurn.getMoves().removeFirst());
+        }
     }
 
     @Override
