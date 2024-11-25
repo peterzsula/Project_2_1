@@ -4,47 +4,48 @@ import org.testing.project_2_1.GameLogic.GameLogic;
 import org.testing.project_2_1.GameLogic.GameState;
 
 public class Human implements Agent{
+    boolean isWhite;
+    GameLogic gameLogic;
+    GameState gameState;
 
-    @Override
-    public boolean isWhite() {
-        // TODO Auto-generated method stub
-        throw new UnsupportedOperationException("Unimplemented method 'isWhite'");
+    public Human(boolean isWhite){
+        this.isWhite = isWhite;
     }
 
     @Override
     public void makeMove() {
-        // TODO Auto-generated method stub
-        throw new UnsupportedOperationException("Unimplemented method 'makeMove'");
+        
+    }
+
+    @Override
+    public boolean isWhite() {
+     return isWhite;   
     }
 
     @Override
     public void setGameLogic(GameLogic gameLogic) {
-        // TODO Auto-generated method stub
-        throw new UnsupportedOperationException("Unimplemented method 'setGameLogic'");
+        this.gameLogic = gameLogic;
+        this.gameState = gameLogic.g;
     }
 
     @Override
     public void setGameState(GameState gameState) {
-        // TODO Auto-generated method stub
-        throw new UnsupportedOperationException("Unimplemented method 'setGameState'");
+        this.gameState = gameState;
     }
 
     @Override
     public Agent reset() {
-        // TODO Auto-generated method stub
-        throw new UnsupportedOperationException("Unimplemented method 'reset'");
+        return new Human(isWhite);
     }
 
     @Override
     public void simulate() {
-        // TODO Auto-generated method stub
-        throw new UnsupportedOperationException("Unimplemented method 'simulate'");
+        
     }
 
     @Override
     public void pause() {
-        // TODO Auto-generated method stub
-        throw new UnsupportedOperationException("Unimplemented method 'pause'");
+        
     }
 
 }

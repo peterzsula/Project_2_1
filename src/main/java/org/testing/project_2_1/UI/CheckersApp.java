@@ -50,7 +50,8 @@ public class CheckersApp extends Application {
     boolean isPlayerOneTurn; // Tracks which player's turn it is
     private long previousPlayerOneTime; // Tracks Player 1's previous time
     private long previousPlayerTwoTime; // Tracks Player 2's previous time
-
+    private Agent agent1; // The first agent
+    private Agent agent2; // The second agent
     /**
      * Gets the group containing the board visuals.
      *
@@ -75,6 +76,8 @@ public class CheckersApp extends Application {
      * @param agent The AI agent to play against.
      */
     public CheckersApp(Agent agent) {
+        agent1 = agent;
+        agent2 = null;
         gameLogic = new GameLogic(this, agent);
         agent.setGameLogic(gameLogic);
         noOfPlayers = 1;
@@ -88,6 +91,8 @@ public class CheckersApp extends Application {
      * @param agent2 The second AI agent.
      */
     public CheckersApp(Agent agent1, Agent agent2) {
+        this.agent1 = agent1;
+        this.agent2 = agent2;
         gameLogic = new GameLogic(this, agent1, agent2);
         agent1.setGameLogic(gameLogic);
         agent2.setGameLogic(gameLogic);
@@ -198,7 +203,16 @@ public class CheckersApp extends Application {
         // Reset Button
         Button resetButton = new Button("Restart");
         resetButton.setOnAction(e -> {
-            gameLogic.restartGame();
+            if (noOfPlayers == 0) {
+                gameLogic = new GameLogic(this, agent1, agent2);
+            }
+            else if (noOfPlayers == 1) {
+                gameLogic = new GameLogic(this, agent1);
+            } else {
+                gameLogic = new GameLogic(this);
+                
+            }
+            
             resetGUI();
         });
 
