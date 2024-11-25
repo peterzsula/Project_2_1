@@ -19,28 +19,40 @@ import javafx.scene.text.Font;
 import javafx.stage.Stage;
 import javafx.scene.image.Image;
 
+/**
+ * The GUI class for the Frisian Checkers game.
+ * This class provides the main game mode selection screen where users can choose
+ * between human and AI players, and start the game with the chosen configurations.
+ */
 public class GUI extends Application {
-    public boolean isSinglePlayer;
-    public boolean isAgentWhite = false;
+    public boolean isSinglePlayer; // Tracks if the game is single-player
+    public boolean isAgentWhite = false; // Tracks if the agent plays as white
 
+    /**
+     * Starts the JavaFX application and initializes the game mode selection screen.
+     *
+     * @param selectionStage The main stage for the selection screen.
+     */
     @Override
-    public void start(@SuppressWarnings("exports") Stage selectionStage) {
+    public void start(Stage selectionStage) {
         Pane selectionPane = new Pane();
         selectionPane.setPrefSize(500, 500);
         selectionPane.setBackground(new Background(new BackgroundFill(Color.web("#FAF0E6"), CornerRadii.EMPTY, Insets.EMPTY)));
 
+        // Set application icon
         Image icon = new Image("pixel-frisian.png");
         selectionStage.getIcons().add(icon);
 
+        // Create and style the game title label
         Label gameTitle = new Label("Frisian Checkers");
         gameTitle.setFont(new Font("Arial", 32));
         gameTitle.setTextFill(Color.BLACK);
         gameTitle.setStyle("-fx-font-weight: bold;");
         gameTitle.setEffect(new DropShadow(5, Color.GRAY));
-
         gameTitle.layoutXProperty().bind(selectionPane.widthProperty().subtract(gameTitle.widthProperty()).divide(2));
-        gameTitle.setLayoutY(70); 
+        gameTitle.setLayoutY(70);
 
+        // Player 1 selection dropdown
         ComboBox<String> player1Selection = new ComboBox<>();
         player1Selection.getItems().addAll("Human", "Minimax", "Baseline AI", "Alpha-Beta Pruning", "MCTS");
         player1Selection.setValue("Select Player 1");
@@ -50,6 +62,7 @@ public class GUI extends Application {
         player1Selection.setStyle("-fx-font-size: 16px; -fx-background-radius: 10; -fx-border-radius: 10;");
         player1Selection.setEffect(new DropShadow(5, Color.LIGHTGRAY));
 
+        // Player 2 selection dropdown
         ComboBox<String> player2Selection = new ComboBox<>();
         player2Selection.getItems().addAll("Human", "Minimax", "Baseline AI", "Alpha-Beta Pruning", "MCTS");
         player2Selection.setValue("Select Player 2");
@@ -59,21 +72,24 @@ public class GUI extends Application {
         player2Selection.setStyle("-fx-font-size: 16px; -fx-background-radius: 10; -fx-border-radius: 10;");
         player2Selection.setEffect(new DropShadow(5, Color.LIGHTGRAY));
 
+        // Start Game button
         Button startGameButton = new Button("START GAME");
         startGameButton.setLayoutX(175);
         startGameButton.setLayoutY(330);
         startGameButton.setPrefWidth(150);
-        startGameButton.setDisable(true); 
+        startGameButton.setDisable(true); // Initially disabled until valid selections are made
         startGameButton.setStyle("-fx-background-color: #4CAF50; -fx-text-fill: white; -fx-font-size: 18px; -fx-background-radius: 15; -fx-border-radius: 15;");
         startGameButton.setEffect(new DropShadow(10, Color.DARKGREEN));
 
+        // Button hover effects
         startGameButton.setOnMouseEntered(e -> startGameButton.setStyle("-fx-background-color: #45A049; -fx-text-fill: white; -fx-font-size: 18px; -fx-background-radius: 15; -fx-border-radius: 15;"));
         startGameButton.setOnMouseExited(e -> startGameButton.setStyle("-fx-background-color: #4CAF50; -fx-text-fill: white; -fx-font-size: 18px; -fx-background-radius: 15; -fx-border-radius: 15;"));
 
+        // Validate selections and enable/disable the Start Game button
         player1Selection.setOnAction(e -> validateSelections(player1Selection, player2Selection, startGameButton));
         player2Selection.setOnAction(e -> validateSelections(player1Selection, player2Selection, startGameButton));
 
-        // Click or Enter Key
+        // Start the game when the button is clicked or ENTER is pressed
         startGameButton.setOnAction(e -> {
             if (!startGameButton.isDisabled()) {
                 startGame(player1Selection, player2Selection);
@@ -82,7 +98,7 @@ public class GUI extends Application {
 
         startGameButton.setOnKeyPressed(e -> {
             switch (e.getCode()) {
-                case ENTER: // Start game when ENTER is pressed
+                case ENTER:
                     if (!startGameButton.isDisabled()) {
                         startGame(player1Selection, player2Selection);
                     }
@@ -92,13 +108,12 @@ public class GUI extends Application {
             }
         });
 
+        // Keyboard navigation for dropdowns and buttons
         player1Selection.setOnKeyPressed(e -> {
             switch (e.getCode()) {
                 case DOWN:
-                    player2Selection.requestFocus(); // Navigate to player 2 selection
-                    break;
                 case ENTER:
-                    player2Selection.requestFocus(); // Navigate to player 2 selection
+                    player2Selection.requestFocus();
                     break;
                 default:
                     break;
@@ -108,24 +123,33 @@ public class GUI extends Application {
         player2Selection.setOnKeyPressed(e -> {
             switch (e.getCode()) {
                 case UP:
-                    player1Selection.requestFocus(); // Navigate back to player 1 selection
+                    player1Selection.requestFocus();
                     break;
                 case ENTER:
-                    startGameButton.requestFocus(); // Navigate to start button
+                    startGameButton.requestFocus();
                     break;
                 default:
                     break;
             }
         });
 
+        // Add UI elements to the selection pane
         selectionPane.getChildren().addAll(gameTitle, player1Selection, player2Selection, startGameButton);
 
+        // Set up and display the scene
         Scene selectionScene = new Scene(selectionPane);
         selectionStage.setTitle("Game Mode Selection");
         selectionStage.setScene(selectionScene);
         selectionStage.show();
     }
 
+    /**
+     * Validates the player selections and enables/disables the Start Game button accordingly.
+     *
+     * @param player1     The ComboBox for Player 1's selection.
+     * @param player2     The ComboBox for Player 2's selection.
+     * @param startButton The Start Game button.
+     */
     private void validateSelections(ComboBox<String> player1, ComboBox<String> player2, Button startButton) {
         String p1 = player1.getValue();
         String p2 = player2.getValue();
@@ -133,12 +157,18 @@ public class GUI extends Application {
         startButton.setDisable(!valid);
     }
 
+    /**
+     * Starts the game with the selected player configurations.
+     *
+     * @param player1Selection The ComboBox for Player 1's selection.
+     * @param player2Selection The ComboBox for Player 2's selection.
+     */
     private void startGame(ComboBox<String> player1Selection, ComboBox<String> player2Selection) {
         CheckersApp game = null;
         Agent player1Agent = null;
         Agent player2Agent = null;
 
-        // Player 1
+        // Configure Player 1
         switch (player1Selection.getValue()) {
             case "Baseline AI":
                 player1Agent = new BaselineAgent(true);
@@ -153,11 +183,11 @@ public class GUI extends Application {
                 player1Agent = new AgentMCTS(true);
                 break;
             default:
-                player1Agent = null;
-                break; // Human
+                player1Agent = null; // Human
+                break;
         }
 
-        // Player 2 
+        // Configure Player 2
         switch (player2Selection.getValue()) {
             case "Baseline AI":
                 player2Agent = new BaselineAgent(false);
@@ -172,20 +202,22 @@ public class GUI extends Application {
                 player2Agent = new AgentMCTS(false);
                 break;
             default:
-                player2Agent = null;
-                break; // Human
+                player2Agent = null; // Human
+                break;
         }
 
+        // Create game with the appropriate configurations
         if (player1Agent != null && player2Agent != null) {
             game = new CheckersApp(player1Agent, player2Agent);
         } else if (player1Agent != null) {
-            game = new CheckersApp(player1Agent); // Player 1 AI, Player 2 Human
+            game = new CheckersApp(player1Agent);
         } else if (player2Agent != null) {
-            game = new CheckersApp(player2Agent); // Player 1 Human, Player 2 AI
+            game = new CheckersApp(player2Agent);
         } else {
-            game = new CheckersApp(); // Both Human
+            game = new CheckersApp();
         }
 
+        // Start the game
         try {
             game.start(new Stage());
         } catch (Exception ex) {
@@ -193,6 +225,11 @@ public class GUI extends Application {
         }
     }
 
+    /**
+     * Main method to launch the JavaFX application.
+     *
+     * @param args Command-line arguments.
+     */
     public static void main(String[] args) {
         launch(args);
     }
