@@ -26,17 +26,27 @@ public class AlphaBetaAgent implements Agent {
     public AlphaBetaAgent(boolean isWhite, int maxDepth) {
         this.isWhite = isWhite;
         this.maxDepth = maxDepth;
-        currentTurn = new Turn();
+        this.currentTurn = new Turn();
     }
     public AlphaBetaAgent(boolean isWhite, GameState gameState){
         this.isWhite = isWhite;
         this.gameState = gameState;
-        currentTurn = new Turn();
-        maxDepth = defaultDepth;
+        this.currentTurn = new Turn();
+        this.maxDepth = defaultDepth;
     }
+
+    public AlphaBetaAgent(boolean isWhite, GameState gameState, int depth) {
+        this.isWhite = isWhite;
+        this.gameState = gameState;
+        this.currentTurn = new Turn();
+        this.maxDepth = depth;
+    }
+    
     public void setGameLogic(GameLogic gameLogic) {
         this.gameLogic = gameLogic;
+        this.gameState = gameLogic.g;
     }
+
     @Override
     public void setGameState(GameState gameState) {
         this.gameState = gameState;
@@ -60,9 +70,9 @@ public class AlphaBetaAgent implements Agent {
         System.out.println("Alpha-Beta agent making move");
         PauseTransition pause = new PauseTransition(Duration.seconds(Agent.delay));
         pause.setOnFinished(event -> {
-            if (gameLogic.g.getIsWhiteTurn() == isWhite && !gameLogic.g.isGameOver()) {
-                List<Turn> turns = gameLogic.g.getLegalTurns();
-                if (isEndgame(gameLogic.g)) {
+            if (gameState.getIsWhiteTurn() == isWhite && !gameState.isGameOver()) {
+                List<Turn> turns = gameState.getLegalTurns();
+                if (gameState.isEndgame()) {
                     System.out.println("Endgame detected, using Proof-Number Search");
                     currentTurn = getBestTurnPNSearch();
                 } else {
@@ -75,12 +85,6 @@ public class AlphaBetaAgent implements Agent {
             }
         });
         pause.play();
-    }
-
-    private boolean isEndgame(GameState gameState) {
-        int totalPieces = gameState.countPieces();
-        int endgameThreshold = 12;
-        return totalPieces < endgameThreshold;
     }
 
     private Turn getBestTurnABP(List<Turn> turns) { // get best turn using Alpha-Beta Pruning

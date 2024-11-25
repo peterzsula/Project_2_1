@@ -1,0 +1,117 @@
+
+White wins: 48 Alpha-Beta depth 1
+Black wins: 51 Alpha-Beta depth 1
+Draws: 1
+White average thinking time: 8 ms
+Black average thinking time: 7 ms
+White average memory usage: 16990 KB
+Black average memory usage: 16371 KB
+Simulation total runtime: 25 s
+
+White wins: 49 Alpha-Beta depth 2
+Black wins: 49 Alpha-Beta depth 1
+Draws: 2
+White average thinking time: 16 ms
+Black average thinking time: 7 ms
+White average memory usage: 43367 KB
+Black average memory usage: 16632 KB
+Simulation total runtime: 26 s
+
+White wins: 54 Alpha-Beta depth 1
+Black wins: 45 Alpha-Beta depth 2
+Draws: 1
+White average thinking time: 8 ms
+Black average thinking time: 16 ms
+White average memory usage: 17239 KB
+Black average memory usage: 40671 KB
+Simulation total runtime: 27 s
+
+White wins: 52 Alpha-Beta depth 2
+Black wins: 45 Alpha-Beta depth 2
+Draws: 3
+White average thinking time: 16 ms
+Black average thinking time: 15 ms
+White average memory usage: 42637 KB
+Black average memory usage: 39270 KB
+Simulation total runtime: 27 s
+
+White wins: 51 Alpha-Beta depth 3
+Black wins: 49 Alpha-Beta depth 2
+Draws: 0
+White average thinking time: 63 ms
+Black average thinking time: 16 ms
+White average memory usage: 80520 KB
+Black average memory usage: 44020 KB
+Simulation total runtime: 31 s
+
+White wins: 50 Alpha-Beta depth 2
+Black wins: 49 Alpha-Beta depth 3
+Draws: 1
+White average thinking time: 17 ms
+Black average thinking time: 69 ms
+White average memory usage: 48307 KB
+Black average memory usage: 72262 KB
+Simulation total runtime: 32 s
+
+White wins: 40 Alpha-Beta depth 3
+Black wins: 57 Alpha-Beta depth 3
+Draws: 3
+White average thinking time: 56 ms
+Black average thinking time: 64 ms
+White average memory usage: 89821 KB
+Black average memory usage: 82173 KB
+Simulation total runtime: 35 s
+
+White wins: 52 Alpha-Beta depth 4
+Black wins: 44 Alpha-Beta depth 3
+Draws: 4
+White average thinking time: 189 ms
+Black average thinking time: 61 ms
+White average memory usage: 299042 KB
+Black average memory usage: 110177 KB
+Simulation total runtime: 47 s
+
+White wins: 47 Alpha-Beta depth 3
+Black wins: 50 Alpha-Beta depth 4
+Draws: 3
+White average thinking time: 57 ms
+Black average thinking time: 164 ms
+White average memory usage: 107288 KB
+Black average memory usage: 219029 KB
+Simulation total runtime: 45 s
+
+White wins: 43 Alpha-Beta depth 4
+Black wins: 55 Alpha-Beta depth 4
+Draws: 2
+White average thinking time: 179 ms
+Black average thinking time: 153 ms
+White average memory usage: 269105 KB
+Black average memory usage: 192368 KB
+Simulation total runtime: 55 s
+
+White wins: 43 Alpha-Beta depth 5
+Black wins: 54 Alpha-Beta depth 3
+Draws: 3
+White average thinking time: 521 ms
+Black average thinking time: 58 ms
+White average memory usage: 767717 KB
+Black average memory usage: 132387 KB
+Simulation total runtime: 80 s
+
+White wins: 43 Alpha-Beta depth 6
+Black wins: 53 Alpha-Beta depth 3
+Draws: 4
+White average thinking time: 1570 ms
+Black average thinking time: 55 ms
+White average memory usage: 1194826 KB
+Black average memory usage: 137077 KB
+Simulation total runtime: 183 s
+
+White wins: 40 Alpha-Beta depth 3
+Black wins: 57 Alpha-Beta depth 6
+Draws: 3
+White average thinking time: 51 ms
+Black average thinking time: 1231 ms
+White average memory usage: 124055 KB
+Black average memory usage: 1157699 KB
+Simulation total runtime: 151 s

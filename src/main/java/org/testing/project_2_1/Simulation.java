@@ -6,12 +6,13 @@ import org.testing.project_2_1.GameLogic.GameState;
 public class Simulation {
     public static void main(String[] args) {
         GameState gameState = new GameState();
-        Agent white = new AlphaBetaAgent(true, gameState);
-        Agent black = new AlphaBetaAgent(false, gameState);
+        Agent white = new AlphaBetaAgent(true, gameState, 3);
+        Agent black = new AlphaBetaAgent(false, gameState, 6);
         int whiteWins = 0;
         int blackWins = 0;
         int draws = 0;
-        final int SIMULATIONS = 25;
+        long startTime = System.nanoTime();
+        final int SIMULATIONS = 100;
 
 
         long totalWhiteThinkingTime = 0;
@@ -58,7 +59,7 @@ public class Simulation {
             } else {
                 draws++;
             }
-
+            System.out.println("Game " + (i + 1) + " finished. White wins: " + whiteWins + ", Black wins: " + blackWins + ", Draws: " + draws);
             gameState = new GameState();
             white.reset();
             black.reset();
@@ -76,5 +77,6 @@ public class Simulation {
 
         System.out.println("White average memory usage: " + (totalWhiteMemoryUsage / 1_024) / SIMULATIONS + " KB");
         System.out.println("Black average memory usage: " + (totalBlackMemoryUsage / 1_024) / SIMULATIONS + " KB");
+        System.out.println("Simulation total runtime: " + (System.nanoTime() - startTime) / 1_000_000_000 + " s");
     }
 }

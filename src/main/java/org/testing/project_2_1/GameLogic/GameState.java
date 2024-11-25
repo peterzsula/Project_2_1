@@ -119,6 +119,12 @@ public class GameState {
         return isGameOver;
     }
 
+    public boolean isEndgame() {
+        int totalPieces = countPieces();
+        int endgameThreshold = 12;
+        return totalPieces < endgameThreshold;
+    }
+
     public int countPieces() {
         return whitePieces.size() + blackPieces.size();
     }

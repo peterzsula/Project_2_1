@@ -20,24 +20,24 @@ public class GameLogic {
 
 
     public GameLogic(CheckersApp app) {
+        setStandardValues(app);
         this.agent = null;
         this.opponent = null;
-        setStandardValues(app);
     }
 
     public GameLogic(CheckersApp app, Agent agent) {
+        setStandardValues(app);
         this.agent = agent.reset();
         this.opponent = null;
         this.agent.setGameLogic(this);
-        setStandardValues(app);
     }
 
     public GameLogic(CheckersApp app, Agent agent1, Agent agent2) {
+        setStandardValues(app);
         this.agent = agent1.reset();
         this.opponent = agent2.reset();
         this.agent.setGameLogic(this);
         this.opponent.setGameLogic(this);
-        setStandardValues(app);
     }
 
     public void setStandardValues(CheckersApp app) {
