@@ -5,8 +5,6 @@ import org.testing.project_2_1.Moves.*;
 import org.testing.project_2_1.UI.CheckersApp;
 import org.testing.project_2_1.UI.PieceDrawer;
 
-import static org.testing.project_2_1.UI.CheckersApp.SIZE;
-
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
@@ -91,7 +89,7 @@ public class GameLogic {
         List<Turn> availableTurns = g.getLegalTurns();
         System.out.println("Nuber of available moves: " + availableTurns.size());
         for (Turn turn : availableTurns) {
-            System.out.println(turn.getMoves().getFirst().toString());
+            System.out.println(turn.getMoves().get(0).toString());
         }
     }
 
@@ -121,7 +119,7 @@ public class GameLogic {
         List<Turn> legalTurns = g.getPossibleTurns();
         
         // Handle normal moves when no captures are available
-        if (move.isNormal() && !legalTurns.getFirst().isShot()) {
+        if (move.isNormal() && !legalTurns.get(0).isShot()) {
             System.out.println("No available captures, making normal move");
             movePiece(move);
             askForMove();
@@ -200,7 +198,7 @@ public class GameLogic {
         if (g.getTurnsPlayed().isEmpty()) {
             return;
         }
-        Move move = g.getTurnsPlayed().getLast().getLast();
+        Move move = g.getTurnsPlayed().get(g.getTurnsPlayed().size() - 1).getLast();
         g.undoMove(move);
         if (move.isCapture()) {
             Capture capture = (Capture) move;
@@ -217,7 +215,7 @@ public class GameLogic {
     }
 
     public void undoLastTurn(GameState g) {
-        Turn turn = g.getTurnsPlayed().removeLast();
+        Turn turn = g.getTurnsPlayed().remove(g.getTurnsPlayed().size() - 1);
         List<Move> moves = turn.getMoves();
         for (int i = 0; i < moves.size(); i++) {
             undoLastMove(g);

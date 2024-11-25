@@ -228,8 +228,9 @@ public class GameState {
             turn.getMoves().addFirst(move);
         } */
         if (move.isTurnEnding() && !turnsPlayed.isEmpty()) {
-            currentTurn = turnsPlayed.removeLast();
-            currentTurn.getMoves().removeLast();
+            currentTurn = turnsPlayed.remove(turnsPlayed.size() - 1);
+            List<Move> moves = currentTurn.getMoves();
+            moves.remove(moves.size() - 1);
             // possibleTurns = GameLogic.getLegalTurns(this);
             switchTurn();
         }
@@ -567,20 +568,22 @@ public class GameState {
             return winner;
         }
         if (isDraw()) {
-            return 100;
+            winner = 100;
+            return winner;
         }
         if (blackPieces.isEmpty()) {
-            return 1;
+            winner = 1;
+            return winner;
         }
         if (whitePieces.isEmpty()) {
-            return -1;
+            winner = -1;
+            return winner;
         }
         return 0;
     }
 
 
     // Old GameLogic Methods
-
     public List<Turn> getLegalTurns() {
         // if (!g.getCurrentTurn().isEmpty()) {
         //     return g.getPossibleTurns();
@@ -714,7 +717,7 @@ public class GameState {
         List<Move> availableMoves = new ArrayList<>();
     
         for (Turn turn : availableTurns) {
-            availableMoves.add(turn.getMoves().getFirst()); // Add the first move of each turn
+            availableMoves.add(turn.getMoves().get(0)); // Add the first move of each turn
         }
     
         return availableMoves;
@@ -724,7 +727,7 @@ public class GameState {
         List<Turn> availableTurns = getLegalTurns(); 
         List<Move> availableMoves = new ArrayList<>(); 
         for (Turn turn : availableTurns) {
-            availableMoves.add(turn.getMoves().getFirst());
+            availableMoves.add(turn.getMoves().get(0));
         }
         return availableMoves;
     }

@@ -13,7 +13,7 @@ public class Piece {
     public PieceType type;
     private int x, y;
     private PieceDrawer pieceDrawer;
-    private int consequtiveMovesPerKing;
+    //private int consequtiveMovesPerKing;
 
     public Piece(PieceType type, int x, int y) {
         this.type = type;
