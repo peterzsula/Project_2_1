@@ -1,6 +1,7 @@
 package org.testing.project_2_1;
 
 import org.testing.project_2_1.Agents.*;
+import org.testing.project_2_1.Agents.AlphaBetaAgent;
 import org.testing.project_2_1.GameLogic.GameState;
 
 public class Simulation {

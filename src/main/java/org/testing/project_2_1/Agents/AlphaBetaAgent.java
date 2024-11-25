@@ -87,47 +87,58 @@ public class AlphaBetaAgent implements Agent {
         pause.play();
     }
 
-    private Turn getBestTurnABP(List<Turn> turns) { // get best turn using Alpha-Beta Pruning
+    private boolean isEndgame(GameState gameState) {
+        int totalPieces = gameState.countPieces();
+        int endgameThreshold = 10;
+        return totalPieces <= endgameThreshold;
+    }
+
+    private Turn getBestTurnABP(List<Turn> turns) {
         Turn bestTurn = null;
         int bestValue;
         if (isWhite) {
-            bestValue = Integer.MIN_VALUE;  // maximize score
+            bestValue = Integer.MIN_VALUE;
         } else {
-            bestValue = Integer.MAX_VALUE; // to minimize score
+            bestValue = Integer.MAX_VALUE;
         }
-
+    
         List<Turn> shuffledTurns = new ArrayList<>(turns);
         Collections.shuffle(shuffledTurns); // Shuffle the turn before evaluation to avoid obtaining exact same outcome every game
+        
+        // Creating a separate list for best turns
+        List<Turn> bestTurns = new ArrayList<>();
+        
         for (Turn turn : shuffledTurns) {
             GameState newState = new GameState(gameState);
             for (Move move : turn.getMoves()) {
                 newState.move(move);
             }
-
+    
             int boardValue = minimaxPruning(newState, maxDepth, Integer.MIN_VALUE, Integer.MAX_VALUE, !isWhite);
-
+    
             if (isWhite) {
                 if (boardValue > bestValue) {
                     bestValue = boardValue;
-                    shuffledTurns.clear();
-                    shuffledTurns.add(turn);
+                    bestTurns.clear();
+                    bestTurns.add(turn);
                 } else if (boardValue == bestValue) {
-                    shuffledTurns.add(turn);
+                    bestTurns.add(turn);
                 }
             } else {
                 if (boardValue < bestValue) {
                     bestValue = boardValue;
-                    shuffledTurns.clear();
-                    shuffledTurns.add(turn);
+                    bestTurns.clear();
+                    bestTurns.add(turn);
                 } else if (boardValue == bestValue) {
-                    shuffledTurns.add(turn);
+                    bestTurns.add(turn);
                 }
             }
         }
+        
         // Randomization between equally-valued moves
-        if (!shuffledTurns.isEmpty()) {
-            int randomIndex = (int)(Math.random() * shuffledTurns.size());
-            bestTurn = shuffledTurns.get(randomIndex);
+        if (!bestTurns.isEmpty()) {
+            int randomIndex = (int)(Math.random() * bestTurns.size());
+            bestTurn = bestTurns.get(randomIndex);
         }
         return bestTurn;
     }
@@ -176,27 +187,31 @@ public class AlphaBetaAgent implements Agent {
     }
 
     // Implement PN Search in endgame situations
-    private Turn getBestTurnPNSearch() {
-        PNSearch pnSearch = new PNSearch(isWhite);
-        GameState currentState = gameState;
-        PNSearch.Node root;
-        if (isWhite) {
-            root = pnSearch.new Node(null, currentState, PNSearch.Node.OR_NODE);
-        } else {
-            root = pnSearch.new Node(null, currentState, PNSearch.Node.AND_NODE);
-        }
-        int maxNodes = 10000;
-        pnSearch.PN(root, maxNodes);
+private Turn getBestTurnPNSearch() {
+    PNSearch pnSearch = new PNSearch(isWhite);
+    GameState currentState = gameState;
+    PNSearch.Node root;
+    if (isWhite) {
+        root = pnSearch.new Node(null, currentState, PNSearch.Node.OR_NODE);
+    } else {
+        root = pnSearch.new Node(null, currentState, PNSearch.Node.AND_NODE);
+    }
+    int maxNodes = 10000;
+    pnSearch.PN(root, maxNodes);
 
-        if (root.proof == 0) {
-            return findBestTurnPNSearch(root);
-        } else if (root.disproof == 0) {
-            return findBestTurnPNSearch(root);
-        } else {
-            List<Turn> turns = currentState.getLegalTurns();
-            return getBestTurnABP(turns);
+    // Check if PNSearch found either a proof or disproof
+    if (root.proof == 0 || root.disproof == 0) {
+        Turn pnTurn = findBestTurnPNSearch(root);
+        if (pnTurn != null && !pnTurn.getMoves().isEmpty()) {
+            return pnTurn;
         }
     }
+    
+    // Fall back to alpha-beta pruning if PNSearch is inconclusive or returns invalid turn
+    System.out.println("PNSearch inconclusive, calling back Alpha-Beta Pruning");
+    List<Turn> turns = currentState.getLegalTurns();
+    return getBestTurnABP(turns);
+}
 
     private Turn findBestTurnPNSearch(PNSearch.Node root) {
         PNSearch.Node node = root;
