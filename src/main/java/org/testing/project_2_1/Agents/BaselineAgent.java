@@ -71,11 +71,6 @@ public class BaselineAgent implements Agent {
     }
 
     @Override
-    public BaselineAgent resetSimulation() {
-        return new BaselineAgent(isWhite, gameState);
-    }
-
-    @Override
     public void simulate() {
         if (currentTurn.isEmpty()) {
             List<Turn> legalTurns = gameState.getLegalTurns();

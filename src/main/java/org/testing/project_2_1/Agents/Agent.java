@@ -9,9 +9,4 @@ public interface Agent {
     public void setGameLogic(GameLogic gameLogic);
     public void pause();
     public Agent reset();
-<<<<<<< Updated upstream
-=======
-    public Agent resetSimulation();
-    public void setGameState(GameState gameState);
->>>>>>> Stashed changes
 }
