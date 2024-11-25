@@ -7,6 +7,7 @@ import org.testing.project_2_1.Moves.Move;
 import org.testing.project_2_1.Moves.Turn;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 import javafx.animation.PauseTransition;
 import javafx.util.Duration;
@@ -83,8 +84,9 @@ public class AlphaBetaAgent implements Agent {
             bestValue = Integer.MAX_VALUE; // to minimize score
         }
 
-        List<Turn> bestTurns = new ArrayList<>();
-        for (Turn turn : turns) {
+        List<Turn> shuffledTurns = new ArrayList<>(turns);
+        Collections.shuffle(shuffledTurns); // Shuffle the turn before evaluation to avoid obtaining exact same outcome every game
+        for (Turn turn : shuffledTurns) {
             GameState newState = new GameState(gameState);
             for (Move move : turn.getMoves()) {
                 newState.move(move);
@@ -95,25 +97,25 @@ public class AlphaBetaAgent implements Agent {
             if (isWhite) {
                 if (boardValue > bestValue) {
                     bestValue = boardValue;
-                    bestTurns.clear();
-                    bestTurns.add(turn);
+                    shuffledTurns.clear();
+                    shuffledTurns.add(turn);
                 } else if (boardValue == bestValue) {
-                    bestTurns.add(turn);
+                    shuffledTurns.add(turn);
                 }
             } else {
                 if (boardValue < bestValue) {
                     bestValue = boardValue;
-                    bestTurns.clear();
-                    bestTurns.add(turn);
+                    shuffledTurns.clear();
+                    shuffledTurns.add(turn);
                 } else if (boardValue == bestValue) {
-                    bestTurns.add(turn);
+                    shuffledTurns.add(turn);
                 }
             }
         }
         // Randomization between equally-valued moves
-        if (!bestTurns.isEmpty()) {
-            int randomIndex = (int)(Math.random() * bestTurns.size());
-            bestTurn = bestTurns.get(randomIndex);
+        if (!shuffledTurns.isEmpty()) {
+            int randomIndex = (int)(Math.random() * shuffledTurns.size());
+            bestTurn = shuffledTurns.get(randomIndex);
         }
         return bestTurn;
     }
