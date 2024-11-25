@@ -1,6 +1,7 @@
 package org.testing.project_2_1;
 
 import org.testing.project_2_1.Agents.*;
+import org.testing.project_2_1.Agents.AlphaBetaAgent;
 import org.testing.project_2_1.GameLogic.GameState;
 
 public class Simulation {
@@ -11,7 +12,10 @@ public class Simulation {
         int whiteWins = 0;
         int blackWins = 0;
         int draws = 0;
+<<<<<<< Updated upstream
         long startTime = System.nanoTime();
+=======
+>>>>>>> Stashed changes
         final int SIMULATIONS = 100;
 
 

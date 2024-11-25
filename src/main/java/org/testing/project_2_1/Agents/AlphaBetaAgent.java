@@ -87,47 +87,62 @@ public class AlphaBetaAgent implements Agent {
         pause.play();
     }
 
+<<<<<<< Updated upstream
     private Turn getBestTurnABP(List<Turn> turns) { // get best turn using Alpha-Beta Pruning
+=======
+    private boolean isEndgame(GameState gameState) {
+        int totalPieces = gameState.countPieces();
+        int endgameThreshold = 12;
+        return totalPieces < endgameThreshold;
+    }
+
+    private Turn getBestTurnABP(List<Turn> turns) {
+>>>>>>> Stashed changes
         Turn bestTurn = null;
         int bestValue;
         if (isWhite) {
-            bestValue = Integer.MIN_VALUE;  // maximize score
+            bestValue = Integer.MIN_VALUE;
         } else {
-            bestValue = Integer.MAX_VALUE; // to minimize score
+            bestValue = Integer.MAX_VALUE;
         }
-
+    
         List<Turn> shuffledTurns = new ArrayList<>(turns);
-        Collections.shuffle(shuffledTurns); // Shuffle the turn before evaluation to avoid obtaining exact same outcome every game
+        Collections.shuffle(shuffledTurns);
+        
+        // Creating a separate list for best turns
+        List<Turn> bestTurns = new ArrayList<>();
+        
         for (Turn turn : shuffledTurns) {
             GameState newState = new GameState(gameState);
             for (Move move : turn.getMoves()) {
                 newState.move(move);
             }
-
+    
             int boardValue = minimaxPruning(newState, maxDepth, Integer.MIN_VALUE, Integer.MAX_VALUE, !isWhite);
-
+    
             if (isWhite) {
                 if (boardValue > bestValue) {
                     bestValue = boardValue;
-                    shuffledTurns.clear();
-                    shuffledTurns.add(turn);
+                    bestTurns.clear();
+                    bestTurns.add(turn);
                 } else if (boardValue == bestValue) {
-                    shuffledTurns.add(turn);
+                    bestTurns.add(turn);
                 }
             } else {
                 if (boardValue < bestValue) {
                     bestValue = boardValue;
-                    shuffledTurns.clear();
-                    shuffledTurns.add(turn);
+                    bestTurns.clear();
+                    bestTurns.add(turn);
                 } else if (boardValue == bestValue) {
-                    shuffledTurns.add(turn);
+                    bestTurns.add(turn);
                 }
             }
         }
+        
         // Randomization between equally-valued moves
-        if (!shuffledTurns.isEmpty()) {
-            int randomIndex = (int)(Math.random() * shuffledTurns.size());
-            bestTurn = shuffledTurns.get(randomIndex);
+        if (!bestTurns.isEmpty()) {
+            int randomIndex = (int)(Math.random() * bestTurns.size());
+            bestTurn = bestTurns.get(randomIndex);
         }
         return bestTurn;
     }
