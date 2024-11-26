@@ -44,7 +44,16 @@ We establish the allowed moves/captures, constraints and regulations based on th
     - A king piece is allowed to make simple moves, but also is allowed to move diagonally to any empty square. 
     - A king can make regular captures, but is also allowed to capture any enemy piece (in any direction) if and only if its linearly-following square is empty.
    
-      ### Winning conditions
+### Winning Conditions
+- A player wins when their opponent has no valid moves left. This can occur in two situations:
+   - The opponent has no pieces remaining on the board.
+   - All of the opponent's pieces are blocked from moving by the player's pieces1.
+- In an endgame with two kings against one king, the player with two kings must win within seven moves. If they fail to do so, the game is declared a draw14.
+### Draw Conditions
+- King vs. King: When both players are left with only one king each, the game is automatically declared a draw if neither king can capture the other on their next turn1.
+- Two Kings vs. One King: If the player with two kings cannot win within seven moves, the game is a draw14.
+- Three Kings Endgame: In a situation where there are only three kings left on the board (regardless of distribution), the game is drawn after both players have made two moves2.
+- No Threefold Repetition: Unlike some other board games, Frisian draughts does not have a draw rule for threefold repetition of positions2.
 
 ## Algorithms
 ### Adversarial Search.  
@@ -73,12 +82,12 @@ Along that, there are some enums, helper and complementary classes:
 - **Tile**: This class defines and sketches the Tile object for each individual square, in order generate the entire playing board.  
 - **MoveResult**, which defines helps to define each Move itself as an object and its **MoveType** helper enum.
 - **CapturedPiecesTracker**, helper class that handles the captured pieces counter for both black and white players and the labels assigned to it.
-- - PlayerTimer.java, TileDrawer.java, and PieceDrawer.java: Handle specific visual or gameplay elements of the UI.
+- PlayerTimer.java, TileDrawer.java, and PieceDrawer.java: Handle specific visual or gameplay elements of the UI.
 
 
 ## Running the program  
 As commented previously, after loading the .zip file, the graphic library JavaFx needs to be added and imported from the Java files via Project Settings > Open Module Settings > Libraries > New Project Library. Done this, the program should be executed on the class **GUI.java**  
-This should launch a Homepage window where the user is meant to select the gamemode. The options for player 1 and player 2After selecting, the "Start Game" button executes the class CheckersApp and the Playing Screen is displayed, including the board and pieces, a timer for each player turn and a black and white pieces' captures tracker.  
+This should launch a Homepage window where the user is meant to select the gamemode. The options are for player 1 and player 2 the type of player for each, either being an agent or a human player, this allowing gametypes of 1vs1, 1vsAgent, or even AgentvsAgent (on spectator mode). After selecting, the "Start Game" button executes the class CheckersApp and the Playing Screen is displayed, including the board and pieces, a timer for each player turn and a black and white pieces' captures tracker.  
 Now it's time to _Play It_! (Frisian's version).
 - In case its necessary, for better visualisation reasons, the Screen Size can be easily adjust by increasing/decreasing the value of the variable `int TILE_SIZE` in the CheckersApp class.
 
