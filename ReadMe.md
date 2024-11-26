@@ -41,9 +41,25 @@ We establish the allowed moves/captures, constraints and regulations based on th
     - A king piece is allowed to make simple moves, but also is allowed to move diagonally to any empty square. 
     - A king can make regular captures, but is also allowed to capture any enemy piece (in any direction) if and only if its linearly-following square is empty.
 
-## Project Structure and Algorithms
-The main class of this program is `CheckersApp.java`, which initializes and displays the primary scene, handles moves and capturing logic, king promotion, sets a timer for each turn and calls methods from other classes for other necessary functionalities.  
-`GUI. java` is the class where the application shall be initiated. Sets the Main Layout design created which introduces a Home window, which allows the selection of the number of players before starting a game. Calls the main class CheckersApp.java  
+## Algorithms
+### Adversarial Search.  
+1. Minimax
+2. Alpha-Beta Pruning
+3. MonteCarlo Tree Search
+4. Proof-Number Search
+### Machine Learning. 
+1. Random Forest
+
+## Project Structure
+### Main Classes
+-Game Logic. 
+-Game State. 
+- The main class of this program is `CheckersApp.java`, which initializes and displays the primary scene, handles moves and capturing logic, king promotion, sets a timer for each turn and calls methods from other classes for other necessary functionalities.  
+- `GUI. java` is the class where the application shall be initiated. Sets the Main Layout design created which introduces a Home window, which allows the selection of the number of players before starting a game. Calls the main class CheckersApp.java.  
+- Agent. 
+
+### Supporting Classes
+
 Along that, there are some enums, helper and complementary classes:
 - **Piece**: This class designs, defines the piece object and its playing constraints
   - And its helper enum **PieceType**, which list the different types of pieces (white, black, kings...)
