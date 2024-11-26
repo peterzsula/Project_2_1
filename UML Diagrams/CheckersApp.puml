@@ -1,0 +1,33 @@
+@startuml
+class CheckersApp {
+    + static final int TILE_SIZE
+    + static final int SIZE
+    - int noOfPlayers
+    - GameLogic gameLogic
+    - Label playerOneTimerLabel
+    - Label playerTwoTimerLabel
+    - Label captureMessageLabel
+    - PlayerTimer playerOneTimer
+    - PlayerTimer playerTwoTimer
+    - ProgressBar evaluationBar
+    - Label evaluationScoreLabel
+    - Group tileGroup
+    - Group pieceGroup
+    - Group boardGroup
+    - CapturedPiecesTracker capturedPiecesTracker
+    - boolean isPlayerOneTurn
+    + CheckersApp()
+    + CheckersApp(Agent agent)
+    + CheckersApp(Agent agent1, Agent agent2)
+    + void start(Stage primaryStage)
+    + Parent createContent()
+    + void addPiecestoBoard(Pane boardPane)
+    + void movePiece(int oldX, int oldY, Piece piece, int newX, int newY)
+    + void resetGUI()
+    + void updateCaptureMessage(String message)
+    + void undoLastMove()
+    + void updateEvaluationBar()
+    + void updateGlows()
+    + void clearHighlights()
+}
+@enduml

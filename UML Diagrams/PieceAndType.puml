@@ -1,0 +1,24 @@
+@startuml
+class Piece {
+    - PieceType type
+    - int x, y
+    - PieceDrawer pieceDrawer
+    + Piece(PieceType type, int x, int y)
+    + PieceType getType()
+    + void movePiece(Move move)
+    + void undoMove(Move move)
+    + void promoteToKing()
+    + void demoteToNormal()
+    + int getX()
+    + int getY()
+}
+
+enum PieceType {
+    BLACK
+    WHITE
+    BLACKKING
+    WHITEKING
+}
+
+Piece --> PieceType
+@enduml

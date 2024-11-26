@@ -1,0 +1,34 @@
+@startuml
+class PlayerTimer {
+    - long totalTime
+    - long initialTotalTime
+    - long increment
+    - Timer timer
+    - TimerTask task
+    - boolean isRunning
+    - Label timerLabel
+    + PlayerTimer(Label timerLabel, long initialTotalTimeMillis, long incrementMillis)
+    + void setTotalTime(long totalTimeMillis)
+    + void startMove(boolean isLegalMove)
+    + void startCountdown()
+    + void stopCountdown()
+    + void reset()
+    + long getRemainingTimeInSeconds()
+}
+
+class CapturedPiecesTracker {
+    - int blackCaptured
+    - int whiteCaptured
+    - Label blackCapturedLabel
+    - Label whiteCapturedLabel
+    - VBox blackWhiteCapturedBox
+    + CapturedPiecesTracker()
+    + void incrementBlackCaptured()
+    + void incrementWhiteCaptured()
+    + void decrementBlackCaptured()
+    + void decrementWhiteCaptured()
+    + void capturePiece(String player)
+    + void reset()
+    + VBox getBlackWhiteCapturedDisplay()
+}
+@enduml

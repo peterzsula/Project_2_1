@@ -1,0 +1,25 @@
+@startuml
+class DepthFirstSearch {
+    - static int maxCaptures
+    - static ArrayList<Turn> result
+    + static void dfs(GameState g, Piece piece, Turn currentTurn, int captureCount)
+    + static ArrayList<Turn> getResult()
+    + static void resetResult()
+    + static void resetMaxCaptures()
+}
+
+class PNSearch {
+    - boolean isWhite
+    + PNSearch(boolean isWhite)
+    + void PN(Node root, int maxNodes)
+    + void evaluate(Node node)
+    + void setProofAndDisproofNumbers(Node node)
+    + Node selectMostProvingNode(Node node)
+    + void expandNode(Node node)
+    + void generateAllChildren(Node node)
+}
+
+DepthFirstSearch --> GameState
+PNSearch --> GameState
+DepthFirstSearch --> Piece
+@enduml

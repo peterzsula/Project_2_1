@@ -1,0 +1,27 @@
+@startuml
+interface Agent {
+    + boolean isWhite()
+    + void makeMove()
+    + void setGameLogic(GameLogic gameLogic)
+    + void setGameState(GameState gameState)
+    + void pause()
+    + Agent reset()
+    + void simulate()
+}
+
+class Human {
+    - boolean isWhite
+    - GameLogic gameLogic
+    - GameState gameState
+    + Human(boolean isWhite)
+    + boolean isWhite()
+    + void makeMove()
+    + void setGameLogic(GameLogic gameLogic)
+    + void setGameState(GameState gameState)
+    + void pause()
+    + Agent reset()
+    + void simulate()
+}
+
+Agent <|.. Human
+@enduml

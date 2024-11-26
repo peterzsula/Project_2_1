@@ -1,0 +1,29 @@
+@startuml
+class Move {
+    - Piece piece
+    - int fromX, fromY, toX, toY
+    - MoveType type
+    - boolean promotion
+    - boolean isTurnEnding
+    + Move(int fromX, int fromY, Piece piece, int toX, int toY)
+    + MoveType getType()
+    + int getToX()
+    + int getToY()
+    + Piece getPiece()
+    + int getFromX()
+    + int getFromY()
+    + boolean isPromotion()
+    + boolean isTurnEnding()
+    + boolean isCapture()
+    + boolean isNormal()
+    + boolean isInvalid()
+    + void setPromotion(boolean promotion)
+    + void setTurnEnding(boolean turnEnding)
+}
+
+enum MoveType {
+    INVALID
+    NORMAL
+    CAPTURE
+}
+@enduml
