@@ -10,9 +10,16 @@ import org.testing.project_2_1.Moves.Move;
 import org.testing.project_2_1.UI.PieceDrawer;
 
 public class Piece {
+<<<<<<< Updated upstream
     public PieceType type;
     private int x, y;
     private PieceDrawer pieceDrawer;
+=======
+    public PieceType type; // The type of the piece (e.g., BLACK, WHITE, KING)
+    private int x, y; // The x and y coordinates of the piece on the board
+    private PieceDrawer pieceDrawer; // The visual representation of the piece
+    private int consecutiveMovesForKing = 0;
+>>>>>>> Stashed changes
 
     public Piece(PieceType type, int x, int y) {
         this.type = type;
@@ -130,4 +137,21 @@ public class Piece {
         return pieces;
     }
 
+<<<<<<< Updated upstream
 }
+=======
+
+    public boolean hasReachedNCMoveLimit() {
+        return consecutiveMovesForKing >= 3;
+    }
+
+    public void incrementNCMoveCount() {
+        consecutiveMovesForKing++;
+    }
+
+    public void resetNCMoveCount() {
+        consecutiveMovesForKing = 0;
+    }
+
+}
+>>>>>>> Stashed changes

@@ -1,4 +1,9 @@
 package org.testing.project_2_1.GameLogic;
+<<<<<<< Updated upstream
+=======
+
+import static org.testing.project_2_1.GameLogic.GameLogic.calculateCaptureValue;
+>>>>>>> Stashed changes
 import static org.testing.project_2_1.UI.CheckersApp.SIZE;
 
 import java.util.ArrayList;
@@ -9,6 +14,7 @@ import org.testing.project_2_1.Moves.InvalidMove;
 import org.testing.project_2_1.Moves.Move;
 import org.testing.project_2_1.Moves.NormalMove;
 import org.testing.project_2_1.Moves.Turn;
+import org.testing.project_2_1.UI.CheckersApp;
 
 public class GameState {
     protected Tile[][] board;
@@ -504,4 +510,307 @@ public class GameState {
     }
 
 
+<<<<<<< Updated upstream
 }
+=======
+    /**
+     * Determines the winner of the game.
+     * @return 1 if White wins, -1 if Black wins, 100 if the game is a draw, 0 if the game is not over.
+     */
+    public int getWinner() {
+        if (winner != 0) {
+            return winner;
+        }
+        if (isDraw()) {
+            winner = 100; // Game is a draw
+            return winner;
+        }
+        if (blackPieces.isEmpty()) {
+            winner = 1; // White wins
+            return winner;
+        }
+        if (whitePieces.isEmpty()) {
+            winner = -1; // Black wins
+            return winner;
+        }
+        return 0; // Game is not over
+    }
+
+    // Old GameLogic Methods
+
+    /**
+     * Retrieves all legal turns for the current player.
+     * If no legal moves are available, the game is set to over.
+     * @return A list of legal turns for the current player.
+     */
+    public List<Turn> getLegalTurns() {
+        ArrayList<Move> availableMoves = getPossibleMoves();
+        if (availableMoves.isEmpty()) {
+            setGameOver(true, isWhiteTurn ? -1 : 1); // Set game over if no moves are available
+            return new ArrayList<>();
+        }
+        if (availableMoves.get(0).isNormal()) {
+            return Turn.copyMovesToTurns(availableMoves); // Convert moves to turns if no captures are available
+        }
+        ArrayList<Turn> availableTurns = new ArrayList<>();
+        Set<Piece> pieces = Piece.movesToPieces(availableMoves);
+        int maxCaptures = 0;
+        for (Piece piece : pieces) {
+            ArrayList<Turn> pieceTurns = getLegalTurns(piece);
+            for (Turn turn : pieceTurns) {
+                // TODO: Add 2 kings rule
+                if (turn.getMoves().size() > maxCaptures) {
+                    availableTurns.clear();
+                    availableTurns.add(turn); // Add turns with the highest number of captures
+                    maxCaptures = turn.getMoves().size();
+                } else if (turn.getMoves().size() == maxCaptures) {
+                    availableTurns.add(turn); // Add turns with equal maximum captures
+                }
+            }
+        }
+        return availableTurns;
+    }
+
+    /**
+     * Retrieves all legal turns for a specific piece.
+     * Uses depth-first search (DFS) to explore potential capture sequences.
+     * @param piece The piece for which legal turns are being determined.
+     * @return A list of legal turns for the specified piece.
+     */
+    public ArrayList<Turn> getLegalTurns(Piece piece) {
+        GameState g = new GameState(this); // Create a copy of the current game state
+        ArrayList<Move> availableMoves = g.getPossibleMoves(piece);
+        if (availableMoves.get(0).isNormal()) {
+            return Turn.copyMovesToTurns(availableMoves); // Convert normal moves to turns
+        }
+        DepthFirstSearch.resetMaxCaptures(); // Reset DFS variables
+        DepthFirstSearch.resetResult();
+        Turn initialTurn = new Turn();
+        DepthFirstSearch.dfs(g, piece, initialTurn, 0); // Perform DFS to find capture sequences
+        ArrayList<Turn> result = DepthFirstSearch.getResult();
+        return result;
+    }
+
+    /**
+     * Retrieves all capture moves available for the current player's pieces.
+     * @return A list of all available capture moves.
+     */
+    public ArrayList<Move> getCaptures() {
+        ArrayList<Move> availableCaptures = new ArrayList<>();
+        ArrayList<Piece> pieces = getListOfPieces();
+        for (Piece piece : pieces) {
+            availableCaptures.addAll(getCaptures(piece));
+        }
+        return availableCaptures;
+    }
+
+    /**
+     * Retrieves all capture moves available for a specific piece.
+     * @param piece The piece for which capture moves are being determined.
+     * @return A list of all available capture moves for the specified piece.
+     */
+    public ArrayList<Move> getCaptures(Piece piece) {
+        ArrayList<Move> availableCaptures = new ArrayList<>();
+        // TODO: Instead of iterating over all black tiles, iterate over all tiles where the piece can move.
+        for (int row = 0; row < SIZE; row++) {
+            int startCol = (row % 2 == 0) ? 1 : 0;
+            for (int col = startCol; col < SIZE; col += 2) {
+                Move move = determineMoveType(piece.getX(), piece.getY(), row, col);
+                if (move.isCapture()) {
+                    availableCaptures.add(move);
+                }
+            }
+        }
+        return availableCaptures;
+    }
+
+    /**
+     * Retrieves all possible moves for the current player's pieces.
+     * Prioritizes capture moves if available.
+     * @return A list of all possible moves for the current player.
+     */
+    private ArrayList<Move> getPossibleMoves() {
+        ArrayList<Move> availableMoves = new ArrayList<>();
+        ArrayList<Move> availableCaptures = new ArrayList<>();
+        ArrayList<Move> currentMoves = new ArrayList<>();
+        ArrayList<Piece> pieces = getListOfPieces();
+        for (Piece piece : pieces) {
+            // TODO: Instead of iterating over all black tiles, iterate over all tiles where the piece can move.
+            currentMoves = getPossibleMoves(piece);
+            if (currentMoves.isEmpty()) {
+                continue;
+            } else if (currentMoves.get(0).isCapture()) {
+                availableCaptures.addAll(currentMoves);
+            } else {
+                availableMoves.addAll(currentMoves);
+            }
+        }
+        if (!availableCaptures.isEmpty()) {
+            return availableCaptures; // Return captures if available
+        }
+        return availableMoves; // Return normal moves otherwise
+    }
+
+    /**
+     * Retrieves all possible moves for a specific piece.
+     * Prioritizes capture moves if available.
+     * @param piece The piece for which possible moves are being determined.
+     * @return A list of all possible moves for the specified piece.
+     */
+    public ArrayList<Move> getPossibleMoves(Piece piece) {
+        ArrayList<Move> availableMoves = new ArrayList<>();
+        ArrayList<Move> availableCaptures = new ArrayList<>();
+        // TODO: Instead of iterating over all black tiles, iterate over all tiles where the piece can move.
+        for (int row = 0; row < SIZE; row++) {
+            int startCol = (row % 2 == 0) ? 1 : 0;
+            for (int col = startCol; col < SIZE; col += 2) {
+                Move move = determineMoveType(piece.getX(), piece.getY(), row, col);
+                if (move.isNormal() && availableCaptures.isEmpty()) {
+                    availableMoves.add(move); // Add normal move if no captures are available
+                } else if (move.isCapture()) {
+                    availableCaptures.add(move); // Add capture move
+                }
+            }
+        }
+        if (!availableCaptures.isEmpty()) {
+            return availableCaptures; // Return captures if available
+        }
+        return availableMoves; // Return normal moves otherwise
+    }
+
+    /**
+     * Determines all pieces that can be captured by the given player's pieces.
+     * @param pieces The player's pieces to evaluate.
+     * @return A set of pieces that are threatened (can be captured).
+     */
+    public Set<Piece> getPiecesTheathenedBy(ArrayList<Piece> pieces) {
+        // TODO: Instead of getLegalMoves, iterate over all legal Turns.
+        Set<Piece> threatenedPieces = new HashSet<>();
+        for (Piece piece : pieces) {
+            for (Move move : getPossibleMoves(piece)) {
+                if (move.isCapture()) {
+                    Capture captureMove = (Capture) move;
+                    threatenedPieces.add(captureMove.getCapturedPiece());
+                }
+            }
+        }
+        return threatenedPieces;
+    }
+
+    /**
+     * Retrieves all legal moves for a specific piece.
+     * @param piece The piece for which legal moves are being determined.
+     * @return A list of legal moves for the specified piece.
+     */
+    public List<Move> getLegalMoves(Piece piece) {
+        List<Turn> availableTurns = getLegalTurns(piece); // Fetch all legal turns for the piece
+        List<Move> availableMoves = new ArrayList<>();
+
+        for (Turn turn : availableTurns) {
+            availableMoves.add(turn.getMoves().get(0)); // Add the first move of each turn
+        }
+
+        return availableMoves;
+    }
+
+    /**
+     * Retrieves all legal moves for the current player.
+     * @return A list of legal moves for the current player.
+     */
+    public List<Move> getLegalMoves() {
+        List<Turn> availableTurns = getLegalTurns(); // Fetch all legal turns for the current player
+        List<Move> availableMoves = new ArrayList<>();
+        for (Turn turn : availableTurns) {
+            availableMoves.add(turn.getMoves().get(0)); // Add the first move of each turn
+        }
+        return availableMoves;
+    }
+
+    /**
+     * Retrieves a list of all pieces for the current player.
+     * @return A list of all pieces for the current player.
+     */
+    public ArrayList<Piece> getListOfPieces() {
+        if (isWhiteTurn) {
+            return getWhitePieces(); // Return white pieces if it's White's turn
+        } else {
+            return getBlackPieces(); // Return black pieces if it's Black's turn
+        }
+    }
+
+    /**
+     * Evaluates the board using weighted features to determine favorability for White or Black.
+     * 
+     * The evaluation function is based on the following features:
+     * - x1: Number of black pieces on the board.
+     * - x2: Number of white pieces on the board.
+     * - x3: Number of black kings on the board.
+     * - x4: Number of white kings on the board.
+     * - x5: Number of black pieces threatened by white (i.e., can be captured on White's next turn).
+     * - x6: Number of white pieces threatened by black.
+     * 
+     * Weights for the features:
+     * - w1 = -1 (negative weight for black pieces)
+     * - w2 = 1 (positive weight for white pieces)
+     * - w3 = -3 (heavier negative weight for black kings)
+     * - w4 = 3 (heavier positive weight for white kings)
+     * - w5 = 1 (positive weight for black pieces threatened by White)
+     * - w6 = -1 (negative weight for white pieces threatened by Black)
+     * 
+     * @return A positive score for White's advantage, negative for Black's advantage.
+     */
+    /**
+     * Evaluates the board using weighted features to determine favorability for White or Black.
+     *
+     * Incorporates `calculateCaptureValue` and applies a penalty for pieces in corners.
+     *
+     * @return A positive score for White's advantage, negative for Black's advantage.
+     */
+    public int evaluateBoard() {
+        if (isGameOver()) {
+            if ((isWhiteTurn && whitePieces.isEmpty()) || (!isWhiteTurn && blackPieces.isEmpty())) {
+                return -1; // Losing state for the current player
+            } else {
+                return 1; // Winning state for the current player
+            }
+        }
+
+        int score = 0;
+
+        // Calculates score for white pieces
+        for (Piece piece : whitePieces) {
+            int menCount = (piece.getType() == PieceType.WHITE) ? 1 : 0;
+            int kingCount = (piece.getType() == PieceType.WHITEKING) ? 1 : 0;
+            score += GameLogic.calculateCaptureValue(menCount, kingCount);
+        }
+
+        // Calculates score for black pieces
+        for (Piece piece : blackPieces) {
+            int menCount = (piece.getType() == PieceType.BLACK) ? 1 : 0;
+            int kingCount = (piece.getType() == PieceType.BLACKKING) ? 1 : 0;
+            score -= GameLogic.calculateCaptureValue(menCount, kingCount);
+        }
+
+        // Adjust score based on whose turn it is
+        if (isWhiteTurn) {
+            if (score > 0) {
+                return 1; // Favorable position for white
+            } else if (score < 0) {
+                return -1; // Unfavorable position for white
+            } else {
+                return 0; // Neutral position
+            }
+        } else {
+            if (score < 0) {
+                return 1; // Favorable position for black
+            } else if (score > 0) {
+                return -1; // Unfavorable position for black
+            } else {
+                return 0; // Neutral position
+            }
+        }
+    }
+
+    // end of old GameLogic methods
+}
+>>>>>>> Stashed changes

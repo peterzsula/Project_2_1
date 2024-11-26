@@ -27,6 +27,19 @@ public class GameLogic {
     private boolean isSevenMoveRuleActive = false;
 
 
+<<<<<<< Updated upstream
+=======
+    private static final int SEVEN_MOVE_LIMIT = 7;
+    private static final int MAX_PIECES_FOR_DRAW_RULES = 3;
+    private int sevenMoveCounter = 0;
+    private boolean isSevenMoveRuleActive = false;
+
+
+    /**
+     * Constructs a new GameLogic instance for Human vs. Human games.
+     * @param app Reference to the CheckersApp UI.
+     */
+>>>>>>> Stashed changes
     public GameLogic(CheckersApp app) {
         this.agent = null;
         this.opponent = null;
@@ -56,6 +69,7 @@ public class GameLogic {
     }
 
     public boolean isGameOver(GameState board) {
+<<<<<<< Updated upstream
 
         if (board.getWhitePieces().size() == 0 || board.getBlackPieces().size() == 0) {
             return true; // standard game-ending conditions
@@ -77,6 +91,21 @@ public class GameLogic {
         }
 
         // handbook, 2j-III draw: 47-15 diagonal control
+=======
+        if (board.getWhitePieces().size() == 0 || board.getBlackPieces().size() == 0) {
+            return true;
+        }
+
+        if (checkSevenMoveRule(board)) {
+            return true;
+        }
+        if (isOneKingDraw(board)) {
+            return true;
+        }
+        if (isLongDiagonalDraw(board)) {
+            return true;
+        }
+>>>>>>> Stashed changes
         if (isOtherDiagonalDraw(board)) {
             return true;
         }
@@ -367,6 +396,17 @@ public class GameLogic {
                 if (curMove.isTurnEnding()) {
                     move.setTurnEnding(true);
                 }
+
+                if (curMove.isCapture()) {
+                    Capture capture = (Capture) curMove;
+                    Piece capturedPiece = g.getPieceAt(capture.getCaptureAtX(), capture.getCaptureAtY());
+                    int menCount = capturedPiece.getType() == PieceType.BLACK || capturedPiece.getType() == PieceType.WHITE ? 1 : 0;
+                    int kingCount = capturedPiece.getType() == PieceType.BLACKKING || capturedPiece.getType() == PieceType.WHITEKING ? 1 : 0;
+
+                    double captureValue = calculateCaptureValue(menCount, kingCount);
+                    System.out.println("Capture Value: " + captureValue);
+                }
+
                 movePiece(move);
                 app.updateCaptureMessage(" ");
 
@@ -420,8 +460,15 @@ public class GameLogic {
     }
 
 
+<<<<<<< Updated upstream
     private void movePiece(Move move, GameState g) {
         g.move(move);
+=======
+    /**
+     * Executes a piece move and updates the game state.
+     * @param move The move to execute.
+     */
+>>>>>>> Stashed changes
     private void movePiece(Move move) {
         if (move.isInvalid()) {
             move.getPiece().abortMove();
@@ -637,11 +684,112 @@ public class GameLogic {
         return false; // Continue the game
     }
 
+<<<<<<< Updated upstream
+=======
+    public static List<Turn> getLegalTurns(GameState gameState) {
+        // TODO Auto-generated method stub
+        throw new UnsupportedOperationException("Unimplemented method 'getLegalTurns'");
+    }
+
+    /**
+     * as per game rules: 2 pawns > 1 king, alternate equation:
+     * capture value = amount of men + (amount of kings * 2) - 0.5
+     */
+    public static double calculateCaptureValue(int menCount, int kingCount) {
+        if (kingCount == 1 && menCount == 2) {
+            return 3.0;
+        } else {
+            return menCount + (kingCount * 2.0) - 0.5;
+        }
+    }
+
+    private boolean isKing(Piece piece) {
+        return piece.getType() == PieceType.BLACKKING || piece.getType() == PieceType.WHITEKING;
+    }
+
+    private int countKings(ArrayList<Piece> pieces) {
+        int kingCount = 0;
+        for (Piece piece : pieces) {
+            if (piece.getType() == PieceType.BLACKKING || piece.getType() == PieceType.WHITEKING) {
+                kingCount++;
+            }
+        }
+        return kingCount;
+    }
+
+    private int countTotalPieces(GameState board) {
+        return board.getWhitePieces().size() + board.getBlackPieces().size();
+    }
+
+    private boolean shouldApplyThreeMoveRule() {
+        return g.getWhitePieces().stream().anyMatch(p -> p.type == PieceType.WHITE) ||
+                g.getBlackPieces().stream().anyMatch(p -> p.type == PieceType.BLACK);
+    }
+
+    //three move rule, no implementation so far
+    private boolean isMoveAllowedByThreeMoveRule(Piece piece, Move move) {
+        if (shouldApplyThreeMoveRule() && piece.hasReachedNCMoveLimit() && move.isNormal()) {
+            System.out.println("this king has reached its limit of three non-capturing moves.");
+            piece.abortMove();
+            return false;
+        }
+        return true;
+    }
+
+    private boolean isOneKingDraw(GameState board) {
+        if (board.getWhitePieces().size() == 1 && board.getBlackPieces().size() == 1) {
+            Piece whitePiece = board.getWhitePieces().get(0);
+            Piece blackPiece = board.getBlackPieces().get(0);
+
+            if (isKing(whitePiece) && isKing(blackPiece)) {
+                if (board.getCaptures(whitePiece).isEmpty() && board.getCaptures(blackPiece).isEmpty()) {
+                    if ((whitePiece.getX() == 4 && whitePiece.getY() == 6 && blackPiece.getX() == 0 && blackPiece.getY() == 0) ||
+                            (whitePiece.getX() == 0 && whitePiece.getY() == 0 && blackPiece.getX() == 4 && blackPiece.getY() == 6)) {
+                        System.out.println("the player on turn loses.");
+                        return false;
+                    }
+                    System.out.println("draw: one king vs one king.");
+                    return true;
+                }
+            }
+        }
+        return false;
+    }
+
+
+    private boolean checkSevenMoveRule(GameState board) {
+        int whiteKings = countKings(board.getWhitePieces());
+        int blackKings = countKings(board.getBlackPieces());
+
+        if (!isSevenMoveRuleActive && whiteKings == 2 && blackKings == 1) {
+            isSevenMoveRuleActive = true;
+            sevenMoveCounter = 0;
+        } else if (!isSevenMoveRuleActive && whiteKings == 1 && blackKings == 2) {
+            isSevenMoveRuleActive = true;
+            sevenMoveCounter = 0;
+        }
+
+        if (isSevenMoveRuleActive) {
+            sevenMoveCounter++;
+            if (sevenMoveCounter > SEVEN_MOVE_LIMIT) {
+                System.out.println("seven-move rule invoked: the game is a draw.");
+                return true; // draw
+            }
+        }
+
+        return false; // continue the game
+    }
+
+>>>>>>> Stashed changes
     private boolean isDiagonalControlled(GameState board, int startX, int startY, int endX, int endY, String color) {
         boolean startControlled = false;
         boolean endControlled = false;
 
+<<<<<<< Updated upstream
         for (Piece piece : getListOfPieces(board)) {
+=======
+        for (Piece piece : board.getListOfPieces()) {
+>>>>>>> Stashed changes
             if (piece.getX() == startX && piece.getY() == startY && piece.getType().color.equals(color)) {
                 startControlled = true;
             }
@@ -649,7 +797,11 @@ public class GameLogic {
                 endControlled = true;
             }
             if (startControlled && endControlled) {
+<<<<<<< Updated upstream
                 return true; // Both ends of the diagonal are controlled
+=======
+                return true;
+>>>>>>> Stashed changes
             }
         }
         return false;
@@ -665,12 +817,20 @@ public class GameLogic {
         boolean isBlackControlling = isDiagonalControlled(board, 7, 0, 0, 7, "black");
 
         if (isWhiteControlling && board.getBlackPieces().size() == 1 && board.getWhitePieces().size() > 1) {
+<<<<<<< Updated upstream
             System.out.println("Draw: White cannot cross the long diagonal (7, 0) to (0, 7).");
+=======
+            System.out.println("draw: White cannot cross the long diagonal (7, 0) to (0, 7).");
+>>>>>>> Stashed changes
             return true;
         }
 
         if (isBlackControlling && board.getWhitePieces().size() == 1 && board.getBlackPieces().size() > 1) {
+<<<<<<< Updated upstream
             System.out.println("Draw: Black cannot cross the long diagonal (7, 0) to (0, 7).");
+=======
+            System.out.println("draw: Black cannot cross the long diagonal (7, 0) to (0, 7).");
+>>>>>>> Stashed changes
             return true;
         }
 
@@ -682,6 +842,7 @@ public class GameLogic {
             return false;
         }
 
+<<<<<<< Updated upstream
         // Check for diagonal (7, 6) to (4, 5) and (0, 3) to (3, 6)
         if (isDiagonalControlled(board, 7, 6, 4, 5, "black") || isDiagonalControlled(board, 0, 3, 3, 6, "black")) {
             System.out.println("Draw: Black controls the diagonal, and white cannot cross.");
@@ -690,12 +851,27 @@ public class GameLogic {
 
         if (isDiagonalControlled(board, 7, 6, 4, 5, "white") || isDiagonalControlled(board, 0, 3, 3, 6, "white")) {
             System.out.println("Draw: White controls the diagonal, and black cannot cross.");
+=======
+        // diagonal 47-15: (6, 7) to (1, 2)
+        if (isDiagonalControlled(board, 6, 7, 1, 2, "black") || isDiagonalControlled(board, 6, 7, 1, 2, "white")) {
+            System.out.println("Draw: Diagonal 47-15 is controlled, and crossing is impossible.");
+            return true;
+        }
+
+        // diagonal 4-36: (0, 3) to (3, 6)
+        if (isDiagonalControlled(board, 0, 3, 3, 6, "black") || isDiagonalControlled(board, 0, 3, 3, 6, "white")) {
+            System.out.println("Draw: Diagonal 4-36 is controlled, and crossing is impossible.");
+>>>>>>> Stashed changes
             return true;
         }
 
         return false;
     }
 
+<<<<<<< Updated upstream
 
 
 }
+=======
+}
+>>>>>>> Stashed changes
