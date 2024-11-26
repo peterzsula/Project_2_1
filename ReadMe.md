@@ -51,18 +51,20 @@ We establish the allowed moves/captures, constraints and regulations based on th
 1. Minimax: A decision-making algorithm that recursively evaluates all possible moves in checkers, assuming perfect play by both players. It maximizes the player's minimum gain, minimizes maximum loss in zero-sum games, such as Frisian Draughts.
 2. Alpha-Beta Pruning: An optimization technique for the Minimax algorithm that reduces the number of nodes evaluated in the game tree. It prunes branches that cannot influence the final decision, exponentially improving its time/space complexity, being able to set the depth of the tree as a parameter. Our agent `AlphabetaAgent.java` outperforms the rest of the intelligent agents, setting higher benchmarks after game simulations againts every single of the other agent, as we show be ruuning `Simulation.java`, which emulates two instances of an agents's class and keeps tracks of the number of wins after a _n_ number of simulations.  
 3. Monte Carlo Tree Search (MCTS): Combines tree search with random sampling to evaluate moves in checkers. It balances exploration of new strategies with exploitation of known good moves, using Upper Confidence Bound (UCB) for tree traversal. We found MCTS to be rather computionally inefficient in the context of our checkers game, especially when compared to Alpha-beta pruning. MCTS seems to be a bigger improvements in such games where there exists randomness (such as card games) or lack of perfect information. Our agents using MCTS, `AgentMCTS.java` is still fully functional.
-4. Proof-Number Search: A best-first search algorithm that efficiently proves or disproves positions in checkers. It focuses on the most promising lines of play by maintaining proof and disproof numbers for each node in the game tree. This search algorithm was
+4. Proof-Number Search: A best-first search algorithm that efficiently proves or disproves positions in checkers. We wanted to use this algorithm to handle endgame situations, when it perform significantly better, we used an implementation based on the work by Mark Winands and Jaap van den Heik. PN Search is effective at very closed, tactical positions close to the end, but very inefficient at open-ended or start of the game positions. Basically, what PNS does is to evaluate each position as either win/loss, and it does this by assigning Proof Numbers, and Disproof numbers to specific positions to evaluate them. These numbers are certain values that verify when a position can be decided to be a win (proof) or a loss (disproof). The problem is that PNS, to avoid over-computatonal complexity, only focus in the most "critical" part of the tree (to reduce the state space), so it's very useful in situations when the game is stall and repetitive, but on contrary, PNS struggles  exploring positions where there is a lot of free space in the board (or a lot of possible moves and many pieces, like the start of the game), since the path to win/loss is highly unclear and, essentially, will fail to find any Proof or Disproof positions (this is basically the reason why we only call PNS in Endgame situations). So if no clear advantage is found, because no positions really constitutes a win or a loss, it will just hit a dead-end. 
+
 ### Machine Learning. 
 1. Random Forest: An ensemble method that constructs multiple (thousands) of decision trees and outputs the class that is the mode of the classes of the individual trees, used to predict optimal moves based on various game features and patterns. In this case, for each GameState the numerical value is calculated using a evaluation function (see Tom Mitchell, 1983), which accounts the number of black/whhite pieces present on the board. This approach was essentially not fully performed, given that our working team decided on deliver a better quality and high effeciency algorithm, which result to be the agent using AlphaBeta Pruning, `AlphaBetaAgent.java`.
    
 ## Project Structure
 ### Main Classes
--Game Logic. 
--Game State. 
+- Game Logic: Implements the core logic for checkers gameplay, including rules and mechanics.
+- Game State: Represents the current state of the game, managing the board state, pieces, and player turns.
 - The main class of this program is `CheckersApp.java`, which initializes and displays the primary scene, handles moves and capturing logic, king promotion, sets a timer for each turn and calls methods from other classes for other necessary functionalities.  
 - `GUI. java` is the class where the application shall be initiated. Sets the Main Layout design created which introduces a Home window, which allows the selection of the number of players before starting a game. Calls the main class CheckersApp.java.  
-- Agent. 
-
+- Agent: The agent interface, Defines the base class for agents (players) interacting with the game, including methods for setting game logic and seeting game state.
+- Simulation: Provides functionality for running simulations, for testing AI agents againts other agents and measure accuracy/performance.
+- UML Diagrams: Folder for dDetailed diagrams for the class structure and relationships, fpr the most important classes
 ### Supporting Classes
 
 Along that, there are some enums, helper and complementary classes:
@@ -71,6 +73,8 @@ Along that, there are some enums, helper and complementary classes:
 - **Tile**: This class defines and sketches the Tile object for each individual square, in order generate the entire playing board.  
 - **MoveResult**, which defines helps to define each Move itself as an object and its **MoveType** helper enum.
 - **CapturedPiecesTracker**, helper class that handles the captured pieces counter for both black and white players and the labels assigned to it.
+- - PlayerTimer.java, TileDrawer.java, and PieceDrawer.java: Handle specific visual or gameplay elements of the UI.
+
 
 ## Running the program  
 As commented previously, after loading the .zip file, the graphic library JavaFx needs to be added and imported from the Java files via Project Settings > Open Module Settings > Libraries > New Project Library. Done this, the program should be executed on the class **GUI.java**  
