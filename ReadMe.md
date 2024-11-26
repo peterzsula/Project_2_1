@@ -5,12 +5,19 @@ Our work on Project 2-1, academic course 2024/25
 
 ### **Quick start**_: Before running, the library JavaFx needs to be imported/added in Module Settings. To run the gameplay app, please execute the file `GUI.java` in the path src/main/java/org/testing/project_2_1_.
 
+**Team members:
+- Anna Balaña Zemanaj.  
+- Péter Zsula.  
+- Anastazja Ziarko.  
+- Betrice Boccolari.  
+- Esteban Naranjo Amórtegui. 
 
 ## Preface  
 This project aims to build a Java-based computer version of the board game
-"Frisian Draughts", a variant of the classic game checkers, which originated in the north-western region of the Netherlands called Fryslân around 250 years ago (originally played on a 100-square board).  
-For the intelligent player functionality, we will design, train and implement AI game-playing algorithms: One type of
-adversarial search algorithm and one machine learning (ML) algorithm.  
+"Frisian Draughts", a variant of the classic game checkers, which originated in the north-western region of the Netherlands called Fryslân around 250 years ago (originally played on a 100-square board). This is a two-agent, zero-sum, perfect information game.
+With help of the graphic library JavaFX, we designed a user-friendly UI which intends to enhance the player experience even from the beginner levels, highlighting possible moves to the user, and showing them other illegal moves, with the objective of being an experience in which the user can from his mistakes, undo moves, restart the game, and so eventually and progressively improve his proficiency.
+For the intelligent player functionality, we built and thoroughly tested several artificial intelligence (AI) game-playing algorithm, including types of
+adversarial search algorithms and one machine learning (ML) algorithm.
 
 ## Rules  
 A game of Frisian Draughts is played by two people on a 10x10 squares board, where only the darker squares are used for the game.  
@@ -25,7 +32,7 @@ We establish the allowed moves/captures, constraints and regulations based on th
     - A king piece is allowed to make simple moves, but also is allowed to move diagonally to any empty square. 
     - A king can make regular captures, but is also allowed to capture any enemy piece (in any direction) if and only if its linearly-following square is empty.
 
-## Project Structure  
+## Project Structure and Algorithms
 The main class of this program is `CheckersApp.java`, which initializes and displays the primary scene, handles moves and capturing logic, king promotion, sets a timer for each turn and calls methods from other classes for other necessary functionalities.  
 `GUI. java` is the class where the application shall be initiated. Sets the Main Layout design created which introduces a Home window, which allows the selection of the number of players before starting a game. Calls the main class CheckersApp.java  
 Along that, there are some enums, helper and complementary classes:
@@ -37,7 +44,7 @@ Along that, there are some enums, helper and complementary classes:
 
 ## Running the program  
 As commented previously, after loading the .zip file, the graphic library JavaFx needs to be added and imported from the Java files via Project Settings > Open Module Settings > Libraries > New Project Library. Done this, the program should be executed on the class **GUI.java**  
-This should launch a Homepage window where the player is asked to select the number of players (1/2) for this game. After selecting, the "Start Game" button executes the class CheckersApp and the Playing Screen is displayed, including the board and pieces, a timer for each player turn and a black and white pieces' captures tracker.  
+This should launch a Homepage window where the user is meant to select the gamemode. The options for player 1 and player 2After selecting, the "Start Game" button executes the class CheckersApp and the Playing Screen is displayed, including the board and pieces, a timer for each player turn and a black and white pieces' captures tracker.  
 Now it's time to _Play It_! (Frisian's version).
 - In case its necessary, for better visualisation reasons, the Screen Size can be easily adjust by increasing/decreasing the value of the variable `int TILE_SIZE` in the CheckersApp class.
 
