@@ -13,16 +13,17 @@ Our work on Project 2-1, academic course 2024/25
 - Esteban Naranjo Amórtegui. 
 
 # Table of Contents  
-1. [Preface](#preface)  
-2. [Rules](#rules)
-   -  [Winning conditions] (#winning-conditions)
-4. [Algorithms] (#algorithms)
-   - [Adversarial Search] (#adversarial-search)
-   - [Machine Learning] (#machine-learning)
-5. [Project Structure](#project-structure-and-algorithms)  
+1. [Preface](#preface) 
+2. [Rules](#rules)  
+   - [Winning Conditions](#winning-conditions)  
+   - [Draw Conditions](#draw-conditions)  
+3. [Algorithms](#algorithms)  
+   - [Adversarial Search](#adversarial-search)  
+   - [Machine Learning](#machine-learning)  
+4. [Project Structure](#project-structure)  
    - [Main Classes](#main-classes)  
    - [Supporting Classes](#supporting-classes)  
-6. [Running the Program](#running-the-program)  
+5. [Running the Program](#running-the-program)  
 
 ## Preface  
 This project aims to build a Java-based computer version of the board game
@@ -73,9 +74,9 @@ We establish the allowed moves/captures, constraints and regulations based on th
 - `GUI. java` is the class where the application shall be initiated. Sets the Main Layout design created which introduces a Home window, which allows the selection of the number of players before starting a game. Calls the main class CheckersApp.java.  
 - Agent: The agent interface, Defines the base class for agents (players) interacting with the game, including methods for setting game logic and seeting game state.
 - Simulation: Provides functionality for running simulations, for testing AI agents againts other agents and measure accuracy/performance.
-- UML Diagrams: Folder for dDetailed diagrams for the class structure and relationships, fpr the most important classes
+- UML Diagrams: Folder for dDetailed diagrams for the class structure and relationships, fpr the most important classes.
+- 
 ### Supporting Classes
-
 Along that, there are some enums, helper and complementary classes:
 - **Piece**: This class designs, defines the piece object and its playing constraints
   - And its helper enum **PieceType**, which list the different types of pieces (white, black, kings...)
