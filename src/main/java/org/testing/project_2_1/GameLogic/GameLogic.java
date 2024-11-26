@@ -12,19 +12,31 @@ import java.util.Set;
 
 import javafx.scene.layout.Pane;
 
+/**
+ * Handles the core game logic for a checkers game.
+ * Manages game state, agents, and player interactions.
+ */
 public class GameLogic {
-    public CheckersApp app;
-    public Agent agent;
-    public Agent opponent;
-    public GameState g;
+    public CheckersApp app; // Reference to the UI application
+    public Agent agent; // Agent controlling one side of the game
+    public Agent opponent; // Opponent agent, if applicable
+    public GameState g; // The current game state
 
-
+    /**
+     * Constructs a new GameLogic instance for Human vs. Human games.
+     * @param app Reference to the CheckersApp UI.
+     */
     public GameLogic(CheckersApp app) {
         setStandardValues(app);
         this.agent = null;
         this.opponent = null;
     }
 
+    /**
+     * Constructs a new GameLogic instance for Human vs. AI games.
+     * @param app Reference to the CheckersApp UI.
+     * @param agent The AI agent playing the game.
+     */
     public GameLogic(CheckersApp app, Agent agent) {
         setStandardValues(app);
         this.agent = agent.reset();
@@ -32,6 +44,12 @@ public class GameLogic {
         this.agent.setGameLogic(this);
     }
 
+    /**
+     * Constructs a new GameLogic instance for AI vs. AI games.
+     * @param app Reference to the CheckersApp UI.
+     * @param agent1 The first AI agent.
+     * @param agent2 The second AI agent.
+     */
     public GameLogic(CheckersApp app, Agent agent1, Agent agent2) {
         setStandardValues(app);
         this.agent = agent1.reset();
@@ -40,43 +58,60 @@ public class GameLogic {
         this.opponent.setGameLogic(this);
     }
 
+    /**
+     * Initializes the game with standard starting values.
+     * Sets up the game state and initializes the UI Pane.
+     * @param app Reference to the CheckersApp UI.
+     */
     public void setStandardValues(CheckersApp app) {
         this.app = app;
-        g = new GameState();
-        new Pane();
-        g.setPossibleTurns(g.getLegalTurns()); // should be in GameState constructor
+        g = new GameState(); // Initialize the game state
+        new Pane(); // Initialize the graphical Pane (currently unused)
+        g.setPossibleTurns(g.getLegalTurns()); // Initialize possible turns
     }
 
-    public boolean isGameOver(GameState board){
-        if (board.getWhitePieces().size() == 0 || board.getBlackPieces().size() == 0) {
-            return true;
-        }
-        return false;
+    /**
+     * Checks if the game is over based on the current board state.
+     * @param board The current game state.
+     * @return True if the game is over, otherwise false.
+     */
+    public boolean isGameOver(GameState board) {
+        return board.getWhitePieces().isEmpty() || board.getBlackPieces().isEmpty();
     }
 
+    /**
+     * Retrieves the current board state as a 2D array of tiles.
+     * @return The current game board.
+     */
     public Tile[][] getBoard() {
         return g.getBoard();
     }
 
-    public void restartGame(){
+    /**
+     * Restarts the game by resetting to the standard initial values.
+     */
+    public void restartGame() {
         setStandardValues(app);
     }
 
+    /**
+     * Requests the next move in the game, either from the user or an agent.
+     * Updates the UI and prints the current turn status.
+     */
     private void askForMove() {
         if (g.isGameOver()) {
             System.out.println("Game over");
             return;
         }
-        app.updateGlows();
-        app.updateEvaluationBar();
+        app.updateGlows(); // Update highlights for possible moves
+        app.updateEvaluationBar(); // Update the UI evaluation bar
         System.out.println();
         if (g.isWhiteTurn) {
             System.out.println("White's turn");
-        }
-        else {
+        } else {
             System.out.println("Black's turn");
         }
-        // printAvailableCaptures(g);
+        // Delegate move-making to agents if applicable
         if (agent != null && agent.isWhite() == g.isWhiteTurn) {
             agent.makeMove();
         }
@@ -85,22 +120,33 @@ public class GameLogic {
         }
     }
 
-    public void printAvailableCaptures(GameState g){
+    /**
+     * Prints all available captures for the current turn.
+     * @param g The current game state.
+     */
+    public void printAvailableCaptures(GameState g) {
         List<Turn> availableTurns = g.getLegalTurns();
-        System.out.println("Nuber of available moves: " + availableTurns.size());
+        System.out.println("Number of available moves: " + availableTurns.size());
         for (Turn turn : availableTurns) {
             System.out.println(turn.getMoves().get(0).toString());
         }
     }
 
-
-
+    /**
+     * Executes a given turn by processing all moves in it.
+     * @param turn The turn to execute.
+     */
     public void takeTurn(Turn turn) {
         for (Move move : turn.getMoves()) {
             takeMove(move);
         }
     }
 
+    /**
+     * Processes a move in the game.
+     * @param move The move to execute.
+     * @return True if the move was successfully executed, false otherwise.
+     */
     public boolean takeMove(Move move) {
         Piece piece = g.getPieceAt(move.getFromX(), move.getFromY());
         if (move.isInvalid()) {
@@ -110,8 +156,7 @@ public class GameLogic {
         }
         if (g.getCurrentTurn().isEmpty()) {
             g.setPossibleTurns(g.getLegalTurns());
-        }
-        else if (piece != g.getPieceAt(g.getCurrentTurn().getLast().getToX(), g.getCurrentTurn().getLast().getToY())) {
+        } else if (piece != g.getPieceAt(g.getCurrentTurn().getLast().getToX(), g.getCurrentTurn().getLast().getToY())) {
             piece.abortMove();
             askForMove();
             return false;
@@ -127,6 +172,7 @@ public class GameLogic {
         }
 
         int i = g.getCurrentTurn().getMoves().size();
+
         // Handle capture moves
         for (Turn turn : legalTurns) {
             Move curMove = turn.getMoves().get(i);
@@ -175,25 +221,31 @@ public class GameLogic {
         return false;
     }
 
+    /**
+     * Executes a piece move and updates the game state.
+     * @param move The move to execute.
+     */
     private void movePiece(Move move) {
         if (move.isInvalid()) {
             move.getPiece().abortMove();
-        }
-        else if (move.isCapture()) {
+        } else if (move.isCapture()) {
             Capture capture = (Capture) move;
             Piece capturedPiece = g.getPieceAt(capture.getCaptureAtX(), capture.getCaptureAtY());
             System.out.println(capturedPiece.toString());
             app.pieceGroup.getChildren().remove(capturedPiece.getPieceDrawer());
             if (capture.getCapturedPiece().type.color.equals("white")) {
                 app.capturedPiecesTracker.capturePiece("Player 2");
-            }
-            else {
+            } else {
                 app.capturedPiecesTracker.capturePiece("Player 1");
             }
         }
         g.move(move);
     }
 
+    /**
+     * Undoes the last move made in the game.
+     * @param g The current game state.
+     */
     public void undoLastMove(GameState g) {
         if (g.getTurnsPlayed().isEmpty()) {
             return;
@@ -206,14 +258,17 @@ public class GameLogic {
             capturedPiece.setPieceDrawer(new PieceDrawer(capturedPiece, app));
             if (capturedPiece.getType().color.equals("white")) {
                 app.capturedPiecesTracker.decrementWhiteCaptured();
-            }
-            else {
+            } else {
                 app.capturedPiecesTracker.decrementBlackCaptured();
             }
         }
         askForMove();
     }
 
+    /**
+     * Undoes the last turn played in the game.
+     * @param g The current game state.
+     */
     public void undoLastTurn(GameState g) {
         Turn turn = g.getTurnsPlayed().remove(g.getTurnsPlayed().size() - 1);
         List<Move> moves = turn.getMoves();
@@ -222,6 +277,11 @@ public class GameLogic {
         }
     }
 
+    /**
+     * Retrieves all pieces that can legally move in the current state.
+     * @param g The current game state.
+     * @return A list of pieces that can make legal moves.
+     */
     public static List<Piece> getMovablePieces(GameState g) {
         List<Piece> movablePieces = new ArrayList<>();
         List<Piece> allPieces = g.getAllPieces();
@@ -235,5 +295,4 @@ public class GameLogic {
 
         return movablePieces;
     }
-
 }

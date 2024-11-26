@@ -44,7 +44,7 @@ public class GUI extends Application {
         selectionStage.getIcons().add(icon);
 
         // Create and style the game title label
-        Label gameTitle = new Label("Frisian Checkers");
+        Label gameTitle = new Label("Frisian Draughts");
         gameTitle.setFont(new Font("Arial", 32));
         gameTitle.setTextFill(Color.BLACK);
         gameTitle.setStyle("-fx-font-weight: bold;");

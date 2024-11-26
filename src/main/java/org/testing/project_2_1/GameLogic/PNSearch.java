@@ -5,9 +5,21 @@ import org.testing.project_2_1.Moves.Turn;
 
 import java.util.List;
 
-public class PNSearch { // Regular Proof-Number Search (see "Winands and van den Herik, 2008")
-    private boolean isWhite;
+/**
+ * Implements Regular Proof-Number Search (PNS) for game tree evaluation.
+ * Based on the work "Winands and van den Herik, 2008".
+ * PNS determines the proof or disproof of a node in a game tree
+ * by iteratively expanding nodes and updating proof/disproof numbers.
+ */
+public class PNSearch {
+
+    private boolean isWhite; // Indicates the player color for this search instance.
+
+    /**
+     * Inner class representing a single node in the PNS game tree.
+     */
     public class Node {
+        // Constants for node types, values, and infinity representation.
         public static final int INFINITY = Integer.MAX_VALUE;
         public static final int AND_NODE = 1;
         public static final int OR_NODE = 2;
@@ -15,16 +27,23 @@ public class PNSearch { // Regular Proof-Number Search (see "Winands and van den
         public static final int FALSE = 2;
         public static final int UNKNOWN = 3;
 
-        public int type;
-        public int value;
-        public int proof;
-        public int disproof;
-        public boolean expanded;
-        public List<Node> children;
-        public Node parent;
-        public Move moveFromParent;
-        public GameState state;
+        // Node properties
+        public int type; // Node type: AND or OR
+        public int value; // Evaluation result: TRUE, FALSE, or UNKNOWN
+        public int proof; // Proof number for this node
+        public int disproof; // Disproof number for this node
+        public boolean expanded; // Indicates if this node has been expanded
+        public List<Node> children; // List of child nodes
+        public Node parent; // Parent node
+        public Move moveFromParent; // Move leading to this node
+        public GameState state; // Game state represented by this node
 
+        /**
+         * Constructs a new Node with the specified properties.
+         * @param parent The parent node of this node.
+         * @param state The game state associated with this node.
+         * @param type The type of this node (AND or OR).
+         */
         public Node(Node parent, GameState state, int type) {
             this.parent = parent;
             this.state = state;
@@ -37,14 +56,23 @@ public class PNSearch { // Regular Proof-Number Search (see "Winands and van den
         }
     }
 
+    /**
+     * Constructor for PNSearch.
+     * @param isWhite Indicates whether the search is for the white player.
+     */
     public PNSearch(boolean isWhite) {
         this.isWhite = isWhite;
     }
 
+    /**
+     * Performs Proof-Number Search starting from the root node.
+     * @param root The root node of the search tree.
+     * @param maxNodes The maximum number of nodes to process.
+     */
     public void PN(Node root, int maxNodes) {
-        evaluate(root);
-        setProofAndDisproofNumbers(root);
-        int nodeCount = 1;
+        evaluate(root); // Initial evaluation of the root node
+        setProofAndDisproofNumbers(root); // Set initial proof/disproof numbers
+        int nodeCount = 1; // Track the number of processed nodes
         Node currentNode = root;
 
         while (root.proof != 0 && root.disproof != 0 && nodeCount <= maxNodes) {
@@ -55,6 +83,10 @@ public class PNSearch { // Regular Proof-Number Search (see "Winands and van den
         }
     }
 
+    /**
+     * Evaluates a node's game state and assigns its value.
+     * @param node The node to evaluate.
+     */
     public void evaluate(Node node) {
         int result = node.state.evaluate();
 
@@ -67,8 +99,12 @@ public class PNSearch { // Regular Proof-Number Search (see "Winands and van den
         }
     }
 
+    /**
+     * Sets the proof and disproof numbers for a given node.
+     * @param node The node for which to calculate proof/disproof numbers.
+     */
     public void setProofAndDisproofNumbers(Node node) {
-        if (node.expanded) { // AND NODE
+        if (node.expanded) { // AND or OR Node
             if (node.type == Node.AND_NODE) {
                 node.proof = 0;
                 node.disproof = Node.INFINITY;
@@ -78,7 +114,7 @@ public class PNSearch { // Regular Proof-Number Search (see "Winands and van den
                         node.disproof = n.disproof;
                     }
                 }
-            } else { // OR_NODE
+            } else { // OR Node
                 node.proof = Node.INFINITY;
                 node.disproof = 0;
                 for (Node n : node.children) {
@@ -106,6 +142,11 @@ public class PNSearch { // Regular Proof-Number Search (see "Winands and van den
         }
     }
 
+    /**
+     * Selects the most proving node (a leaf node) by traversing the tree.
+     * @param node The starting node.
+     * @return The most proving node.
+     */
     public Node selectMostProvingNode(Node node) {
         while (node.expanded) {
             Node nextNode = null;
@@ -132,6 +173,10 @@ public class PNSearch { // Regular Proof-Number Search (see "Winands and van den
         return node;
     }
 
+    /**
+     * Expands a given node by generating all its children.
+     * @param node The node to expand.
+     */
     public void expandNode(Node node) {
         generateAllChildren(node);
         for (Node n : node.children) {
@@ -145,6 +190,10 @@ public class PNSearch { // Regular Proof-Number Search (see "Winands and van den
         node.expanded = true;
     }
 
+    /**
+     * Generates all child nodes for a given node based on possible turns.
+     * @param node The node for which to generate children.
+     */
     public void generateAllChildren(Node node) {
         List<Turn> possibleTurns = node.state.getLegalTurns();
         int childType = (node.type == Node.AND_NODE) ? Node.OR_NODE : Node.AND_NODE;
@@ -158,6 +207,12 @@ public class PNSearch { // Regular Proof-Number Search (see "Winands and van den
         }
     }
 
+    /**
+     * Updates the proof and disproof numbers of a node's ancestors.
+     * @param node The node whose ancestors to update.
+     * @param root The root of the tree.
+     * @return The updated ancestor node.
+     */
     public Node updateAncestors(Node node, Node root) {
         do {
             int oldProof = node.proof;
@@ -176,9 +231,12 @@ public class PNSearch { // Regular Proof-Number Search (see "Winands and van den
         } while (true);
     }
 
+    /**
+     * Deletes the subtree rooted at the given node.
+     * @param node The root of the subtree to delete.
+     */
     public void deleteSubtree(Node node) {
         node.children.clear();
         node.expanded = false;
     }
 }
-
