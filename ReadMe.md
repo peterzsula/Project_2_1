@@ -14,12 +14,15 @@ Our work on Project 2-1, academic course 2024/25
 
 # Table of Contents  
 1. [Preface](#preface)  
-2. [Rules](#rules)  
-3. [Algorithms] (#algorithms)
-4. [Project Structure](#project-structure-and-algorithms)  
+2. [Rules](#rules)
+   -  [Winning conditions] (#winning-conditions)
+4. [Algorithms] (#algorithms)
+   - [Adversarial Search] (#adversarial-search)
+   - [Machine Learning] (#machine-learning)
+5. [Project Structure](#project-structure-and-algorithms)  
    - [Main Classes](#main-classes)  
    - [Supporting Classes](#supporting-classes)  
-4. [Running the Program](#running-the-program)  
+6. [Running the Program](#running-the-program)  
 
 ## Preface  
 This project aims to build a Java-based computer version of the board game
@@ -40,16 +43,18 @@ We establish the allowed moves/captures, constraints and regulations based on th
   - A piece is promoted to king when: any piece reaches the opposite king row (which is the first row on the opposition side)
     - A king piece is allowed to make simple moves, but also is allowed to move diagonally to any empty square. 
     - A king can make regular captures, but is also allowed to capture any enemy piece (in any direction) if and only if its linearly-following square is empty.
+   
+      ### Winning conditions
 
 ## Algorithms
 ### Adversarial Search.  
-1. Minimax
-2. Alpha-Beta Pruning
-3. MonteCarlo Tree Search
-4. Proof-Number Search
+1. Minimax: A decision-making algorithm that recursively evaluates all possible moves in checkers, assuming perfect play by both players. It maximizes the player's minimum gain, minimizes maximum loss in zero-sum games, such as Frisian Draughts.
+2. Alpha-Beta Pruning: An optimization technique for the Minimax algorithm that reduces the number of nodes evaluated in the game tree. It prunes branches that cannot influence the final decision, exponentially improving its time/space complexity, being able to set the depth of the tree as a parameter. Our agent `AlphabetaAgent.java` outperforms the rest of the intelligent agents, setting higher benchmarks after game simulations againts every single of the other agent, as we show be ruuning `Simulation.java`, which emulates two instances of an agents's class and keeps tracks of the number of wins after a _n_ number of simulations.  
+3. Monte Carlo Tree Search (MCTS): Combines tree search with random sampling to evaluate moves in checkers. It balances exploration of new strategies with exploitation of known good moves, using Upper Confidence Bound (UCB) for tree traversal. We found MCTS to be rather computionally inefficient in the context of our checkers game, especially when compared to Alpha-beta pruning. MCTS seems to be a bigger improvements in such games where there exists randomness (such as card games) or lack of perfect information. Our agents using MCTS, `AgentMCTS.java` is still fully functional.
+4. Proof-Number Search: A best-first search algorithm that efficiently proves or disproves positions in checkers. It focuses on the most promising lines of play by maintaining proof and disproof numbers for each node in the game tree. This search algorithm was
 ### Machine Learning. 
-1. Random Forest
-
+1. Random Forest: An ensemble method that constructs multiple (thousands) of decision trees and outputs the class that is the mode of the classes of the individual trees, used to predict optimal moves based on various game features and patterns. In this case, for each GameState the numerical value is calculated using a evaluation function (see Tom Mitchell, 1983), which accounts the number of black/whhite pieces present on the board. This approach was essentially not fully performed, given that our working team decided on deliver a better quality and high effeciency algorithm, which result to be the agent using AlphaBeta Pruning, `AlphaBetaAgent.java`.
+   
 ## Project Structure
 ### Main Classes
 -Game Logic. 
