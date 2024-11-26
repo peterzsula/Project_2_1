@@ -46,6 +46,19 @@ public class MinimaxAgent implements Agent {
     }
 
     /**
+     * Constructs a MinimaxAgent with a specified color, initial game state, and depth.
+     * @param isWhite Whether the agent plays as white.
+     * @param gameState The initial game state.
+     * @param maxDepth The maximum depth for the Minimax algorithm.
+     */
+    public MinimaxAgent(boolean isWhite, GameState gameState, int maxDepth) {
+        this.isWhite = isWhite;
+        this.gameState = gameState;
+        this.currentTurn = new Turn();
+        this.maxDepth = maxDepth;
+    }
+
+    /**
      * Sets the game logic for the agent.
      * Updates the current game state reference.
      * @param gameLogic The game logic to associate with the agent.

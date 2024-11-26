@@ -34,7 +34,7 @@ public class GUI extends Application {
      * @param selectionStage The main stage for the selection screen.
      */
     @Override
-    public void start(Stage selectionStage) {
+    public void start(@SuppressWarnings("exports") Stage selectionStage) {
         Pane selectionPane = new Pane();
         selectionPane.setPrefSize(500, 500);
         selectionPane.setBackground(new Background(new BackgroundFill(Color.web("#FAF0E6"), CornerRadii.EMPTY, Insets.EMPTY)));
@@ -174,10 +174,10 @@ public class GUI extends Application {
                 player1Agent = new BaselineAgent(true);
                 break;
             case "Minimax":
-                player1Agent = new MinimaxAgent(true, 3);
+                player1Agent = new MinimaxAgent(true, 4);
                 break;
             case "Alpha-Beta Pruning":
-                player1Agent = new AlphaBetaAgent(true, 6);
+                player1Agent = new AlphaBetaAgent(true, 3);
                 break;
             case "MCTS":
                 player1Agent = new AgentMCTS(true);

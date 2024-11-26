@@ -1,7 +1,6 @@
 package org.testing.project_2_1;
 
 import org.testing.project_2_1.Agents.*;
-import org.testing.project_2_1.Agents.AlphaBetaAgent;
 import org.testing.project_2_1.GameLogic.GameState;
 
 public class Simulation {
@@ -15,8 +14,8 @@ public class Simulation {
      */
     public static void main(String[] args) {
         GameState gameState = new GameState(); // Initialize the game state
-        Agent white = new AlphaBetaAgent(true, gameState, 3); // White agent with depth 3
-        Agent black = new AlphaBetaAgent(false, gameState, 6); // Black agent with depth 6
+        Agent white = new MinimaxAgent(true, gameState, 3); // White agent with depth 3
+        Agent black = new MinimaxAgent(false, gameState, 4); // Black agent with depth 6
         int whiteWins = 0; // Counter for white wins
         int blackWins = 0; // Counter for black wins
         int draws = 0; // Counter for draws

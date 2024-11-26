@@ -1,1 +1,1 @@
-getLegalTurns() doesnt find all possible moves since we changed undo
+Highlights won't highlight correct moves if there are multiple captures with more than one capture avaialble -> solution: currentturn in highlighter

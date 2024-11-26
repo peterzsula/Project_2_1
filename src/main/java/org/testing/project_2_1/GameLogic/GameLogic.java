@@ -6,9 +6,7 @@ import org.testing.project_2_1.UI.CheckersApp;
 import org.testing.project_2_1.UI.PieceDrawer;
 
 import java.util.ArrayList;
-import java.util.HashSet;
 import java.util.List;
-import java.util.Set;
 
 import javafx.scene.layout.Pane;
 
