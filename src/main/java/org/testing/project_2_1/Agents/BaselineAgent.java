@@ -11,14 +11,23 @@ import java.util.Random;
 
 import javafx.animation.PauseTransition;
 
+/**
+ * Represents a baseline agent for the game.
+ * This agent plays moves randomly from the set of legal moves
+ * and can simulate moves or pause/resume its actions.
+ */
 public class BaselineAgent implements Agent {
-    private PauseTransition pause;
-    private boolean onPause;
-    private GameLogic gameLogic;
-    private GameState gameState;
-    private boolean isWhite;
-    private Turn currentTurn;
+    private PauseTransition pause; // Handles delay between agent moves
+    private boolean onPause; // Tracks whether the agent is paused
+    private GameLogic gameLogic; // Reference to the game logic
+    private GameState gameState; // Current game state
+    private boolean isWhite; // Indicates if the agent is playing as white
+    private Turn currentTurn; // The current turn being processed by the agent
 
+    /**
+     * Constructs a baseline agent with a specified color.
+     * @param isWhite Whether the agent plays as white.
+     */
     public BaselineAgent(boolean isWhite) {
         this.isWhite = isWhite;
         pause = new PauseTransition(Duration.seconds(Agent.delay));
@@ -26,25 +35,46 @@ public class BaselineAgent implements Agent {
         currentTurn = new Turn();
     }
 
+    /**
+     * Constructs a baseline agent with a specified color and initial game state.
+     * @param isWhite Whether the agent plays as white.
+     * @param gameState The initial game state.
+     */
     public BaselineAgent(boolean isWhite, GameState gameState) {
         this.isWhite = isWhite;
         currentTurn = new Turn();
         this.gameState = gameState;
     }
 
+    /**
+     * Sets the game logic for the agent.
+     * @param gameLogic The game's logic object.
+     */
     public void setGameLogic(GameLogic gameLogic) {
         this.gameLogic = gameLogic;
     }
 
+    /**
+     * Sets the current game state for the agent.
+     * @param gameState The current game state.
+     */
     public void setGameState(GameState gameState) {
         this.gameState = gameState;
     }
 
+    /**
+     * Checks if the agent is playing as white.
+     * @return True if the agent is white, otherwise false.
+     */
     @Override
     public boolean isWhite() {
         return isWhite;
     }
 
+    /**
+     * Makes a move by selecting a random legal turn and executing the moves.
+     * Uses a delay to simulate thinking time.
+     */
     @Override
     public void makeMove() {
         System.out.println("Baseline agent making move");
@@ -65,11 +95,18 @@ public class BaselineAgent implements Agent {
         pause.play();
     }
 
+    /**
+     * Resets the agent by creating a new instance with the same configuration.
+     * @return A new instance of the BaselineAgent.
+     */
     @Override
     public BaselineAgent reset() {
         return new BaselineAgent(isWhite);
     }
 
+    /**
+     * Simulates the agent's actions by playing random moves until the game ends or the turn is empty.
+     */
     @Override
     public void simulate() {
         List<Turn> legalTurns = gameState.getLegalTurns();
@@ -85,6 +122,10 @@ public class BaselineAgent implements Agent {
         }
     }
 
+    /**
+     * Pauses or resumes the agent's actions.
+     * Toggles between pausing and resuming based on the current state.
+     */
     @Override
     public void pause() {
         if (onPause) {
@@ -97,5 +138,4 @@ public class BaselineAgent implements Agent {
             System.out.println("pause agent");
         }
     }
-
 }

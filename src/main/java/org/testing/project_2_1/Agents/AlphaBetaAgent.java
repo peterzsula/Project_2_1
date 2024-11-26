@@ -12,36 +12,62 @@ import java.util.Collections;
 import javafx.animation.PauseTransition;
 import javafx.util.Duration;
 
+/**
+ * Alpha-Beta agent implementation for the checkers game.
+ * The agent uses the Alpha-Beta pruning algorithm to evaluate and make optimal moves.
+ * Additionally, it switches to Proof-Number Search (PNS) for endgame scenarios.
+ */
 public class AlphaBetaAgent implements Agent {
-    private GameLogic gameLogic;
-    private GameState gameState;
+    private GameLogic gameLogic; // Reference to the game logic
+    private GameState gameState; // Current game state
 
-    private boolean isWhite;
-    private int maxDepth;
-    private final int defaultDepth = 3;
+    private boolean isWhite; // Indicates if the agent is playing as white
+    private int maxDepth; // Maximum depth for Alpha-Beta pruning
+    private final int defaultDepth = 3; // Default depth for Alpha-Beta pruning
 
     private int nodesVisited = 0; // Counter for runtime profiling
-    private Turn currentTurn;
+    private Turn currentTurn; // The current turn being executed by the agent
 
+    /**
+     * Constructs an Alpha-Beta agent with a specified color and maximum depth.
+     * @param isWhite Whether the agent plays as white.
+     * @param maxDepth The maximum depth for Alpha-Beta pruning.
+     */
     public AlphaBetaAgent(boolean isWhite, int maxDepth) {
         this.isWhite = isWhite;
         this.maxDepth = maxDepth;
         this.currentTurn = new Turn();
     }
-    public AlphaBetaAgent(boolean isWhite, GameState gameState){
+
+    /**
+     * Constructs an Alpha-Beta agent with a specified color and initial game state.
+     * @param isWhite Whether the agent plays as white.
+     * @param gameState The initial game state.
+     */
+    public AlphaBetaAgent(boolean isWhite, GameState gameState) {
         this.isWhite = isWhite;
         this.gameState = gameState;
         this.currentTurn = new Turn();
         this.maxDepth = defaultDepth;
     }
 
+    /**
+     * Constructs an Alpha-Beta agent with a specified color, game state, and depth.
+     * @param isWhite Whether the agent plays as white.
+     * @param gameState The initial game state.
+     * @param depth The depth for Alpha-Beta pruning.
+     */
     public AlphaBetaAgent(boolean isWhite, GameState gameState, int depth) {
         this.isWhite = isWhite;
         this.gameState = gameState;
         this.currentTurn = new Turn();
         this.maxDepth = depth;
     }
-    
+
+    /**
+     * Sets the game logic for the agent.
+     * @param gameLogic The game's logic object.
+     */
     public void setGameLogic(GameLogic gameLogic) {
         this.gameLogic = gameLogic;
         this.gameState = gameLogic.g;
@@ -57,14 +83,25 @@ public class AlphaBetaAgent implements Agent {
         return isWhite;
     }
 
+    /**
+     * Retrieves the number of nodes visited during the Alpha-Beta pruning process.
+     * @return The number of nodes visited.
+     */
     public int getNodesVisited() {
         return nodesVisited;
     }
 
+    /**
+     * Resets the node counter for profiling purposes.
+     */
     public void resetNodeCounter() {
         nodesVisited = 0; // Reset the counter for new runs
     }
 
+    /**
+     * Makes a move by selecting the best turn using either Alpha-Beta pruning or Proof-Number Search (PNS).
+     * This method evaluates the current game state and selects the best move.
+     */
     @Override
     public void makeMove() {
         System.out.println("Alpha-Beta agent making move");
@@ -87,12 +124,22 @@ public class AlphaBetaAgent implements Agent {
         pause.play();
     }
 
+    /**
+     * Checks if the game is in the endgame phase based on the number of pieces.
+     * @param gameState The current game state.
+     * @return True if the game is in the endgame phase, otherwise false.
+     */
     private boolean isEndgame(GameState gameState) {
         int totalPieces = gameState.countPieces();
-        int endgameThreshold = 15;
+        int endgameThreshold = 15; // Threshold for determining endgame based on the number of pieces
         return totalPieces <= endgameThreshold;
     }
 
+    /**
+     * Selects the best turn using Alpha-Beta pruning from the list of legal turns.
+     * @param turns The list of legal turns.
+     * @return The best turn based on Alpha-Beta pruning.
+     */
     private Turn getBestTurnABP(List<Turn> turns) {
         Turn bestTurn = null;
         int bestValue;
@@ -102,9 +149,6 @@ public class AlphaBetaAgent implements Agent {
             bestValue = Integer.MAX_VALUE;
         }
     
-        // List<Turn> shuffledTurns = new ArrayList<>(turns);
-        // Collections.shuffle(shuffledTurns); // Shuffle the turn before evaluation to avoid obtaining exact same outcome every game
-                
         for (Turn turn : turns) {
             GameState newState = new GameState(gameState);
             for (Move move : turn.getMoves()) {
@@ -133,6 +177,15 @@ public class AlphaBetaAgent implements Agent {
         return bestTurn;
     }
 
+    /**
+     * Alpha-Beta pruning implementation of the minimax algorithm to evaluate the best move.
+     * @param gameState The current game state.
+     * @param depth The remaining depth for the search.
+     * @param alpha The best value for the maximizer.
+     * @param beta The best value for the minimizer.
+     * @param isMaxPlayerWhite Whether the maximizing player is white.
+     * @return The evaluation of the current game state.
+     */
     public int minimaxPruning(GameState gameState, int depth, int alpha, int beta, boolean isMaxPlayerWhite) {
         if (depth == 0 || gameState.isGameOver()) {
             return (int) gameState.evaluateBoard();
@@ -176,33 +229,42 @@ public class AlphaBetaAgent implements Agent {
         }
     }
 
-    // Implement PN Search in endgame situations
-private Turn getBestTurnPNSearch() {
-    PNSearch pnSearch = new PNSearch(isWhite);
-    GameState currentState = gameState;
-    PNSearch.Node root;
-    if (isWhite) {
-        root = pnSearch.new Node(null, currentState, PNSearch.Node.OR_NODE);
-    } else {
-        root = pnSearch.new Node(null, currentState, PNSearch.Node.AND_NODE);
-    }
-    int maxNodes = 10000;
-    pnSearch.PN(root, maxNodes);
-
-    // Check if PNSearch found either a proof or disproof
-    if (root.proof == 0 || root.disproof == 0) {
-        Turn pnTurn = findBestTurnPNSearch(root);
-        if (pnTurn != null && !pnTurn.getMoves().isEmpty()) {
-            return pnTurn;
+    /**
+     * Determines the best turn in endgame situations using Proof-Number Search (PNS).
+     * Falls back to Alpha-Beta Pruning if PNS is inconclusive.
+     * @return The best turn found using PNS or Alpha-Beta Pruning.
+     */
+    private Turn getBestTurnPNSearch() {
+        PNSearch pnSearch = new PNSearch(isWhite);
+        GameState currentState = gameState;
+        PNSearch.Node root;
+        if (isWhite) {
+            root = pnSearch.new Node(null, currentState, PNSearch.Node.OR_NODE);
+        } else {
+            root = pnSearch.new Node(null, currentState, PNSearch.Node.AND_NODE);
         }
-    }
-    
-    // Fall back to alpha-beta pruning if PNSearch is inconclusive or returns invalid turn
-    System.out.println("PNSearch inconclusive, calling back Alpha-Beta Pruning");
-    List<Turn> turns = currentState.getLegalTurns();
-    return getBestTurnABP(turns);
-}
+        int maxNodes = 10000;
+        pnSearch.PN(root, maxNodes);
 
+        // Check if PNSearch found either a proof or disproof
+        if (root.proof == 0 || root.disproof == 0) {
+            Turn pnTurn = findBestTurnPNSearch(root);
+            if (pnTurn != null && !pnTurn.getMoves().isEmpty()) {
+                return pnTurn;
+            }
+        }
+
+        // Fall back to Alpha-Beta pruning if PNSearch is inconclusive or returns invalid turn
+        System.out.println("PNSearch inconclusive, calling back Alpha-Beta Pruning");
+        List<Turn> turns = currentState.getLegalTurns();
+        return getBestTurnABP(turns);
+    }
+
+    /**
+     * Traverses the PNS tree to construct the best turn based on the proof or disproof numbers.
+     * @param root The root node of the PNS tree.
+     * @return The best turn found in the PNS tree.
+     */
     private Turn findBestTurnPNSearch(PNSearch.Node root) {
         PNSearch.Node node = root;
         Turn bestTurn = new Turn();
@@ -237,8 +299,12 @@ private Turn getBestTurnPNSearch() {
         return bestTurn;
     }
 
-    // Using this for the Complexity tests
-    // PLEASE, DO NOT REMOVE ANYTHING
+    /**
+     * Profiles memory usage of the minimax algorithm for complexity analysis.
+     * @param gameState The game state to analyze.
+     * @param depth The depth to search in the minimax algorithm.
+     * @param isMaxPlayerWhite Whether the maximizing player is white.
+     */
     public void profileMemoryUsage(GameState gameState, int depth, boolean isMaxPlayerWhite) {
         Runtime runtime = Runtime.getRuntime();
 
@@ -259,6 +325,13 @@ private Turn getBestTurnPNSearch() {
         System.out.println("Memory used: " + memoryUsed + " bytes");
     }
 
+    /**
+     * Implements the plain minimax algorithm without Alpha-Beta pruning.
+     * @param gameState The current game state.
+     * @param depth The depth of the search.
+     * @param isMaxPlayerWhite Whether the maximizing player is white.
+     * @return The evaluation of the best possible move.
+     */
     public int minimaxPlain(GameState gameState, int depth, boolean isMaxPlayerWhite) {
         nodesVisited++; // Increment node counter
 
@@ -301,6 +374,10 @@ private Turn getBestTurnPNSearch() {
         return new AlphaBetaAgent(isWhite, maxDepth);
     }
 
+    /**
+     * Simulates the agent's decision-making process by playing the best moves
+     * using Alpha-Beta Pruning until a winner is determined.
+     */
     @Override
     public void simulate() {
         if (gameState.getIsWhiteTurn() == isWhite && gameState.getWinner() == 0) {
@@ -317,6 +394,11 @@ private Turn getBestTurnPNSearch() {
         }
     }
 
+    /**
+     * Pauses the agent's actions.
+     * Currently unimplemented.
+     * @throws UnsupportedOperationException If called.
+     */
     @Override
     public void pause() {
         // TODO Auto-generated method stub

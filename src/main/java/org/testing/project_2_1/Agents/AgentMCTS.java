@@ -12,24 +12,35 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Random;
 
-
+/**
+ * Implements an agent using Monte Carlo Tree Search (MCTS) for decision-making.
+ * The agent simulates multiple possible game outcomes to determine the optimal move.
+ */
 public class AgentMCTS implements Agent {
-    private GameLogic gameLogic;
-    private GameState gameState;
-    private boolean isWhite;
+    private GameLogic gameLogic; // Reference to the game logic
+    private GameState gameState; // Current game state
+    private boolean isWhite; // Indicates if the agent is playing as white
     private static final int SIMULATIONS = 20; // Number of simulations per move
-    private static final double EXPLORATION_CONSTANT = Math.sqrt(2); // UCB1 constant
-    private Turn currentTurn;
+    private static final double EXPLORATION_CONSTANT = Math.sqrt(2); // UCB1 constant for exploration
+    private Turn currentTurn; // The current turn being executed
 
-    // Node class for MCTS
+    /**
+     * Node class representing a state in the MCTS tree.
+     */
     private static class Node {
-        GameState state;
+        GameState state; // The game state at this node
         Turn turn; // The move leading to this state
-        Node parent;
-        ArrayList<Node> children;
-        int visits;
-        double wins;
+        Node parent; // Parent node
+        ArrayList<Node> children; // List of child nodes
+        int visits; // Number of visits to this node
+        double wins; // Total wins accumulated by this node
 
+        /**
+         * Constructs a Node for the MCTS tree.
+         * @param state The game state at this node.
+         * @param move The move leading to this state.
+         * @param parent The parent node.
+         */
         Node(GameState state, Turn move, Node parent) {
             this.state = state;
             this.turn = move;
@@ -40,11 +51,20 @@ public class AgentMCTS implements Agent {
         }
     }
 
+    /**
+     * Constructs an MCTS agent with the specified player color.
+     * @param isWhite Whether the agent plays as white.
+     */
     public AgentMCTS(boolean isWhite) {
         this.isWhite = isWhite;
         currentTurn = new Turn();
     }
 
+    /**
+     * Constructs an MCTS agent with the specified player color and game state.
+     * @param isWhite Whether the agent plays as white.
+     * @param gameState The initial game state.
+     */
     public AgentMCTS(boolean isWhite, GameState gameState) {
         this.isWhite = isWhite;
         this.gameState = gameState;
@@ -67,21 +87,24 @@ public class AgentMCTS implements Agent {
         this.gameState = gameState;
     }
 
+    /**
+     * Executes a move using MCTS to determine the best possible action.
+     */
     @Override
     public void makeMove() {
         System.out.println("Monte Carlo Tree Search agent making move");
 
-        // Create the root node
+        // Create the root node for the MCTS tree
         Node root = new Node(new GameState(gameState), null, null);
 
-        // Perform MCTS simulations
+        // Perform simulations
         for (int i = 0; i < SIMULATIONS; i++) {
-            Node selectedNode = selection(root);
+            Node selectedNode = selection(root); // Select the most promising node
             if (!selectedNode.state.isGameOver()) {
-                expansion(selectedNode);
+                expansion(selectedNode); // Expand the selected node
                 Node nodeToSimulate = selectedNode.children.isEmpty() ? selectedNode : getRandomChild(selectedNode);
-                double result = simulation(nodeToSimulate.state);
-                backpropagation(nodeToSimulate, result);
+                double result = simulation(nodeToSimulate.state); // Simulate the game
+                backpropagation(nodeToSimulate, result); // Update the tree with the result
             }
         }
 
@@ -145,7 +168,6 @@ public class AgentMCTS implements Agent {
 
         while (!simState.isGameOver()) {
             List<Turn> legalTurns = simState.getLegalTurns();
-
             if (legalTurns.isEmpty()) {
                 break; // Exit simulation if no legal turns are available
             }
@@ -156,10 +178,9 @@ public class AgentMCTS implements Agent {
             }
         }
 
-        // Return a simulated result
-        return simState.evaluateBoard(); // Positive value if white wins, negative if black wins no need to multiply by -1
+        // Return the simulated result
+        return simState.evaluateBoard(); // Positive if white wins, negative if black wins
     }
-
 
     private void backpropagation(Node node, double result) {
         while (node != null) {
@@ -201,7 +222,7 @@ public class AgentMCTS implements Agent {
     public void simulate() {
         Node root = new Node(new GameState(gameState), null, null);
 
-        // Perform MCTS simulations
+        // Perform simulations
         for (int i = 0; i < SIMULATIONS; i++) {
             Node selectedNode = selection(root);
             if (!selectedNode.state.isGameOver()) {
@@ -212,7 +233,7 @@ public class AgentMCTS implements Agent {
             }
         }
 
-        // Choose the best move
+        // Execute the best move
         Node bestChild = selectBestChild(root);
         if (bestChild != null && bestChild.turn != null) {
             if (currentTurn.isEmpty()) {
@@ -232,6 +253,4 @@ public class AgentMCTS implements Agent {
         // TODO Auto-generated method stub
         throw new UnsupportedOperationException("Unimplemented method 'pause'");
     }
-
 }
-
