@@ -14,13 +14,13 @@ public class Simulation {
      */
     public static void main(String[] args) {
         GameState gameState = new GameState(); // Initialize the game state
-        Agent white = new MinimaxAgent(true, gameState, 3); // White agent with depth 3
-        Agent black = new MinimaxAgent(false, gameState, 4); // Black agent with depth 6
+        Agent white = new AlphaBetaAgent(true, gameState, 4); // White agent with depth 3
+        Agent black = new AlphaBetaAgent(false, gameState, 5); // Black agent with depth 6
         int whiteWins = 0; // Counter for white wins
         int blackWins = 0; // Counter for black wins
         int draws = 0; // Counter for draws
         long startTime = System.nanoTime(); // Start measuring simulation runtime
-        final int SIMULATIONS = 10; // Number of games to simulate
+        final int SIMULATIONS = 20; // Number of games to simulate
 
         long totalWhiteThinkingTime = 0; // Total thinking time for White
         long totalBlackThinkingTime = 0; // Total thinking time for Black

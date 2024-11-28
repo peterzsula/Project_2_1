@@ -6,9 +6,10 @@ import org.testing.project_2_1.GameLogic.GameState;
 import org.testing.project_2_1.Moves.Move;
 import org.testing.project_2_1.Moves.Turn;
 
-import java.util.List;
 import java.util.ArrayList;
-import java.util.Collections;
+import java.util.List;
+import java.util.Random;
+
 import javafx.animation.PauseTransition;
 import javafx.util.Duration;
 
@@ -27,6 +28,7 @@ public class AlphaBetaAgent implements Agent {
 
     private int nodesVisited = 0; // Counter for runtime profiling
     private Turn currentTurn; // The current turn being executed by the agent
+    public boolean PNS = false; // Whether to use PNS for endgame scenarios
 
     /**
      * Constructs an Alpha-Beta agent with a specified color and maximum depth.
@@ -37,6 +39,21 @@ public class AlphaBetaAgent implements Agent {
         this.isWhite = isWhite;
         this.maxDepth = maxDepth;
         this.currentTurn = new Turn();
+    }
+
+    public AlphaBetaAgent(boolean isWhite,GameState gameState, int maxDepth,  boolean PNS) {
+        this.isWhite = isWhite;
+        this.maxDepth = maxDepth;
+        this.gameState = gameState;
+        this.currentTurn = new Turn();
+        this.PNS = PNS;
+    }
+
+    public AlphaBetaAgent(boolean isWhite, int maxDepth, boolean PNS) {
+        this.isWhite = isWhite;
+        this.maxDepth = maxDepth;
+        this.currentTurn = new Turn();
+        this.PNS = PNS;
     }
 
     /**
@@ -108,17 +125,16 @@ public class AlphaBetaAgent implements Agent {
         PauseTransition pause = new PauseTransition(Duration.seconds(Agent.delay));
         pause.setOnFinished(event -> {
             if (gameState.getIsWhiteTurn() == isWhite && !gameState.isGameOver()) {
-                List<Turn> turns = gameState.getLegalTurns();
-                if (gameState.isEndgame()) {
-                    System.out.println("Endgame detected, using Proof-Number Search");
-                    currentTurn = getBestTurnPNSearch();
-                } else {
+                if (currentTurn.isEmpty()) {
+                    List<Turn> turns = gameState.getLegalTurns();
+                    if (isEndgame(gameState) && PNS) {
+                        currentTurn = getBestTurnPNSearch();
+                    } else {
                     currentTurn = getBestTurnABP(turns);
+                    }
                 }
-                if (currentTurn != null && !currentTurn.getMoves().isEmpty()) {
-                    Move move = currentTurn.getMoves().removeFirst();
-                    gameLogic.takeMove(move);
-                }
+                Move move = currentTurn.getMoves().removeFirst();
+                gameLogic.takeMove(move);
             }
         });
         pause.play();
@@ -141,6 +157,7 @@ public class AlphaBetaAgent implements Agent {
      * @return The best turn based on Alpha-Beta pruning.
      */
     private Turn getBestTurnABP(List<Turn> turns) {
+        ArrayList<Turn> bestTurns = new ArrayList<>();
         Turn bestTurn = null;
         int bestValue;
         if (isWhite) {
@@ -158,22 +175,21 @@ public class AlphaBetaAgent implements Agent {
             int boardValue = minimaxPruning(newState, maxDepth, Integer.MIN_VALUE, Integer.MAX_VALUE, !isWhite);
     
             if (isWhite) {
-                if (boardValue > bestValue) {
+                if (boardValue >= bestValue) {
                     bestValue = boardValue;
                     bestTurn = turn;
-                } else if (boardValue == bestValue) {
-                    bestTurn = turn;
+                    bestTurns.add(turn);
                 }
             } else {
                 if (boardValue < bestValue) {
                     bestValue = boardValue;
                     bestTurn = (turn);
-                } else if (boardValue == bestValue) {
-                    bestTurn = turn;
+                    bestTurns.add(turn);
                 }
             }
         }
-        
+        int randomIndex = new Random().nextInt(bestTurns.size());
+        bestTurn = bestTurns.get(randomIndex);
         return bestTurn;
     }
 
