@@ -157,7 +157,7 @@ public class GameState {
      * @return True if the game is over, otherwise false.
      */
     public boolean isGameOver() {
-        if (whitePieces.isEmpty() || blackPieces.isEmpty()) {
+        if (whitePieces.isEmpty() || blackPieces.isEmpty() || isDraw()) {
             isGameOver = true;
         }
         return isGameOver;
@@ -776,7 +776,7 @@ public class GameState {
      * @return True if the game is a draw, otherwise false.
      */
     public boolean isDraw() {
-        return turnsPlayed.size() >= 100;
+        return turnsPlayed.size() >= 150;
     }
 
     /**

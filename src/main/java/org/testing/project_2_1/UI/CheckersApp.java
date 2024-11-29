@@ -52,6 +52,8 @@ public class CheckersApp extends Application {
     private long previousPlayerTwoTime; // Tracks Player 2's previous time
     private Agent agent1; // The first agent
     private Agent agent2; // The second agent
+    static boolean autoRestart = true; // Tracks if the game should auto-restart
+
     /**
      * Gets the group containing the board visuals.
      *
@@ -137,6 +139,7 @@ public class CheckersApp extends Application {
         } else if (noOfPlayers == 1 && gameLogic.agent.isWhite() && isPlayerOneTurn) {
             gameLogic.agent.makeMove();
         }
+        
 
         // Ensure the application terminates when the window is closed
         primaryStage.setOnCloseRequest(event -> {
@@ -150,6 +153,18 @@ public class CheckersApp extends Application {
             // Terminate the application
             System.exit(0);
         });
+    }
+
+    public void autoRestart() {
+        if (autoRestart && gameLogic.g.isGameOver() && noOfPlayers == 0) {
+            //wait for 2 seconds before restarting
+            try {
+                Thread.sleep(2000);
+            } catch (InterruptedException e) {
+                e.printStackTrace();
+            }
+            resetGUI();
+        }
     }
 
     /**
@@ -203,16 +218,6 @@ public class CheckersApp extends Application {
         // Reset Button
         Button resetButton = new Button("Restart");
         resetButton.setOnAction(e -> {
-            if (noOfPlayers == 0) {
-                gameLogic = new GameLogic(this, agent1, agent2);
-            }
-            else if (noOfPlayers == 1) {
-                gameLogic = new GameLogic(this, agent1);
-            } else {
-                gameLogic = new GameLogic(this);
-                
-            }
-            
             resetGUI();
         });
 
@@ -301,6 +306,14 @@ public class CheckersApp extends Application {
      * Ensures all pieces and tiles are properly redrawn and re-initialized.
      */
     public void resetGUI() {
+        if (noOfPlayers == 0) {
+            gameLogic = new GameLogic(this, agent1, agent2);
+        }
+        else if (noOfPlayers == 1) {
+            gameLogic = new GameLogic(this, agent1);
+        } else {
+            gameLogic = new GameLogic(this);   
+        }
         if (pieceGroup == null) {
             pieceGroup = new Group();
         }

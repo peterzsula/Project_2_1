@@ -12,7 +12,7 @@ public interface Agent {
     /**
      * The delay (in seconds) for an agent's move to simulate thinking time.
      */
-    public static final double delay = 0.05;
+    public static final double delay = 0.001;
 
     /**
      * Determines whether the agent is playing as white.

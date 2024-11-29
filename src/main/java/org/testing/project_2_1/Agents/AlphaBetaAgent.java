@@ -121,7 +121,7 @@ public class AlphaBetaAgent implements Agent {
      */
     @Override
     public void makeMove() {
-        System.out.println("Alpha-Beta agent making move");
+        //System.out.println("Alpha-Beta agent making move");
         PauseTransition pause = new PauseTransition(Duration.seconds(Agent.delay));
         pause.setOnFinished(event -> {
             if (gameState.getIsWhiteTurn() == isWhite && !gameState.isGameOver()) {

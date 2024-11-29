@@ -1,5 +1,6 @@
 package org.testing.project_2_1.GameLogic;
 
+import org.testing.project_2_1.Simulation;
 import org.testing.project_2_1.Agents.Agent;
 import org.testing.project_2_1.Moves.*;
 import org.testing.project_2_1.UI.CheckersApp;
@@ -64,7 +65,7 @@ public class GameLogic {
     public void setStandardValues(CheckersApp app) {
         this.app = app;
         g = new GameState(); // Initialize the game state
-        new Pane(); // Initialize the graphical Pane (currently unused)
+        // new Pane(); // Initialize the graphical Pane (needed for some reason)
         g.setPossibleTurns(g.getLegalTurns()); // Initialize possible turns
     }
 
@@ -97,17 +98,41 @@ public class GameLogic {
      * Updates the UI and prints the current turn status.
      */
     private void askForMove() {
-        if (g.isGameOver()) {
-            System.out.println("Game over");
-            return;
+        int result = g.getWinner();
+        if (result != 0) {
+            //System.out.println("Game over");
+            Simulation.simsRan++;
+            switch (result) {
+                case 1:
+                    Simulation.whiteWins++;
+                    System.out.println("White wins");
+                    break;
+                case -1:
+                    Simulation.blackWins++;
+                    System.out.println("Black wins");
+                    break;
+                case 100:
+                    Simulation.draws++;
+                    System.out.println("Draw");
+                    break;
+                default:
+                    break;
+            }
+            if (Simulation.SIMULATIONS > Simulation.simsRan) {
+                app.autoRestart();
+            }
+            else {
+                System.out.println("White wins: " + Simulation.whiteWins + ", Black wins: " + Simulation.blackWins + ", Draws: " + Simulation.draws);
+            }
+            
         }
         app.updateGlows(); // Update highlights for possible moves
         app.updateEvaluationBar(); // Update the UI evaluation bar
-        System.out.println();
+        //System.out.println();
         if (g.isWhiteTurn) {
-            System.out.println("White's turn");
+            //System.out.println("White's turn");
         } else {
-            System.out.println("Black's turn");
+            //System.out.println("Black's turn");
         }
         // Delegate move-making to agents if applicable
         if (agent != null && agent.isWhite() == g.isWhiteTurn) {
@@ -163,7 +188,7 @@ public class GameLogic {
 
         // Handle normal moves when no captures are available
         if (move.isNormal() && !legalTurns.get(0).isShot()) {
-            System.out.println("No available captures, making normal move");
+            //System.out.println("No available captures, making normal move");
             movePiece(move);
             askForMove();
             return true;
@@ -183,12 +208,12 @@ public class GameLogic {
 
                 // If the turn ends after the move
                 if (curMove.isTurnEnding()) {
-                    System.out.println("Made all available captures");
+                    //System.out.println("Made all available captures");
                     askForMove();
                     return true;
                 } else {
                     // Handle additional captures in the same turn
-                    System.out.println("Made capture, can take again");
+                    //System.out.println("Made capture, can take again");
                     askForMove();
                     return true;
                 }
@@ -207,7 +232,7 @@ public class GameLogic {
         if (g.getCurrentTurn().getLast().isCapture()) {
             piece.abortMove();
             app.updateCaptureMessage(" ");
-            System.out.println("Can take again");
+            //System.out.println("Can take again");
             askForMove();
             return true;
         }
@@ -229,7 +254,7 @@ public class GameLogic {
         } else if (move.isCapture()) {
             Capture capture = (Capture) move;
             Piece capturedPiece = g.getPieceAt(capture.getCaptureAtX(), capture.getCaptureAtY());
-            System.out.println(capturedPiece.toString());
+            //System.out.println(capturedPiece.toString());
             app.pieceGroup.getChildren().remove(capturedPiece.getPieceDrawer());
             if (capture.getCapturedPiece().type.color.equals("white")) {
                 app.capturedPiecesTracker.capturePiece("Player 2");

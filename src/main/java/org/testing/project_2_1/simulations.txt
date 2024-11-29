@@ -115,3 +115,38 @@ Black average thinking time: 1231 ms
 White average memory usage: 124055 KB
 Black average memory usage: 1157699 KB
 Simulation total runtime: 151 s
+
+White wins: 73 ABP  depth 5
+Black wins: 27 ABP dept 1
+Draws: 0
+White average thinking time: 2070 ms
+Black average thinking time: 21 ms
+Simulation total runtime: 209 s
+
+White wins: 72 ABP d5
+Black wins: 27 ABP d1, pns
+Draws: 1
+White average thinking time: 2044 ms
+Black average thinking time: 20 ms
+Simulation total runtime: 206 s
+
+White wins: 39 ABP d1
+Black wins: 60 ABP d5
+Draws: 1
+White average thinking time: 24 ms
+Black average thinking time: 2806 ms
+Simulation total runtime: 283 s
+
+White wins: 36 ABP d1 pns
+Black wins: 64 ABP d5
+Draws: 0
+White average thinking time: 23 ms
+Black average thinking time: 2864 ms
+Simulation total runtime: 288 s
+
+White wins: 52 ABP d5 pns
+Black wins: 47 ABP d5
+Draws: 1
+White average thinking time: 2229 ms
+Black average thinking time: 2668 ms
+Simulation total runtime: 489 s
