@@ -2,6 +2,7 @@ package org.testing.project_2_1.GameLogic;
 
 import static org.testing.project_2_1.UI.CheckersApp.SIZE;
 
+import java.lang.reflect.Array;
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
@@ -20,13 +21,15 @@ import org.testing.project_2_1.Moves.Turn;
 public class GameState {
     protected Tile[][] board; // The game board represented as a 2D array of tiles
     protected boolean isWhiteTurn; // Indicates if it's White's turn
-    private ArrayList<Piece> whitePieces; // List of white pieces currently on the board
-    private ArrayList<Piece> blackPieces; // List of black pieces currently on the board
+    private ArrayList<Piece> whitePieces; // List of ALL white pieces currently on the board (including kings)
+    private ArrayList<Piece> blackPieces; // List of ALL black pieces currently on the board (including kings)
     private ArrayList<Turn> turnsPlayed; // History of turns played
     private Turn currentTurn; // The current turn being processed
     private List<Turn> possibleTurns; // List of possible turns for the current player
     private boolean isGameOver; // Indicates if the game is over
     private int winner; // Stores the winner of the game (0 = none, 1 = white, -1 = black)
+    private ArrayList<Piece> whiteKings; // List of white kings
+    private ArrayList<Piece> blackKings; // List of black kings
 
     /**
      * Default constructor for initializing a new game state.
@@ -36,6 +39,8 @@ public class GameState {
         isWhiteTurn = true;
         whitePieces = new ArrayList<>();
         blackPieces = new ArrayList<>();
+        whiteKings = new ArrayList<>();
+        blackKings = new ArrayList<>();
         turnsPlayed = new ArrayList<>();
         currentTurn = new Turn();
         possibleTurns = new ArrayList<>();
@@ -68,6 +73,8 @@ public class GameState {
     public GameState(GameState originalB) {
         this.whitePieces = new ArrayList<>();
         this.blackPieces = new ArrayList<>();
+        this.whiteKings = new ArrayList<>();
+        this.blackKings = new ArrayList<>();
         this.turnsPlayed = new ArrayList<>();
         this.currentTurn = new Turn(originalB.getCurrentTurn());
         this.possibleTurns = new ArrayList<>(originalB.getPossibleTurns());
@@ -88,6 +95,12 @@ public class GameState {
                         this.whitePieces.add(this.board[x][y].getPiece());
                     } else {
                         this.blackPieces.add(this.board[x][y].getPiece());
+                    }
+                    if (piece.type == PieceType.WHITEKING) {
+                        whiteKings.add(piece);
+                    }
+                    else if (piece.type == PieceType.BLACKKING) {
+                        blackKings.add(piece);
                     }
                 }
             }
@@ -1026,40 +1039,28 @@ public class GameState {
      * @return A positive score for White's advantage, negative for Black's advantage.
      */
     public double evaluateBoard() {
-        int x1 = 0, x2 = 0, x3 = 0, x4 = 0, x5 = 0, x6 = 0;
+        int[] x = boardParameters();
         // evaluation positive for white, negative for black
-        double w1 = -1, w2 = 1, w3 = -3, w4 = 3, w5 = 1, w6 = -1;
-
-        // Count black pieces and black kings
-        for (Piece piece : getBlackPieces()) {
-            if (piece.type == PieceType.BLACK) {
-                x1++;
-            } else {
-                x3++;
-            }
-        }
-
-        // Count white pieces and white kings
-        for (Piece piece : getWhitePieces()) {
-            if (piece.type == PieceType.WHITE) {
-                x2++;
-            } else {
-                x4++;
-            }
-        }
-
-        // Count black pieces threatened by white
-        Set<Piece> threatenedPieces = getPiecesTheathenedBy(getWhitePieces());
-        x5 = threatenedPieces.size();
-        threatenedPieces.clear();
-
-        // Count white pieces threatened by black
-        threatenedPieces = getPiecesTheathenedBy(getBlackPieces());
-        x6 = threatenedPieces.size();
-
+        double w0 = -1, w1 = 1, w2 = -3, w3 = 3, w4 = 1, w5 = -1;
         // Calculate and return the weighted evaluation
-        return w1 * x1 + w2 * x2 + w3 * x3 + w4 * x4 + w5 * x5 + w6 * x6;
+        return w0*x[0] + w1*x[1] + w2*x[2] + w3*x[3] + w4*x[4] + w5*x[5];
+    }
+
+    public double evaluateBoard(double[] weights) {
+        int[] x = boardParameters();
+        return weights[0]*x[0] + weights[1]*x[1] + weights[2]*x[2] + weights[3]*x[3] + weights[4]*x[4] + weights[5]*x[5];
     }
 
     // end of old GameLogic methods
+
+    public int[] boardParameters() {
+        int[] parameters = new int[6];
+        parameters[0] = whitePieces.size();
+        parameters[1] = blackPieces.size();
+        parameters[2] = whiteKings.size();
+        parameters[3] = blackKings.size();
+        parameters[4] = getPiecesTheathenedBy(getWhitePieces()).size();
+        parameters[5] = getPiecesTheathenedBy(getBlackPieces()).size();
+        return parameters;
+    }
 }

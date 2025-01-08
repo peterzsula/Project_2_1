@@ -135,10 +135,10 @@ public class GameLogic {
             //System.out.println("Black's turn");
         }
         // Delegate move-making to agents if applicable
-        if (agent != null && agent.isWhite() == g.isWhiteTurn) {
+        if (agent != null && agent.isWhite() == g.isWhiteTurn && !isGameOver(g)) {
             agent.makeMove();
         }
-        if (opponent != null && opponent.isWhite() == g.isWhiteTurn) {
+        if (opponent != null && opponent.isWhite() == g.isWhiteTurn && !isGameOver(g)) {
             opponent.makeMove();
         }
     }

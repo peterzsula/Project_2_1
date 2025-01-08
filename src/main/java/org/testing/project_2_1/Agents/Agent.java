@@ -2,6 +2,7 @@ package org.testing.project_2_1.Agents;
 
 import org.testing.project_2_1.GameLogic.GameLogic;
 import org.testing.project_2_1.GameLogic.GameState;
+import org.testing.project_2_1.Moves.Move;
 
 /**
  * Interface representing an agent in the game.
@@ -58,4 +59,8 @@ public interface Agent {
      * @param gameState The current game state.
      */
     public void setGameState(GameState gameState);
+
+    default Move randomMove(){
+        return null;
+    }
 }

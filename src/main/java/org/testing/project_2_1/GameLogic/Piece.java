@@ -33,6 +33,10 @@ public class Piece {
         this.pieceDrawer = null;
     }
 
+    public Piece(String string) {
+        //TODO Auto-generated constructor stub
+    }
+
     /**
      * Gets the type of the piece.
      *

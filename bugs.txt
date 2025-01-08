@@ -1,1 +1,2 @@
 Highlights won't highlight correct moves if there are multiple captures with more than one capture avaialble -> solution: currentturn in highlighter
+the game lets you move a king instead of taking
