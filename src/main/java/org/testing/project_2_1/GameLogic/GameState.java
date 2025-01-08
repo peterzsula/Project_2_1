@@ -855,19 +855,41 @@ public class GameState {
      * Uses depth-first search (DFS) to explore potential capture sequences.
      * @param piece The piece for which legal turns are being determined.
      * @return A list of legal turns for the specified piece.
-     */
+    */
     public ArrayList<Turn> getLegalTurns(Piece piece) {
-        GameState g = new GameState(this); // Create a copy of the current game state
+        // Create a copy of the current game state
+        GameState g = new GameState(this);
+
+        // Get all possible moves for the given piece
         ArrayList<Move> availableMoves = g.getPossibleMoves(piece);
-        if (availableMoves.get(0).isNormal()) {
-            return Turn.copyMovesToTurns(availableMoves); // Convert normal moves to turns
+
+        // Handle cases where the list of available moves is null or empty
+        if (availableMoves == null || availableMoves.isEmpty()) {
+            // Return an empty list if no moves are available
+            return new ArrayList<>();
         }
-        DepthFirstSearch.resetMaxCaptures(); // Reset DFS variables
-        DepthFirstSearch.resetResult();
+
+        // Check if the first move is a normal move (not a capture)
+        if (availableMoves.get(0).isNormal()) {
+            // Convert normal moves to turns and return
+            return Turn.copyMovesToTurns(availableMoves);
+        }
+
+        // Reset DFS-related variables to ensure a clean state
+        DepthFirstSearch.resetMaxCaptures(); // Clear any previous max capture data
+        DepthFirstSearch.resetResult(); // Reset the DFS result storage
+
+        // Initialize the starting point for the DFS
         Turn initialTurn = new Turn();
-        DepthFirstSearch.dfs(g, piece, initialTurn, 0); // Perform DFS to find capture sequences
+
+        // Perform depth-first search to find all capture sequences
+        DepthFirstSearch.dfs(g, piece, initialTurn, 0);
+
+        // Retrieve the results of the DFS
         ArrayList<Turn> result = DepthFirstSearch.getResult();
-        return result;
+
+        // Ensure the result is not null; return an empty list if no turns are found
+        return result != null ? result : new ArrayList<>();
     }
 
     /**

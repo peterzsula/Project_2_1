@@ -198,7 +198,15 @@ public class GameLogic {
 
         // Handle capture moves
         for (Turn turn : legalTurns) {
-            Move curMove = turn.getMoves().get(i);
+            int moveIndex = Math.min(g.getCurrentTurn().getMoves().size(), turn.getMoves().size() - 1);
+
+            // Check if the move index is out of bounds
+            if (moveIndex >= turn.getMoves().size()) {
+                continue; // Skip to the next turn
+            }
+
+            Move curMove = turn.getMoves().get(moveIndex);
+
             if (curMove.equals(move)) {
                 if (curMove.isTurnEnding()) {
                     move.setTurnEnding(true);
@@ -206,20 +214,27 @@ public class GameLogic {
                 movePiece(move);
                 app.updateCaptureMessage(" ");
 
-                // If the turn ends after the move
-                if (curMove.isTurnEnding()) {
-                    //System.out.println("Made all available captures");
+                // Reset `g.getCurrentTurn()` to avoid invalid `moveIndex`
+                g.getCurrentTurn().getMoves().clear();
+
+                // Get updated legal turns
+                List<Turn> updatedLegalTurns = g.getLegalTurns();
+
+                boolean canAnyPieceCapture = updatedLegalTurns.stream().anyMatch(Turn::isShot);
+
+                if (curMove.isTurnEnding() || !canAnyPieceCapture) {
+                    g.setPossibleTurns(g.getLegalTurns()); // Update turns for the next player
                     askForMove();
-                    return true;
+                    return true; // End the current player's turn
                 } else {
-                    // Handle additional captures in the same turn
-                    //System.out.println("Made capture, can take again");
-                    askForMove();
+                    askForMove(); // Prompt the player to continue capturing
                     return true;
                 }
             }
         }
 
+        //return false; // No matching move found in legal turns
+    
         // Handle cases where the current turn is empty
         if (g.getCurrentTurn().isEmpty()) {
             piece.abortMove();
