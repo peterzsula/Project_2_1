@@ -54,11 +54,11 @@ public class GameState {
                 Tile tile = new Tile(x, y);
                 board[x][y] = tile;
                 if (y <= ((SIZE - 2) / 2) - 1 && tile.isBlack()) {
-                    Piece piece = new Piece(PieceType.BLACK, x, y);
+                    Piece piece = new Piece(PieceType.BLACK, x, y, this);
                     tile.setPiece(piece);
                     blackPieces.add(piece);
                 } else if (y >= SIZE - ((SIZE - 2) / 2) && tile.isBlack()) {
-                    Piece piece = new Piece(PieceType.WHITE, x, y);
+                    Piece piece = new Piece(PieceType.WHITE, x, y, this);
                     tile.setPiece(piece);
                     whitePieces.add(piece);
                 }
@@ -89,7 +89,7 @@ public class GameState {
                 this.board[x][y] = new Tile(x, y);
                 if (originalB.board[x][y].hasPiece()) {
                     Piece originalPiece = originalB.board[x][y].getPiece();
-                    Piece piece = new Piece(originalPiece.type, x, y);
+                    Piece piece = new Piece(originalPiece.type, x, y, this);
                     this.board[x][y].setPiece(piece);
                     if (piece.type == PieceType.WHITE || piece.type == PieceType.WHITEKING) {
                         this.whitePieces.add(this.board[x][y].getPiece());
@@ -318,7 +318,7 @@ public class GameState {
         board[move.getToX()][move.getToY()].setPiece(null);
         if (move.isCapture()) {
             Capture capture = (Capture) move;
-            Piece capturedPiece = new Piece(capture.getCapturedPiece().getType(), capture.getCaptureAtX(), capture.getCaptureAtY());
+            Piece capturedPiece = new Piece(capture.getCapturedPiece().getType(), capture.getCaptureAtX(), capture.getCaptureAtY(), this);
             board[capturedPiece.getX()][capturedPiece.getY()].setPiece(capturedPiece);
             addCapturedPieceToLists(capturedPiece);
         }
@@ -1063,7 +1063,7 @@ public class GameState {
     public double evaluateBoard() {
         int[] x = boardParameters();
         // evaluation positive for white, negative for black
-        double w0 = -1, w1 = 1, w2 = -3, w3 = 3, w4 = 1, w5 = -1;
+        double w0 = 1, w1 = -1, w2 = 3, w3 = -3, w4 = 1, w5 = -1;
         // Calculate and return the weighted evaluation
         return w0*x[0] + w1*x[1] + w2*x[2] + w3*x[3] + w4*x[4] + w5*x[5];
     }
@@ -1077,12 +1077,41 @@ public class GameState {
 
     public int[] boardParameters() {
         int[] parameters = new int[6];
-        parameters[0] = whitePieces.size();
-        parameters[1] = blackPieces.size();
-        parameters[2] = whiteKings.size();
-        parameters[3] = blackKings.size();
+        
+        for (Piece piece : getWhitePieces()) {
+            if (piece.type == PieceType.WHITE) {
+                parameters[0]++;
+            } else {
+                parameters[2]++;
+            }
+        }
+
+        for (Piece piece : getBlackPieces()) {
+            if (piece.type == PieceType.BLACK) {
+                parameters[1]++;
+            } else {
+                parameters[3]++;
+            }
+        }
+
         parameters[4] = getPiecesTheathenedBy(getWhitePieces()).size();
         parameters[5] = getPiecesTheathenedBy(getBlackPieces()).size();
         return parameters;
+    }
+
+    public void addWhiteKing(Piece piece) {
+        whiteKings.add(piece);
+    }
+
+    public void addBlackKing(Piece piece) {
+        blackKings.add(piece);
+    }
+
+    public void removeWhiteKing(Piece piece) {
+        whiteKings.remove(piece);
+    }
+
+    public void removeBlackKing(Piece piece) {
+        blackKings.remove(piece);
     }
 }

@@ -18,6 +18,7 @@ public class Piece {
     public PieceType type; // The type of the piece (e.g., BLACK, WHITE, KING)
     private int x, y; // The x and y coordinates of the piece on the board
     private PieceDrawer pieceDrawer; // The visual representation of the piece
+    private final GameState gameState;
 
     /**
      * Constructs a `Piece` with the specified type and position.
@@ -25,16 +26,14 @@ public class Piece {
      * @param type The type of the piece.
      * @param x    The initial x-coordinate of the piece.
      * @param y    The initial y-coordinate of the piece.
+     * @param gameState
      */
-    public Piece(PieceType type, int x, int y) {
+    public Piece(PieceType type, int x, int y, GameState gameState) {
         this.type = type;
         this.x = x;
         this.y = y;
         this.pieceDrawer = null;
-    }
-
-    public Piece(String string) {
-        //TODO Auto-generated constructor stub
+        this.gameState = gameState;
     }
 
     /**
@@ -135,8 +134,10 @@ public class Piece {
     public void promoteToKing() {
         if (type.color.equals("white") && type == PieceType.WHITE) {
             type = PieceType.WHITEKING;
+            gameState.addWhiteKing(this);
         } else if (type.color.equals("black") && type == PieceType.BLACK) {
             type = PieceType.BLACKKING;
+            gameState.addBlackKing(this);
         }
         if (pieceDrawer != null) {
             pieceDrawer.promoteToKing();
@@ -149,11 +150,13 @@ public class Piece {
     public void demoteToNormal() {
         if (type.color.equals("white") && type == PieceType.WHITEKING) {
             type = PieceType.WHITE;
+            gameState.removeWhiteKing(this);
         } else if (type.color.equals("black") && type == PieceType.BLACKKING) {
             type = PieceType.BLACK;
         }
         if (pieceDrawer != null) {
             pieceDrawer.demoteToNormal();
+            gameState.removeBlackKing(this);
         }
     }
 
