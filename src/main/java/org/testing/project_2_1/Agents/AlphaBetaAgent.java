@@ -174,23 +174,25 @@ public class AlphaBetaAgent implements Agent {
             int boardValue = minimaxPruning(newState, maxDepth, Integer.MIN_VALUE, Integer.MAX_VALUE, !isWhite);
     
             if (isWhite) {
-                if (boardValue > bestValue) {
+                if (boardValue == bestValue) {
+                    bestTurns.add(turn);
+                }
+                else if (boardValue > bestValue) {
                     bestValue = boardValue;
                     bestTurns.clear();
                     bestTurns.add(turn);
                 }
-                if (boardValue == bestValue) {
-                    bestTurns.add(turn);
-                }
+                
             } else {
-                if (boardValue < bestValue) {
+                if (boardValue == bestValue) {
+                    bestTurns.add(turn);
+                }
+                else if (boardValue < bestValue) {
                     bestValue = boardValue;
                     bestTurns.clear();
                     bestTurns.add(turn);
                 }
-                if (boardValue == bestValue) {
-                    bestTurns.add(turn);
-                }
+                
             }
         }
         int randomIndex = new Random().nextInt(bestTurns.size());
