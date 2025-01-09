@@ -12,6 +12,7 @@ public class Turn {
     private List<Move> moves; // List of moves in the turn
     private boolean isShot; // Indicates if the turn involves a capture (shot)
     private double evaluation; // Evaluation score of the turn
+    private boolean isRandomChoice;
 
     /**
      * Default constructor initializing an empty turn.
@@ -19,6 +20,7 @@ public class Turn {
     public Turn() {
         moves = new LinkedList<>();
         evaluation = 0;
+        isRandomChoice = false;
     }
 
     /**
@@ -31,6 +33,7 @@ public class Turn {
         this.moves = new LinkedList<>(moves);
         this.isShot = isShot;
         evaluation = 0;
+        isRandomChoice = false;
     }
 
     /**
@@ -44,6 +47,8 @@ public class Turn {
         for (Move move : currentTurn.getMoves()) {
             this.moves.add(move);
         }
+        this.evaluation = currentTurn.evaluation;
+        this.isRandomChoice = currentTurn.isRandomChoice;
     }
 
     /**
@@ -116,6 +121,14 @@ public class Turn {
         if (!moves.isEmpty()) {
             moves.remove(moves.size() - 1);
         }
+    }
+
+    public boolean isRandomChoice() {
+        return isRandomChoice;
+    }
+
+    public void setRandomChoice(boolean isRandomChoice) {
+        this.isRandomChoice = isRandomChoice;
     }
 
     /**

@@ -197,6 +197,9 @@ public class AlphaBetaAgent implements Agent {
         }
         int randomIndex = new Random().nextInt(bestTurns.size());
         Turn bestTurn = bestTurns.get(randomIndex);
+        if (bestTurns.size() != 1) {
+            bestTurn.setRandomChoice(true);
+        }
         bestTurn.setEvaluation(bestValue);
         return bestTurn;
     }

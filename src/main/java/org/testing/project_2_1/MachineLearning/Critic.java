@@ -16,10 +16,19 @@ public class Critic {
         agent = new AlphaBetaAgent(true, gamestate, 5);
     }
 
-    public void findRandomMove(){
+    public void skipToRandomMove(){
         currentGame = new GameState();
-        List<Turn> availableTurns = currentGame.getLegalTurns();
-        double[] scores = new double[availableTurns.size()];
-        
+        Turn currentTurn = pastGame.getTurnsPlayed().get(0);
+        while (currentTurn.isRandomChoice() == false) {
+            for (Move move : currentTurn.getMoves()) {
+                currentGame.move(move);
+            }
+        }
     }
+
+    public Turn findBetterTurn(){
+        // TODO: find a better turn
+        return null;
+    }
+
 }
