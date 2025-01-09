@@ -9,11 +9,11 @@ import javafx.application.Application;
 import javafx.stage.Stage;
 
 public class Simulation extends Application{
-    public static final boolean showGUI = true; 
-    public static final int SIMULATIONS = 1; // Number of games to simulate
+    public static final boolean showGUI = false; 
+    public static final int SIMULATIONS = 10; // Number of games to simulate
     static GameState gameState = new GameState(); // Initialize the game state
     static Agent white = new AlphaBetaAgent(true, gameState, 5);
-    static Agent black = new AlphaBetaAgent(false, gameState, 5, true);
+    static Agent black = new AlphaBetaAgent(false, gameState, 3);
     public static int whiteWins = 0; 
     public static int blackWins = 0; 
     public static int draws = 0;
