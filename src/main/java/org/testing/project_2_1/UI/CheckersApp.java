@@ -226,15 +226,11 @@ public class CheckersApp extends Application {
         Button undoButton = new Button("Undo");
         undoButton.setOnAction(e -> undoLastMove());
 
-        // Pause Button
-        Button pauseButton = new Button("Pause/Resume");
-        pauseButton.setOnAction(e -> pauseAgents());
-
         //Help Button
         HelpButton helpButton = new HelpButton();
 
         // Place buttons in a horizontal box
-        HBox buttonBox = new HBox(10, resetButton, undoButton, pauseButton,  helpButton);
+        HBox buttonBox = new HBox(10, resetButton, undoButton, helpButton);
         buttonBox.setPadding(new Insets(10));
 
         styleTitle(playerOneTitle);
