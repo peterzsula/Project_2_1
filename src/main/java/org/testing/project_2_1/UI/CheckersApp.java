@@ -1,27 +1,26 @@
 package org.testing.project_2_1.UI;
 
-import org.testing.project_2_1.Agents.*;
-import org.testing.project_2_1.GameLogic.GameLogic;
-import org.testing.project_2_1.GameLogic.Piece;
-import org.testing.project_2_1.GameLogic.Tile;
-import org.testing.project_2_1.Moves.Move;
-
-import javafx.scene.image.Image;
 import javafx.application.Application;
 import javafx.geometry.Insets;
 import javafx.scene.Group;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
-import javafx.scene.control.Button;
-import javafx.scene.control.Label;
+import javafx.scene.control.*;
+import javafx.scene.image.Image;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.Pane;
 import javafx.scene.layout.VBox;
-import javafx.stage.Stage;
 import javafx.scene.text.Font;
 import javafx.scene.text.FontWeight;
-import javafx.scene.control.ProgressBar;
+import javafx.stage.Stage;
+import org.testing.project_2_1.Agents.Agent;
+import org.testing.project_2_1.GameLogic.GameLogic;
+import org.testing.project_2_1.GameLogic.Piece;
+import org.testing.project_2_1.GameLogic.Tile;
+import org.testing.project_2_1.Moves.Move;
+
 import java.util.List;
+
 
 /**
  * The main application class for Frisian Checkers.
@@ -53,6 +52,8 @@ public class CheckersApp extends Application {
     private Agent agent1; // The first agent
     private Agent agent2; // The second agent
     static boolean autoRestart = true; // Tracks if the game should auto-restart
+
+
 
     /**
      * Gets the group containing the board visuals.
@@ -225,12 +226,11 @@ public class CheckersApp extends Application {
         Button undoButton = new Button("Undo");
         undoButton.setOnAction(e -> undoLastMove());
 
-        // Pause Button
-        Button pauseButton = new Button("Pause/Resume");
-        pauseButton.setOnAction(e -> pauseAgents());
+        //Help Button
+        HelpButton helpButton = new HelpButton();
 
         // Place buttons in a horizontal box
-        HBox buttonBox = new HBox(10, resetButton, undoButton, pauseButton);
+        HBox buttonBox = new HBox(10, resetButton, undoButton, helpButton);
         buttonBox.setPadding(new Insets(10));
 
         styleTitle(playerOneTitle);
@@ -523,6 +523,65 @@ public class CheckersApp extends Application {
         List<Piece> pieces = gameLogic.g.getAllPieces();
         for (Piece piece : pieces) {
             piece.getPieceDrawer().updateGlow();
+        }
+    }
+    /**
+     * A Help Button class that displays the main rules of Frisian Checkers when clicked.
+     */
+    public class HelpButton extends Button {
+
+        /**
+         * Constructor for the Help Button.
+         */
+        public HelpButton() {
+            // Set button properties
+            this.setText("?");
+            this.setStyle("-fx-font-size: 14px; " +
+                    "-fx-font-weight: bold; " +
+                    "-fx-text-fill: black; " +
+                    "-fx-background-color: #f0f8ff; " +
+                    "-fx-border-color: #b0b0b0; " +
+                    "-fx-border-width: 2px; " +
+                    "-fx-border-radius: 5px; " +
+                    "-fx-background-radius: 5px;");
+
+            this.setPrefSize(30, 30);
+
+            // Set click event
+            this.setOnAction(event -> showHelpDialog());
+        }
+
+        /**
+         * Shows a dialog with the main rules of Frisian Checkers.
+         */
+        private void showHelpDialog() {
+            Alert helpDialog = new Alert(Alert.AlertType.INFORMATION);
+            helpDialog.setTitle("Frisian Checkers Rules");
+            helpDialog.setHeaderText("Main Rules of Frisian Checkers");
+
+            // Create a scrollable TextArea for the content
+            TextArea textArea = new TextArea(
+                    "1. The game is played on a 10x10 board.\n"
+                            + "2. Each player starts with 20 pieces.\n"
+                            + "3. Pieces move diagonally forward to an adjacent empty tile.\n"
+                            + "4. Captures are mandatory and are made by jumping over an opponent's piece.\n"
+                            + "5. Multiple captures can be made in a single turn if possible.\n"
+                            + "6. Kings move diagonally any number of tiles and can jump over pieces from any distance.\n"
+                            + "7. The game ends when a player cannot make a move, either due to all pieces being captured "
+                            + "or being blocked.\n"
+                            + "8. The player with remaining pieces or a higher score wins."
+            );
+            textArea.setEditable(false);
+            textArea.setWrapText(true);
+
+            // Set preferred size for the TextArea
+            textArea.setPrefWidth(400);
+            textArea.setPrefHeight(200);
+
+            // Replace the content of the dialog with the TextArea
+            helpDialog.getDialogPane().setContent(textArea);
+
+            helpDialog.showAndWait();
         }
     }
 
