@@ -440,8 +440,15 @@ public class CheckersApp extends Application {
         playerOneTimer.stopCountdown();
         playerTwoTimer.stopCountdown();
 
-        gameLogic.undoLastMove(gameLogic.g);
-
+        if (noOfPlayers == 0) {
+            gameLogic.undoLastMove(gameLogic.g);
+        }
+        if (noOfPlayers == 1) {
+            gameLogic.undoLastMove(gameLogic.g);
+            gameLogic.undoLastMove(gameLogic.g);
+        } else {
+            gameLogic.undoLastMove(gameLogic.g);
+        }
         playerOneTimer.setTotalTime(previousPlayerOneTime * 1000);
         playerTwoTimer.setTotalTime(previousPlayerTwoTime * 1000);
 

@@ -24,11 +24,19 @@ public class Critic {
                 currentGame.move(move);
             }
         }
-    }
-
+        findBetterTurn();
+        changeEvaluation();
+        }
+        
     public Turn findBetterTurn(){
         // TODO: find a better turn
+        // use the same agent but with a greater depth
         return null;
+    }
+
+    private void changeEvaluation() {
+        // TODO Auto-generated method stub
+        throw new UnsupportedOperationException("Unimplemented method 'changeEvaluation'");
     }
 
 }
