@@ -41,7 +41,14 @@ public class AlphaBetaAgent implements Agent {
         this.currentTurn = new Turn();
     }
 
-    public AlphaBetaAgent(boolean isWhite,GameState gameState, int maxDepth,  boolean PNS) {
+    /**
+     * Constructs an Alpha-Beta agent with a specified color, game state, maximum depth, and PNS flag.
+     * @param isWhite Whether the agent plays as white.
+     * @param gameState The initial game state.
+     * @param maxDepth The maximum depth for Alpha-Beta pruning.
+     * @param PNS Whether to use Proof-Number Search in endgame scenarios.
+     */
+    public AlphaBetaAgent(boolean isWhite, GameState gameState, int maxDepth, boolean PNS) {
         this.isWhite = isWhite;
         this.maxDepth = maxDepth;
         this.gameState = gameState;
@@ -49,6 +56,12 @@ public class AlphaBetaAgent implements Agent {
         this.PNS = PNS;
     }
 
+    /**
+     * Constructs an Alpha-Beta agent with a specified color, maximum depth, and PNS flag.
+     * @param isWhite Whether the agent plays as white.
+     * @param maxDepth The maximum depth for Alpha-Beta pruning.
+     * @param PNS Whether to use Proof-Number Search in endgame scenarios.
+     */
     public AlphaBetaAgent(boolean isWhite, int maxDepth, boolean PNS) {
         this.isWhite = isWhite;
         this.maxDepth = maxDepth;
@@ -121,7 +134,6 @@ public class AlphaBetaAgent implements Agent {
      */
     @Override
     public void makeMove() {
-        //System.out.println("Alpha-Beta agent making move");
         PauseTransition pause = new PauseTransition(Duration.seconds(Agent.delay));
         pause.setOnFinished(event -> {
             if (gameState.getIsWhiteTurn() == isWhite && !gameState.isGameOver()) {
@@ -130,7 +142,7 @@ public class AlphaBetaAgent implements Agent {
                     if (isEndgame(gameState) && PNS) {
                         currentTurn = getBestTurnPNSearch();
                     } else {
-                    currentTurn = getBestTurnABP(turns);
+                        currentTurn = getBestTurnABP(turns);
                     }
                 }
                 Move move = currentTurn.getMoves().removeFirst();
