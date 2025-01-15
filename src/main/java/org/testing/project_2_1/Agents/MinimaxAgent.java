@@ -21,6 +21,7 @@ public class MinimaxAgent implements Agent {
     private Turn currentTurn; // The current turn being executed by the agent
     private final int defaultDepth = 3; // Default search depth for Minimax
     private int maxDepth; // Maximum depth for Minimax search
+    private double[] coefficients = {1, 3, 1};
 
     /**
      * Constructs a MinimaxAgent with a specified color and depth.
@@ -56,6 +57,14 @@ public class MinimaxAgent implements Agent {
         this.gameState = gameState;
         this.currentTurn = new Turn();
         this.maxDepth = maxDepth;
+    }
+
+    public MinimaxAgent(boolean isWhite, GameState gameState, int maxDepth, double[] coefficients) {
+        this.isWhite = isWhite;
+        this.gameState = gameState;
+        this.currentTurn = new Turn();
+        this.maxDepth = maxDepth;
+        this.coefficients = coefficients;
     }
 
     /**
@@ -152,7 +161,7 @@ public class MinimaxAgent implements Agent {
      */
     private int minimax(GameState gameState, int depth, boolean maxPlayer) {
         if (depth == 0 || gameState.isGameOver()) {
-            return (int) gameState.evaluateBoard();
+            return (int) gameState.evaluateBoard(coefficients);
         }
 
         List<Turn> legalTurns = gameState.getLegalTurns();

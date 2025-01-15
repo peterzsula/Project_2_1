@@ -9,7 +9,7 @@ public class SimulatedAnnealing {
     int iterations;
     double[] bestSolution;
     double performance;
-    double[] oldCoefficients = {1, -1, 3, -3, 1, -1};
+    double[] oldCoefficients = {1, 3, 1};
 
     public SimulatedAnnealing(double temperature, double coolingRate, int iterations) {
         this.temperature = temperature;
@@ -18,14 +18,14 @@ public class SimulatedAnnealing {
     }
 
     public double[] optimize() {
-        double[] currentSolution = new double[10];
-        bestSolution = new double[10];
+        double[] currentSolution = new double[3];
+        bestSolution = new double[3];
         double currentPerformance = evaluate(currentSolution);
         performance = currentPerformance;
         System.arraycopy(currentSolution, 0, bestSolution, 0, 10);
 
         for (int i = 0; i < iterations; i++) {
-            double[] newSolution = new double[10];
+            double[] newSolution = new double[3];
             System.arraycopy(currentSolution, 0, newSolution, 0, 10);
 
             int randomIndex = (int) (Math.random() * 10);
