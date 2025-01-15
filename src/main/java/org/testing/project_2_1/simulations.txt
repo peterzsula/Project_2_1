@@ -150,3 +150,10 @@ Draws: 1
 White average thinking time: 2229 ms
 Black average thinking time: 2668 ms
 Simulation total runtime: 489 s
+
+White wins: 4691 Baseline
+Black wins: 5309 Baseline
+Draws: 0
+White average thinking time: 0 ms
+Black average thinking time: 0 ms
+Simulation total runtime: 28 s

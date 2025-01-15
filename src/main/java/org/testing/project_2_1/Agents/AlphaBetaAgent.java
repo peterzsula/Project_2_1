@@ -29,6 +29,7 @@ public class AlphaBetaAgent implements Agent {
     private int nodesVisited = 0; // Counter for runtime profiling
     private Turn currentTurn; // The current turn being executed by the agent
     public boolean PNS = false; // Whether to use PNS for endgame scenarios
+    private double[] coefficients = {1, -1, 3, -3, 1, -1};
 
     /**
      * Constructs an Alpha-Beta agent with a specified color and maximum depth.
@@ -41,7 +42,7 @@ public class AlphaBetaAgent implements Agent {
         this.currentTurn = new Turn();
     }
 
-    public AlphaBetaAgent(boolean isWhite,GameState gameState, int maxDepth,  boolean PNS) {
+    public AlphaBetaAgent(boolean isWhite,GameState gameState, int maxDepth, boolean PNS) {
         this.isWhite = isWhite;
         this.maxDepth = maxDepth;
         this.gameState = gameState;
@@ -79,6 +80,14 @@ public class AlphaBetaAgent implements Agent {
         this.gameState = gameState;
         this.currentTurn = new Turn();
         this.maxDepth = depth;
+    }
+
+    public AlphaBetaAgent(boolean isWhite, GameState gameState, int depth, double[] coefficients) {
+        this.isWhite = isWhite;
+        this.gameState = gameState;
+        this.currentTurn = new Turn();
+        this.maxDepth = depth;
+        this.coefficients = coefficients;
     }
 
     /**
@@ -171,7 +180,7 @@ public class AlphaBetaAgent implements Agent {
                 newState.move(move);
             }
     
-            int boardValue = minimaxPruning(newState, maxDepth, Integer.MIN_VALUE, Integer.MAX_VALUE, !isWhite);
+            int boardValue = minimaxPruning(newState, maxDepth, Integer.MIN_VALUE, Integer.MAX_VALUE, newState.getIsWhiteTurn());
     
             if (isWhite) {
                 if (boardValue == bestValue) {
@@ -215,7 +224,7 @@ public class AlphaBetaAgent implements Agent {
      */
     public int minimaxPruning(GameState gameState, int depth, int alpha, int beta, boolean isMaxPlayerWhite) {
         if (depth == 0 || gameState.isGameOver()) {
-            return (int) gameState.evaluateBoard();
+            return (int) gameState.evaluateBoard(coefficients);
         }
 
         List<Turn> legalTurns = gameState.getLegalTurns();
@@ -363,7 +372,7 @@ public class AlphaBetaAgent implements Agent {
         nodesVisited++; // Increment node counter
 
         if (depth == 0 || gameState.isGameOver()) {
-            return (int) gameState.evaluateBoard();
+            return (int) gameState.evaluateBoard(coefficients);
         }
 
         List<Turn> legalTurns = gameState.getLegalTurns();

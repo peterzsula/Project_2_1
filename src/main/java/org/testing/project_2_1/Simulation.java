@@ -10,10 +10,12 @@ import javafx.stage.Stage;
 
 public class Simulation extends Application{
     public static final boolean showGUI = true; 
-    public static final int SIMULATIONS = 10; // Number of games to simulate
+    public static final int SIMULATIONS = 100; // Number of games to simulate
     static GameState gameState = new GameState(); // Initialize the game state
-    static Agent white = new AlphaBetaAgent(true, gameState, 5);
-    static Agent black = new AlphaBetaAgent(false, gameState, 3);
+    static Agent white = new BaselineAgent(true, gameState);
+    static Agent black = new AgentMCTS(false, gameState);
+    // static Agent white = new BaselineAgent(true, gameState);
+    // static Agent black = new BaselineAgent(false, gameState);
     public static int whiteWins = 0; 
     public static int blackWins = 0; 
     public static int draws = 0;
