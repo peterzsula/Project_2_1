@@ -41,14 +41,7 @@ public class AlphaBetaAgent implements Agent {
         this.currentTurn = new Turn();
     }
 
-    /**
-     * Constructs an Alpha-Beta agent with a specified color, game state, maximum depth, and PNS flag.
-     * @param isWhite Whether the agent plays as white.
-     * @param gameState The initial game state.
-     * @param maxDepth The maximum depth for Alpha-Beta pruning.
-     * @param PNS Whether to use Proof-Number Search in endgame scenarios.
-     */
-    public AlphaBetaAgent(boolean isWhite, GameState gameState, int maxDepth, boolean PNS) {
+    public AlphaBetaAgent(boolean isWhite,GameState gameState, int maxDepth,  boolean PNS) {
         this.isWhite = isWhite;
         this.maxDepth = maxDepth;
         this.gameState = gameState;
@@ -56,12 +49,6 @@ public class AlphaBetaAgent implements Agent {
         this.PNS = PNS;
     }
 
-    /**
-     * Constructs an Alpha-Beta agent with a specified color, maximum depth, and PNS flag.
-     * @param isWhite Whether the agent plays as white.
-     * @param maxDepth The maximum depth for Alpha-Beta pruning.
-     * @param PNS Whether to use Proof-Number Search in endgame scenarios.
-     */
     public AlphaBetaAgent(boolean isWhite, int maxDepth, boolean PNS) {
         this.isWhite = isWhite;
         this.maxDepth = maxDepth;
@@ -134,6 +121,7 @@ public class AlphaBetaAgent implements Agent {
      */
     @Override
     public void makeMove() {
+        //System.out.println("Alpha-Beta agent making move");
         PauseTransition pause = new PauseTransition(Duration.seconds(Agent.delay));
         pause.setOnFinished(event -> {
             if (gameState.getIsWhiteTurn() == isWhite && !gameState.isGameOver()) {
@@ -176,15 +164,15 @@ public class AlphaBetaAgent implements Agent {
         } else {
             bestValue = Integer.MAX_VALUE;
         }
-    
+
         for (Turn turn : turns) {
             GameState newState = new GameState(gameState);
             for (Move move : turn.getMoves()) {
                 newState.move(move);
             }
-    
+
             int boardValue = minimaxPruning(newState, maxDepth, Integer.MIN_VALUE, Integer.MAX_VALUE, !isWhite);
-    
+
             if (isWhite) {
                 if (boardValue == bestValue) {
                     bestTurns.add(turn);
@@ -194,7 +182,7 @@ public class AlphaBetaAgent implements Agent {
                     bestTurns.clear();
                     bestTurns.add(turn);
                 }
-                
+
             } else {
                 if (boardValue == bestValue) {
                     bestTurns.add(turn);
@@ -204,7 +192,7 @@ public class AlphaBetaAgent implements Agent {
                     bestTurns.clear();
                     bestTurns.add(turn);
                 }
-                
+
             }
         }
         int randomIndex = new Random().nextInt(bestTurns.size());
