@@ -1,0 +1,57 @@
+@startuml
+class PNSearch {
+    - boolean isWhite
+    - Map<GameState, Integer> evaluationCache
+
+    + PNSearch(boolean isWhite)
+    + void PN(Node root, int maxNodes)
+    + void evaluate(Node node)
+    + void setProofAndDisproofNumbers(Node node)
+    + Node selectMostProvingNode(Node node)
+    + void expandNode(Node node)
+    + void generateAllChildren(Node node)
+    + Node updateAncestors(Node node, Node root)
+    + void deleteSubtree(Node node)
+
+    class Node {
+        + static final int INFINITY
+        + static final int AND_NODE
+        + static final int OR_NODE
+        + static final int TRUE
+        + static final int FALSE
+        + static final int UNKNOWN
+
+        + int type
+        + int value
+        + int proof
+        + int disproof
+        + boolean expanded
+        + List<Node> children
+        + Node parent
+        + Move moveFromParent
+        + GameState state
+
+        + Node(Node parent, GameState state, int type)
+        + Node getMostProvingChild()
+        + void setMostProvingChild(Node child)
+    }
+
+
+class GameState {
+    + List<Turn> getLegalTurns()
+    + void move(Move move)
+    + int evaluate()
+}
+
+class Move {}
+class Turn {
+    + List<Move> getMoves()
+}
+
+PNSearch --> GameState : uses
+PNSearch --> Node : contains
+Node --> Move : uses
+Node --> GameState : represents
+Node --> Turn : contains
+Turn --> Move : contains
+@enduml

@@ -1,0 +1,96 @@
+@startuml
+
+interface Agent {
+    + boolean isWhite()
+    + void setGameLogic(GameLogic gameLogic)
+    + void setGameState(GameState gameState)
+    + void makeMove()
+    + Agent reset()
+    + void simulate()
+    + void pause()
+}
+
+class Human {
+    - boolean isWhite
+    - GameLogic gameLogic
+    - GameState gameState
+    + Human(boolean isWhite)
+    + boolean isWhite()
+    + void setGameLogic(GameLogic gameLogic)
+    + void setGameState(GameState gameState)
+    + void makeMove()
+    + Agent reset()
+    + void simulate()
+    + void pause()
+}
+
+class BaselineAgent {
+    - boolean onPause
+    - boolean isWhite
+    - GameLogic gameLogic
+    - GameState gameState
+    - Turn currentTurn
+    + BaselineAgent(boolean isWhite)
+    + BaselineAgent(boolean isWhite, GameState gameState)
+    + boolean isWhite()
+    + void setGameLogic(GameLogic gameLogic)
+    + void setGameState(GameState gameState)
+    + void makeMove()
+    + Agent reset()
+    + void simulate()
+    + void pause()
+}
+
+class MinimaxAgent {
+    - boolean isWhite
+    - GameLogic gameLogic
+    - GameState gameState
+    - Turn currentTurn
+    - int maxDepth
+    + MinimaxAgent(boolean isWhite, int maxDepth)
+    + MinimaxAgent(boolean isWhite, GameState gameState)
+    + boolean isWhite()
+    + void setGameLogic(GameLogic gameLogic)
+    + void setGameState(GameState gameState)
+    + void makeMove()
+    + Agent reset()
+    + void simulate()
+}
+
+class AlphaBetaAgent {
+    - boolean isWhite
+    - GameLogic gameLogic
+    - GameState gameState
+    - int maxDepth
+    - boolean PNS
+    + AlphaBetaAgent(boolean isWhite, int maxDepth)
+    + AlphaBetaAgent(boolean isWhite, GameState gameState, int maxDepth, boolean PNS)
+    + boolean isWhite()
+    + void setGameLogic(GameLogic gameLogic)
+    + void setGameState(GameState gameState)
+    + void makeMove()
+    + Agent reset()
+    + void simulate()
+}
+
+class AgentMCTS {
+    - boolean isWhite
+    - GameLogic gameLogic
+    - GameState gameState
+    + AgentMCTS(boolean isWhite)
+    + AgentMCTS(boolean isWhite, GameState gameState)
+    + boolean isWhite()
+    + void setGameLogic(GameLogic gameLogic)
+    + void setGameState(GameState gameState)
+    + void makeMove()
+    + Agent reset()
+    + void simulate()
+}
+
+Agent <|-- Human
+Agent <|-- BaselineAgent
+Agent <|-- MinimaxAgent
+Agent <|-- AlphaBetaAgent
+Agent <|-- AgentMCTS
+
+@enduml
