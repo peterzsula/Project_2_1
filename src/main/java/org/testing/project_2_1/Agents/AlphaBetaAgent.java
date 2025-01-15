@@ -139,7 +139,7 @@ public class AlphaBetaAgent implements Agent {
                     if (isEndgame(gameState) && PNS) {
                         currentTurn = getBestTurnPNSearch();
                     } else {
-                    currentTurn = getBestTurnABP(turns);
+                        currentTurn = getBestTurnABP(turns);
                     }
                 }
                 Move move = currentTurn.getMoves().removeFirst();
@@ -173,7 +173,7 @@ public class AlphaBetaAgent implements Agent {
         } else {
             bestValue = Integer.MAX_VALUE;
         }
-    
+
         for (Turn turn : turns) {
             GameState newState = new GameState(gameState);
             for (Move move : turn.getMoves()) {
@@ -191,7 +191,7 @@ public class AlphaBetaAgent implements Agent {
                     bestTurns.clear();
                     bestTurns.add(turn);
                 }
-                
+
             } else {
                 if (boardValue == bestValue) {
                     bestTurns.add(turn);
@@ -201,7 +201,7 @@ public class AlphaBetaAgent implements Agent {
                     bestTurns.clear();
                     bestTurns.add(turn);
                 }
-                
+
             }
         }
         int randomIndex = new Random().nextInt(bestTurns.size());

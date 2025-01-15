@@ -147,7 +147,9 @@ public class GameState {
     public ArrayList<Turn> getTurnsPlayed() {
         return turnsPlayed;
     }
-
+    public int getDepth() {
+        return turnsPlayed.size();
+    }
     /**
      * Switches the turn to the other player.
      */
@@ -353,6 +355,46 @@ public class GameState {
         } else {
             blackPieces.add(piece);
         }
+    }
+
+    /**
+     * Calculates the advantage of the white player based on the current board state.
+     * Factors include the number of pieces, number of kings, and their positions.
+     * @return A score representing White's advantage.
+     */
+    public double getWhiteAdvantage() {
+        double advantage = 0;
+
+        for (Piece piece : whitePieces) {
+            advantage += 1; // Standard value
+            if (piece.getType() == PieceType.WHITEKING) {
+                advantage += 2; // Additional value for a king
+            }
+
+            advantage += (board.length - 1 - piece.getY()) * 0.1;
+        }
+
+        return advantage;
+    }
+
+    /**
+     * Calculates the advantage of the black player based on the current board state.
+     * Factors include the number of pieces, number of kings, and their positions.
+     * @return A score representing Black's advantage.
+     */
+    public double getBlackAdvantage() {
+        double advantage = 0;
+
+        for (Piece piece : blackPieces) {
+            advantage += 1; // Standard value
+            if (piece.getType() == PieceType.BLACKKING) {
+                advantage += 2; // Additional value for a king
+            }
+
+            advantage += piece.getY() * 0.1;
+        }
+
+        return advantage;
     }
 
     /**

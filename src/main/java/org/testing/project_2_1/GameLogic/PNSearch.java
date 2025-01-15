@@ -3,7 +3,9 @@ package org.testing.project_2_1.GameLogic;
 import org.testing.project_2_1.Moves.Move;
 import org.testing.project_2_1.Moves.Turn;
 
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 /**
  * Implements Regular Proof-Number Search (PNS) for game tree evaluation.
@@ -14,6 +16,8 @@ import java.util.List;
 public class PNSearch {
 
     private boolean isWhite; // Indicates the player color for this search instance.
+    private final Map<GameState, Integer> evaluationCache = new HashMap<>();
+
 
     /**
      * Inner class representing a single node in the PNS game tree.
@@ -37,6 +41,8 @@ public class PNSearch {
         public Node parent; // Parent node
         public Move moveFromParent; // Move leading to this node
         public GameState state; // Game state represented by this node
+        private Node mostProvingChild; // Pointer to the most-proving child
+
 
         /**
          * Constructs a new Node with the specified properties.
@@ -54,7 +60,16 @@ public class PNSearch {
             this.expanded = false;
             this.children = new java.util.ArrayList<>();
         }
+
+        public Node getMostProvingChild() {
+            return this.mostProvingChild;
+        }
+
+        public void setMostProvingChild(Node child) {
+            this.mostProvingChild = child;
+        }
     }
+
 
     /**
      * Constructor for PNSearch.
@@ -88,14 +103,13 @@ public class PNSearch {
      * @param node The node to evaluate.
      */
     public void evaluate(Node node) {
-        int result = node.state.evaluate();
-
-        if (result == 1) {
-            node.value = Node.TRUE;
-        } else if (result == -1) {
-            node.value = Node.FALSE;
+        Integer cachedResult = evaluationCache.get(node.state);
+        if (cachedResult != null) {
+            node.value = cachedResult;
         } else {
-            node.value = Node.UNKNOWN;
+            int result = node.state.evaluate();
+            evaluationCache.put(node.state, result);
+            node.value = result;
         }
     }
 
@@ -144,34 +158,22 @@ public class PNSearch {
 
     /**
      * Selects the most proving node (a leaf node) by traversing the tree.
+     * Optimized to use stored pointers to the most-proving child node.
      * @param node The starting node.
      * @return The most proving node.
      */
     public Node selectMostProvingNode(Node node) {
         while (node.expanded) {
-            Node nextNode = null;
-            if (node.type == Node.OR_NODE) {
-                for (Node child : node.children) {
-                    if (child.proof == node.proof) {
-                        nextNode = child;
-                        break;
-                    }
-                }
-            } else { // AND_NODE
-                for (Node child : node.children) {
-                    if (child.disproof == node.disproof) {
-                        nextNode = child;
-                        break;
-                    }
-                }
-            }
+            // Use the stored most-proving child for traversal
+            Node nextNode = node.getMostProvingChild();
             if (nextNode == null) {
-                break;
+                break; // Safety check: exit if no valid most-proving child
             }
             node = nextNode;
         }
         return node;
     }
+
 
     /**
      * Expands a given node by generating all its children.
@@ -179,16 +181,35 @@ public class PNSearch {
      */
     public void expandNode(Node node) {
         generateAllChildren(node);
-        for (Node n : node.children) {
-            evaluate(n);
-            setProofAndDisproofNumbers(n);
-            if ((node.type == Node.OR_NODE && n.proof == 0) ||
-                    (node.type == Node.AND_NODE && n.disproof == 0)) {
+
+        Node mostProvingChild = null;
+        for (Node child : node.children) {
+            evaluate(child);
+            setProofAndDisproofNumbers(child);
+
+            // Update the most-proving child based on the node type
+            if (node.type == Node.OR_NODE) {
+                if (mostProvingChild == null || child.proof < mostProvingChild.proof) {
+                    mostProvingChild = child;
+                }
+            } else if (node.type == Node.AND_NODE) {
+                if (mostProvingChild == null || child.disproof < mostProvingChild.disproof) {
+                    mostProvingChild = child;
+                }
+            }
+
+            // Stop early if terminal condition is met
+            if ((node.type == Node.OR_NODE && child.proof == 0) ||
+                    (node.type == Node.AND_NODE && child.disproof == 0)) {
                 break;
             }
         }
+
+        node.setMostProvingChild(mostProvingChild);
         node.expanded = true;
     }
+
+
 
     /**
      * Generates all child nodes for a given node based on possible turns.
@@ -218,6 +239,22 @@ public class PNSearch {
             int oldProof = node.proof;
             int oldDisproof = node.disproof;
             setProofAndDisproofNumbers(node);
+
+            // Recalculate the most-proving child if proof-disproof numbers change
+            Node mostProvingChild = null;
+            for (Node child : node.children) {
+                if (node.type == Node.OR_NODE) {
+                    if (mostProvingChild == null || child.proof < mostProvingChild.proof) {
+                        mostProvingChild = child;
+                    }
+                } else if (node.type == Node.AND_NODE) {
+                    if (mostProvingChild == null || child.disproof < mostProvingChild.disproof) {
+                        mostProvingChild = child;
+                    }
+                }
+            }
+            node.setMostProvingChild(mostProvingChild);
+
             if (node.proof == oldProof && node.disproof == oldDisproof) {
                 return node;
             }
@@ -230,6 +267,7 @@ public class PNSearch {
             node = node.parent;
         } while (true);
     }
+
 
     /**
      * Deletes the subtree rooted at the given node.
