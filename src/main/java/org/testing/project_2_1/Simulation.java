@@ -13,7 +13,7 @@ public class Simulation extends Application{
     public static final int SIMULATIONS = 10; // Number of games to simulate
     static GameState gameState = new GameState(); // Initialize the game state
     static Agent white = new AlphaBetaAgent(true, gameState, 5);
-    static Agent black = new AlphaBetaAgent(false, gameState, 3);
+    static Agent black = new AgentMCTS(false, gameState);
     public static int whiteWins = 0; 
     public static int blackWins = 0; 
     public static int draws = 0;

@@ -141,7 +141,7 @@ public class AgentMCTS implements Agent {
         double logVisits = Math.log(node.visits + 1);
 
         for (Node child : node.children) {
-            double ucb1Value = child.wins / (child.visits + 1e-6) +
+            double ucb1Value = (child.wins / (child.visits + 1e-6)) +
                     EXPLORATION_CONSTANT * Math.sqrt(logVisits / (child.visits + 1e-6));
             if (ucb1Value > bestValue) {
                 bestValue = ucb1Value;
@@ -151,6 +151,7 @@ public class AgentMCTS implements Agent {
 
         return bestNode;
     }
+
 
 
     private void expansion(Node node) {
@@ -269,6 +270,23 @@ public class AgentMCTS implements Agent {
             }
         }
     }
+
+    private void performSimulations(Node root, long timeLimitMillis) {
+        long startTime = System.currentTimeMillis();
+        int simulations = 0;
+
+        while (simulations < SIMULATIONS && (System.currentTimeMillis() - startTime) < timeLimitMillis) {
+            Node selectedNode = selection(root);
+            if (!selectedNode.state.isGameOver()) {
+                expansion(selectedNode);
+                Node nodeToSimulate = selectedNode.children.isEmpty() ? selectedNode : getRandomChild(selectedNode);
+                double result = simulation(nodeToSimulate.state);
+                backpropagation(nodeToSimulate, result);
+            }
+            simulations++;
+        }
+    }
+
 
     @Override
     public void pause() {
