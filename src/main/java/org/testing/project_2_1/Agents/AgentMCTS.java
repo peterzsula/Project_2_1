@@ -21,6 +21,7 @@ public class AgentMCTS implements Agent {
     private GameState gameState; // Current game state
     private boolean isWhite; // Indicates if the agent is playing as white
     private static final int SIMULATIONS = 20; // Number of simulations per move
+    int numSimulations = Math.min(SIMULATIONS, 100 / (1 + gameState.getDepth()));
     private static final double EXPLORATION_CONSTANT = Math.sqrt(2); // UCB1 constant for exploration
     private Turn currentTurn; // The current turn being executed
 
@@ -98,7 +99,7 @@ public class AgentMCTS implements Agent {
         Node root = new Node(new GameState(gameState), null, null);
 
         // Perform simulations
-        for (int i = 0; i < SIMULATIONS; i++) {
+        for (int i = 0; i < numSimulations; i++) {
             Node selectedNode = selection(root); // Select the most promising node
             if (!selectedNode.state.isGameOver()) {
                 expansion(selectedNode); // Expand the selected node
@@ -137,10 +138,11 @@ public class AgentMCTS implements Agent {
     private Node selectWithUCB1(Node node) {
         Node bestNode = null;
         double bestValue = Double.NEGATIVE_INFINITY;
+        double logVisits = Math.log(node.visits + 1);
 
         for (Node child : node.children) {
             double ucb1Value = child.wins / (child.visits + 1e-6) +
-                    EXPLORATION_CONSTANT * Math.sqrt(Math.log(node.visits + 1) / (child.visits + 1e-6));
+                    EXPLORATION_CONSTANT * Math.sqrt(logVisits / (child.visits + 1e-6));
             if (ucb1Value > bestValue) {
                 bestValue = ucb1Value;
                 bestNode = child;
@@ -149,6 +151,7 @@ public class AgentMCTS implements Agent {
 
         return bestNode;
     }
+
 
     private void expansion(Node node) {
         List<Turn> legalTurns = node.state.getLegalTurns();
@@ -163,24 +166,43 @@ public class AgentMCTS implements Agent {
     }
 
     private double simulation(GameState state) {
-        GameState simState = new GameState(state); // Deep copy for simulation
+        GameState simState = new GameState(state);
         Random random = new Random();
 
         while (!simState.isGameOver()) {
             List<Turn> legalTurns = simState.getLegalTurns();
             if (legalTurns.isEmpty()) {
-                break; // Exit simulation if no legal turns are available
+                break;
             }
 
-            Turn randomTurn = legalTurns.get(random.nextInt(legalTurns.size())); // Randomly pick a legal move
-            for (Move move : randomTurn.getMoves()) {
+            // Prioritize better moves with heuristics
+            Turn bestTurn = null;
+            double bestScore = Double.NEGATIVE_INFINITY;
+
+            for (Turn turn : legalTurns) {
+                GameState testState = new GameState(simState);
+                for (Move move : turn.getMoves()) {
+                    testState.move(move);
+                }
+
+                double heuristicScore = testState.evaluateBoard() +
+                        (isWhite ? testState.getWhiteAdvantage() : testState.getBlackAdvantage());
+
+                if (heuristicScore > bestScore) {
+                    bestScore = heuristicScore;
+                    bestTurn = turn;
+                }
+            }
+
+            Turn selectedTurn = (bestTurn != null) ? bestTurn : legalTurns.get(random.nextInt(legalTurns.size()));
+            for (Move move : selectedTurn.getMoves()) {
                 simState.move(move);
             }
         }
 
-        // Return the simulated result
-        return simState.evaluateBoard(); // Positive if white wins, negative if black wins
+        return simState.evaluateBoard();
     }
+
 
     private void backpropagation(Node node, double result) {
         while (node != null) {
@@ -223,7 +245,7 @@ public class AgentMCTS implements Agent {
         Node root = new Node(new GameState(gameState), null, null);
 
         // Perform simulations
-        for (int i = 0; i < SIMULATIONS; i++) {
+        for (int i = 0; i < numSimulations; i++) {
             Node selectedNode = selection(root);
             if (!selectedNode.state.isGameOver()) {
                 expansion(selectedNode);
