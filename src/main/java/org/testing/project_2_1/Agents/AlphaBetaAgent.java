@@ -171,7 +171,8 @@ public class AlphaBetaAgent implements Agent {
                 newState.move(move);
             }
 
-            int boardValue = minimaxPruning(newState, maxDepth, Integer.MIN_VALUE, Integer.MAX_VALUE, !isWhite);
+            int randomicity = new Random().nextInt(10) - 5;
+            int boardValue = minimaxPruning(newState, maxDepth, Integer.MIN_VALUE, Integer.MAX_VALUE, !isWhite)+randomicity;
 
             if (isWhite) {
                 if (boardValue == bestValue) {
