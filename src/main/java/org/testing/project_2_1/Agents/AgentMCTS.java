@@ -20,10 +20,10 @@ public class AgentMCTS implements Agent {
     private GameLogic gameLogic; // Reference to the game logic
     private GameState gameState; // Current game state
     private boolean isWhite; // Indicates if the agent is playing as white
-    private static final int SIMULATIONS = 20; // Number of simulations per move
-    int numSimulations = Math.min(SIMULATIONS, 100 / (1 + gameState.getDepth()));
-    private static final double EXPLORATION_CONSTANT = Math.sqrt(2); // UCB1 constant for exploration
+    private static final int SIMULATIONS = 100; // Number of simulations per move
+    private static final double EXPLORATION_CONSTANT = 0.2; // UCB1 constant for exploration
     private Turn currentTurn; // The current turn being executed
+    private double[] coefficients = {1, 3, 1};
 
     /**
      * Node class representing a state in the MCTS tree.
@@ -72,6 +72,13 @@ public class AgentMCTS implements Agent {
         currentTurn = new Turn();
     }
 
+    public AgentMCTS(boolean isWhite, GameState gameState, double[] coefficients) {
+        this.isWhite = isWhite;
+        this.gameState = gameState;
+        currentTurn = new Turn();
+        this.coefficients = coefficients;
+    }
+
     @Override
     public boolean isWhite() {
         return isWhite;
@@ -93,11 +100,10 @@ public class AgentMCTS implements Agent {
      */
     @Override
     public void makeMove() {
-        System.out.println("Monte Carlo Tree Search agent making move");
-
         // Create the root node for the MCTS tree
         Node root = new Node(new GameState(gameState), null, null);
 
+        int numSimulations = Math.min(SIMULATIONS, 100 / (1 + gameState.getDepth()));
         // Perform simulations
         for (int i = 0; i < numSimulations; i++) {
             Node selectedNode = selection(root); // Select the most promising node
@@ -186,7 +192,7 @@ public class AgentMCTS implements Agent {
                     testState.move(move);
                 }
 
-                double heuristicScore = testState.evaluateBoard() +
+                double heuristicScore = testState.evaluateBoard(coefficients) +
                         (isWhite ? testState.getWhiteAdvantage() : testState.getBlackAdvantage());
 
                 if (heuristicScore > bestScore) {
@@ -201,7 +207,7 @@ public class AgentMCTS implements Agent {
             }
         }
 
-        return simState.evaluateBoard();
+        return simState.evaluateBoard(coefficients);
     }
 
 
@@ -245,6 +251,7 @@ public class AgentMCTS implements Agent {
     public void simulate() {
         Node root = new Node(new GameState(gameState), null, null);
 
+        int numSimulations = Math.min(SIMULATIONS, 100 / (1 + gameState.getDepth()));
         // Perform simulations
         for (int i = 0; i < numSimulations; i++) {
             Node selectedNode = selection(root);

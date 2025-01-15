@@ -29,7 +29,7 @@ public class AlphaBetaAgent implements Agent {
     private int nodesVisited = 0; // Counter for runtime profiling
     private Turn currentTurn; // The current turn being executed by the agent
     public boolean PNS = false; // Whether to use PNS for endgame scenarios
-    private double[] coefficients = {1, -1, 3, -3, 1, -1};
+    public double[] coefficients = {1, 3, 1}; // Coefficients for board evaluation
 
     /**
      * Constructs an Alpha-Beta agent with a specified color and maximum depth.
@@ -130,7 +130,6 @@ public class AlphaBetaAgent implements Agent {
      */
     @Override
     public void makeMove() {
-        //System.out.println("Alpha-Beta agent making move");
         PauseTransition pause = new PauseTransition(Duration.seconds(Agent.delay));
         pause.setOnFinished(event -> {
             if (gameState.getIsWhiteTurn() == isWhite && !gameState.isGameOver()) {

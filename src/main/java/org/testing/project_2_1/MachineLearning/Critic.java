@@ -13,7 +13,7 @@ public class Critic {
 
     public Critic(GameState gamestate){
         this.pastGame = gamestate;
-        agent = new AlphaBetaAgent(true, gamestate, 5);
+        agent = new AlphaBetaAgent(true, gamestate, 8);
     }
 
     public void skipToRandomMove(){

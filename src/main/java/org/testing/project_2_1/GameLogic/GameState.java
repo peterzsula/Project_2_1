@@ -1112,7 +1112,7 @@ public class GameState {
 
     public double evaluateBoard(double[] weights) {
         int[] x = boardParameters();
-        return weights[0]*x[0] + weights[1]*x[1] + weights[2]*x[2] + weights[3]*x[3] + weights[4]*x[4] + weights[5]*x[5];
+        return weights[0]*x[0] - weights[0]*x[1] + weights[1]*x[2] - weights[1]*x[3] + weights[2]*x[4] + weights[2]*x[5];
     }
 
     // end of old GameLogic methods

@@ -77,8 +77,6 @@ public class BaselineAgent implements Agent {
      */
     @Override
     public void makeMove() {
-        System.out.println("Baseline agent making move");
-
         pause.setOnFinished(event -> {
             if (gameLogic.g.getIsWhiteTurn() == isWhite && !gameLogic.g.isGameOver()) {
                 if (currentTurn.isEmpty()) {
