@@ -1,4 +1,4 @@
-package org.testing.project_2_1.Test;
+package org.testing.project_2_1;
 
 import org.testing.project_2_1.Agents.AlphaBetaAgent;
 import org.testing.project_2_1.GameLogic.GameState;
@@ -8,7 +8,7 @@ import org.testing.project_2_1.GameLogic.GameState;
  * This class tests the agent under various game scenarios with both Alpha-Beta pruning
  * and plain minimax algorithms at different depths.
  */
-public class AlphaBetaAgentTest {
+public class Complexity_ABP {
 
     /**
      * Entry point for the test program.
