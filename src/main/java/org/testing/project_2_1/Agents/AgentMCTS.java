@@ -174,6 +174,33 @@ public class AgentMCTS implements Agent {
         }
     }
 
+    private void selectiveExpansion(Node node) {
+        List<Turn> legalTurns = node.state.getLegalTurns();
+
+        legalTurns.sort((turn1, turn2) -> {
+            GameState testState1 = new GameState(node.state);
+            turn1.getMoves().forEach(testState1::move);
+            double score1 = testState1.evaluateBoard(coefficients);
+
+            GameState testState2 = new GameState(node.state);
+            turn2.getMoves().forEach(testState2::move);
+            double score2 = testState2.evaluateBoard(coefficients);
+
+            return Double.compare(score2, score1);
+        });
+
+        // Expand only the top moves
+        int expandLimit = Math.min(legalTurns.size(), 5);
+        for (int i = 0; i < expandLimit; i++) {
+            Turn turn = legalTurns.get(i);
+            GameState newState = new GameState(node.state);
+            turn.getMoves().forEach(newState::move);
+            Node childNode = new Node(newState, turn, node);
+            node.children.add(childNode);
+        }
+    }
+
+
     private double simulation(GameState state) {
         GameState simState = new GameState(state);
         Random random = new Random();
@@ -254,7 +281,7 @@ public class AgentMCTS implements Agent {
         for (int i = 0; i < numSimulations; i++) {
             Node selectedNode = selection(root);
             if (!selectedNode.state.isGameOver()) {
-                expansion(selectedNode);
+                selectiveExpansion(selectedNode);
                 Node nodeToSimulate = selectedNode.children.isEmpty() ? selectedNode : getRandomChild(selectedNode);
                 double result = simulation(nodeToSimulate.state);
                 backpropagation(nodeToSimulate, result);
@@ -273,22 +300,6 @@ public class AgentMCTS implements Agent {
                     gameState.move(moves.remove(0));
                 }
             }
-        }
-    }
-
-    private void performSimulations(Node root, long timeLimitMillis) {
-        long startTime = System.currentTimeMillis();
-        int simulations = 0;
-
-        while (simulations < SIMULATIONS && (System.currentTimeMillis() - startTime) < timeLimitMillis) {
-            Node selectedNode = selection(root);
-            if (!selectedNode.state.isGameOver()) {
-                expansion(selectedNode);
-                Node nodeToSimulate = selectedNode.children.isEmpty() ? selectedNode : getRandomChild(selectedNode);
-                double result = simulation(nodeToSimulate.state);
-                backpropagation(nodeToSimulate, result);
-            }
-            simulations++;
         }
     }
     @Override
