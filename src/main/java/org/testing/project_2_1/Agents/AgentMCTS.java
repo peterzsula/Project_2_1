@@ -178,39 +178,35 @@ public class AgentMCTS implements Agent {
         GameState simState = new GameState(state);
         Random random = new Random();
 
-        while (!simState.isGameOver()) {
+        // Adjust depth based on game state
+        int remainingPieces = simState.getWhitePieces().size() + simState.getBlackPieces().size();
+        int depthLimit = Math.max(5, 50 - remainingPieces);
+
+        while (!simState.isGameOver() && depthLimit-- > 0) {
             List<Turn> legalTurns = simState.getLegalTurns();
             if (legalTurns.isEmpty()) {
                 break;
             }
 
-            // Prioritize better moves with heuristics
-            Turn bestTurn = null;
-            double bestScore = Double.NEGATIVE_INFINITY;
+            Turn bestTurn = legalTurns.stream()
+                    .max((turn1, turn2) -> {
+                        GameState testState1 = new GameState(simState);
+                        turn1.getMoves().forEach(testState1::move);
+                        double score1 = testState1.evaluate();
 
-            for (Turn turn : legalTurns) {
-                GameState testState = new GameState(simState);
-                for (Move move : turn.getMoves()) {
-                    testState.move(move);
-                }
+                        GameState testState2 = new GameState(simState);
+                        turn2.getMoves().forEach(testState2::move);
+                        double score2 = testState2.evaluate();
 
-                double heuristicScore = testState.evaluateBoard(coefficients) +
-                        (isWhite ? testState.getWhiteAdvantage() : testState.getBlackAdvantage());
+                        return Double.compare(score1, score2);
+                    }).orElse(legalTurns.get(random.nextInt(legalTurns.size())));
 
-                if (heuristicScore > bestScore) {
-                    bestScore = heuristicScore;
-                    bestTurn = turn;
-                }
-            }
-
-            Turn selectedTurn = (bestTurn != null) ? bestTurn : legalTurns.get(random.nextInt(legalTurns.size()));
-            for (Move move : selectedTurn.getMoves()) {
-                simState.move(move);
-            }
+            bestTurn.getMoves().forEach(simState::move);
         }
 
         return simState.evaluateBoard(coefficients);
     }
+
 
 
     private void backpropagation(Node node, double result) {
@@ -295,8 +291,6 @@ public class AgentMCTS implements Agent {
             simulations++;
         }
     }
-
-
     @Override
     public void pause() {
         // TODO Auto-generated method stub
