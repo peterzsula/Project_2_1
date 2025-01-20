@@ -144,11 +144,12 @@ public class AgentMCTS implements Agent {
     private Node selectWithUCB1(Node node) {
         Node bestNode = null;
         double bestValue = Double.NEGATIVE_INFINITY;
-        double logVisits = Math.log(node.visits + 1);
+        double logVisits = Math.log(Math.max(1, node.visits));
 
         for (Node child : node.children) {
-            double ucb1Value = (child.wins / (child.visits + 1e-6)) +
-                    EXPLORATION_CONSTANT * Math.sqrt(logVisits / (child.visits + 1e-6));
+            double ucb1Value = (child.visits > 0 ?
+                    (child.wins / child.visits) : Double.POSITIVE_INFINITY) +
+                    EXPLORATION_CONSTANT * Math.sqrt(logVisits / (1 + child.visits));
             if (ucb1Value > bestValue) {
                 bestValue = ucb1Value;
                 bestNode = child;
@@ -157,6 +158,7 @@ public class AgentMCTS implements Agent {
 
         return bestNode;
     }
+
 
 
 
