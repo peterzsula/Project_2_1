@@ -1,0 +1,40 @@
+@startuml
+
+package "MachineLearning" {
+    class ReinforcedLearning {
+        - GameState pastGame
+        - GameState currentGame
+        - double[] weights
+        - List<Turn> turns
+        - Turn currentTurn
+        + static int whiteWins
+        + static int blackWins
+        + static int draws
+        + static int simsRan
+        + ReinforcedLearning(double[] weights)
+        + double[] train()
+        - GameState findSuccessorGameState(GameState gameState)
+        - void updateWeights(GameState gameState, double learningRate, double targetValue)
+    }
+
+    class SimulatedAnnealing {
+        - double temperature
+        - double coolingRate
+        - int iterations
+        - double[] bestSolution
+        - double performance
+        - double[] oldCoefficients
+        + SimulatedAnnealing(double temperature, double coolingRate, int iterations)
+        + double[] optimize()
+        - double evaluate(double[] solution, int numSimulations)
+        - double acceptanceProbability(double currentPerformance, double newPerformance, double temperature)
+    }
+}
+
+ReinforcedLearning --> GameState
+ReinforcedLearning --> Turn
+ReinforcedLearning --> Agent
+SimulatedAnnealing --> Agent
+SimulatedAnnealing --> GameState
+
+@enduml
