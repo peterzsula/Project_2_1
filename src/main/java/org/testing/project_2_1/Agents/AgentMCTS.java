@@ -144,11 +144,12 @@ public class AgentMCTS implements Agent {
     private Node selectWithUCB1(Node node) {
         Node bestNode = null;
         double bestValue = Double.NEGATIVE_INFINITY;
-        double logVisits = Math.log(node.visits + 1);
+        double logVisits = Math.log(Math.max(1, node.visits));
 
         for (Node child : node.children) {
-            double ucb1Value = (child.wins / (child.visits + 1e-6)) +
-                    EXPLORATION_CONSTANT * Math.sqrt(logVisits / (child.visits + 1e-6));
+            double ucb1Value = (child.visits > 0 ?
+                    (child.wins / child.visits) : Double.POSITIVE_INFINITY) +
+                    EXPLORATION_CONSTANT * Math.sqrt(logVisits / (1 + child.visits));
             if (ucb1Value > bestValue) {
                 bestValue = ucb1Value;
                 bestNode = child;
@@ -157,6 +158,7 @@ public class AgentMCTS implements Agent {
 
         return bestNode;
     }
+
 
 
 
@@ -172,43 +174,66 @@ public class AgentMCTS implements Agent {
         }
     }
 
+    private void selectiveExpansion(Node node) {
+        List<Turn> legalTurns = node.state.getLegalTurns();
+
+        legalTurns.sort((turn1, turn2) -> {
+            GameState testState1 = new GameState(node.state);
+            turn1.getMoves().forEach(testState1::move);
+            double score1 = testState1.evaluateBoard(coefficients);
+
+            GameState testState2 = new GameState(node.state);
+            turn2.getMoves().forEach(testState2::move);
+            double score2 = testState2.evaluateBoard(coefficients);
+
+            return Double.compare(score2, score1);
+        });
+
+        // Expand only the top moves
+        int expandLimit = Math.min(legalTurns.size(), 5);
+        for (int i = 0; i < expandLimit; i++) {
+            Turn turn = legalTurns.get(i);
+            GameState newState = new GameState(node.state);
+            turn.getMoves().forEach(newState::move);
+            Node childNode = new Node(newState, turn, node);
+            node.children.add(childNode);
+        }
+    }
+
+
     private double simulation(GameState state) {
         GameState simState = new GameState(state);
         Random random = new Random();
 
-        while (!simState.isGameOver()) {
+        // Adjust depth based on game state
+        int remainingPieces = simState.getWhitePieces().size() + simState.getBlackPieces().size();
+        int depthLimit = Math.max(5, 50 - remainingPieces);
+
+        while (!simState.isGameOver() && depthLimit-- > 0) {
             List<Turn> legalTurns = simState.getLegalTurns();
             if (legalTurns.isEmpty()) {
                 break;
             }
 
-            // Prioritize better moves with heuristics
-            Turn bestTurn = null;
-            double bestScore = Double.NEGATIVE_INFINITY;
+            Turn bestTurn = legalTurns.stream()
+                    .max((turn1, turn2) -> {
+                        GameState testState1 = new GameState(simState);
+                        turn1.getMoves().forEach(testState1::move);
+                        double score1 = testState1.evaluate();
 
-            for (Turn turn : legalTurns) {
-                GameState testState = new GameState(simState);
-                for (Move move : turn.getMoves()) {
-                    testState.move(move);
-                }
+                        GameState testState2 = new GameState(simState);
+                        turn2.getMoves().forEach(testState2::move);
+                        double score2 = testState2.evaluate();
 
-                double heuristicScore = testState.evaluateBoard(coefficients) +
-                        (isWhite ? testState.getWhiteAdvantage() : testState.getBlackAdvantage());
+                        return Double.compare(score1, score2);
+                    }).orElse(legalTurns.get(random.nextInt(legalTurns.size())));
 
-                if (heuristicScore > bestScore) {
-                    bestScore = heuristicScore;
-                    bestTurn = turn;
-                }
-            }
-
-            Turn selectedTurn = (bestTurn != null) ? bestTurn : legalTurns.get(random.nextInt(legalTurns.size()));
-            for (Move move : selectedTurn.getMoves()) {
-                simState.move(move);
-            }
+            bestTurn.getMoves().forEach(simState::move);
         }
 
         return simState.evaluateBoard(coefficients);
     }
+
 
 
     private void backpropagation(Node node, double result) {
@@ -256,7 +281,7 @@ public class AgentMCTS implements Agent {
         for (int i = 0; i < numSimulations; i++) {
             Node selectedNode = selection(root);
             if (!selectedNode.state.isGameOver()) {
-                expansion(selectedNode);
+                selectiveExpansion(selectedNode);
                 Node nodeToSimulate = selectedNode.children.isEmpty() ? selectedNode : getRandomChild(selectedNode);
                 double result = simulation(nodeToSimulate.state);
                 backpropagation(nodeToSimulate, result);
@@ -277,24 +302,6 @@ public class AgentMCTS implements Agent {
             }
         }
     }
-
-    private void performSimulations(Node root, long timeLimitMillis) {
-        long startTime = System.currentTimeMillis();
-        int simulations = 0;
-
-        while (simulations < SIMULATIONS && (System.currentTimeMillis() - startTime) < timeLimitMillis) {
-            Node selectedNode = selection(root);
-            if (!selectedNode.state.isGameOver()) {
-                expansion(selectedNode);
-                Node nodeToSimulate = selectedNode.children.isEmpty() ? selectedNode : getRandomChild(selectedNode);
-                double result = simulation(nodeToSimulate.state);
-                backpropagation(nodeToSimulate, result);
-            }
-            simulations++;
-        }
-    }
-
-
     @Override
     public void pause() {
         // TODO Auto-generated method stub
