@@ -18,39 +18,55 @@ public class SimulatedAnnealing {
     }
 
     public double[] optimize() {
-        double[] currentSolution = new double[3];
-        bestSolution = new double[3];
-        double currentPerformance = evaluate(currentSolution);
+        double[] currentSolution = {1, 1, 1}; // Initialize with reasonable default values
+        bestSolution = currentSolution.clone();
+        double currentPerformance = evaluate(currentSolution, 10); // Start with fewer simulations
         performance = currentPerformance;
-        System.arraycopy(currentSolution, 0, bestSolution, 0, 10);
+
+        int stagnationCounter = 0; // Tracks iterations with no improvement
+        int maxStagnation = 50; // Threshold for restarting
 
         for (int i = 0; i < iterations; i++) {
-            double[] newSolution = new double[3];
-            System.arraycopy(currentSolution, 0, newSolution, 0, 10);
+            double[] newSolution = currentSolution.clone();
+            int randomIndex = (int) (Math.random() * newSolution.length);
 
-            int randomIndex = (int) (Math.random() * 10);
-            newSolution[randomIndex] += Math.random() * 0.1 - 0.05;
+            // Adjust the perturbation size dynamically based on temperature
+            double perturbation = (Math.random() * 0.1 - 0.05) * (temperature / 100.0);
+            newSolution[randomIndex] = Math.max(0.5, Math.min(5.0, newSolution[randomIndex] + perturbation));
 
-            double newPerformance = evaluate(newSolution);
+            // Evaluate new solution
+            double newPerformance = evaluate(newSolution, i > iterations / 2 ? 50 : 10); // More simulations in later iterations
             double acceptanceProbability = acceptanceProbability(currentPerformance, newPerformance, temperature);
 
             if (acceptanceProbability > Math.random()) {
-                System.arraycopy(newSolution, 0, currentSolution, 0, 10);
+                currentSolution = newSolution.clone();
                 currentPerformance = newPerformance;
             }
 
+            // Update the best solution if performance improves
             if (currentPerformance > performance) {
                 performance = currentPerformance;
-                System.arraycopy(currentSolution, 0, bestSolution, 0, 10);
+                bestSolution = currentSolution.clone();
+                stagnationCounter = 0; // Reset stagnation counter
+            } else {
+                stagnationCounter++;
+            }
+            // Restart with a new random solution if stagnation occurs
+            if (stagnationCounter > maxStagnation) {
+                currentSolution = new double[]{1, 1, 1};
+                currentPerformance = evaluate(currentSolution, 10);
+                stagnationCounter = 0;
+                System.out.println("Restarting with a new random solution...");
             }
 
-            temperature *= 1 - coolingRate;
+            temperature *= coolingRate; // Gradually cool the temperature
         }
 
         return bestSolution;
     }
 
-    double evaluate(double[] solution) {
+
+    double evaluate(double[] solution, int numSimulations) {
         GameState gameState = new GameState(); // Initialize the game state
         Agent white = new AlphaBetaAgent(true, gameState, 3, solution);
         Agent black = new AlphaBetaAgent(false, gameState, 3, oldCoefficients);
@@ -72,12 +88,12 @@ public class SimulatedAnnealing {
             }
             simsRan++;
         }
-        return whiteWins/100;
+        return (double) whiteWins / numSimulations; // Return win rate as performance
     }
 
     double acceptanceProbability(double currentPerformance, double newPerformance, double temperature) {
         if (newPerformance > currentPerformance) {
-            return 1;
+            return 1.0;
         }
         return Math.exp((newPerformance - currentPerformance) / temperature);
     }
