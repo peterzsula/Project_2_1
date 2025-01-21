@@ -116,4 +116,5 @@ public class Simulation extends Application{
         //System.out.println("Black average memory usage: " + (totalBlackMemoryUsage / 1_024) / SIMULATIONS + " KB");
         System.out.println("Simulation total runtime: " + (System.nanoTime() - startTime) / 1_000_000_000 + " s");
     }
+
 }
