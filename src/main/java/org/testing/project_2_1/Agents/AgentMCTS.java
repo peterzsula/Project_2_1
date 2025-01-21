@@ -124,7 +124,7 @@ public class AgentMCTS implements Agent {
             Move move = currentTurn.getMoves().remove(0);
             PauseTransition pause = new PauseTransition(Duration.seconds(Agent.delay));
             pause.setOnFinished(event -> {
-                if (gameState.getIsWhiteTurn() == isWhite && !gameState.isGameOver()) {
+                if (gameState.isWhiteTurn() == isWhite && !gameState.isGameOver()) {
                     gameLogic.takeMove(move);
                 }
             });
@@ -299,5 +299,11 @@ public class AgentMCTS implements Agent {
     public void pause() {
         // TODO Auto-generated method stub
         throw new UnsupportedOperationException("Unimplemented method 'pause'");
+    }
+
+    @Override
+    public Turn findBetterTurn() {
+        // TODO Auto-generated method stub
+        throw new UnsupportedOperationException("Unimplemented method 'findBetterTurn'");
     }
 }

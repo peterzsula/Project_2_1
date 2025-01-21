@@ -29,7 +29,7 @@ public class AlphaBetaAgent implements Agent {
     private int nodesVisited = 0; // Counter for runtime profiling
     private Turn currentTurn; // The current turn being executed by the agent
     public boolean PNS = false; // Whether to use PNS for endgame scenarios
-    public double[] coefficients = {1, 3, 1}; // Coefficients for board evaluation
+    public double[] coefficients = {1, -1, 3, -3, 1, -1, 3, -3}; // Coefficients for board evaluation
 
     /**
      * Constructs an Alpha-Beta agent with a specified color and maximum depth.
@@ -132,7 +132,7 @@ public class AlphaBetaAgent implements Agent {
     public void makeMove() {
         PauseTransition pause = new PauseTransition(Duration.seconds(Agent.delay));
         pause.setOnFinished(event -> {
-            if (gameState.getIsWhiteTurn() == isWhite && !gameState.isGameOver()) {
+            if (gameState.isWhiteTurn() == isWhite && !gameState.isGameOver()) {
                 if (currentTurn.isEmpty()) {
                     List<Turn> turns = gameState.getLegalTurns();
                     if (isEndgame(gameState) && PNS) {
@@ -140,6 +140,11 @@ public class AlphaBetaAgent implements Agent {
                     } else {
                         currentTurn = getBestTurnABP(turns);
                     }
+                }
+                if (currentTurn == null || currentTurn.getMoves().isEmpty()) {
+                    gameState.setGameOver(true, isWhite ? -1 : 1);
+                    return;
+                    
                 }
                 Move move = currentTurn.getMoves().removeFirst();
                 gameLogic.takeMove(move);
@@ -166,49 +171,44 @@ public class AlphaBetaAgent implements Agent {
      */
     private Turn getBestTurnABP(List<Turn> turns) {
         ArrayList<Turn> bestTurns = new ArrayList<>();
+        Turn bestTurn = null;
         int bestValue;
         if (isWhite) {
             bestValue = Integer.MIN_VALUE;
         } else {
             bestValue = Integer.MAX_VALUE;
         }
-
+    
         for (Turn turn : turns) {
             GameState newState = new GameState(gameState);
             for (Move move : turn.getMoves()) {
                 newState.move(move);
             }
     
-            int boardValue = minimaxPruning(newState, maxDepth, Integer.MIN_VALUE, Integer.MAX_VALUE, newState.getIsWhiteTurn());
+            int boardValue = minimaxPruning(newState, maxDepth, Integer.MIN_VALUE, Integer.MAX_VALUE, !isWhite);
     
             if (isWhite) {
-                if (boardValue == bestValue) {
-                    bestTurns.add(turn);
-                }
-                else if (boardValue > bestValue) {
+                if (boardValue >= bestValue) {
                     bestValue = boardValue;
-                    bestTurns.clear();
+                    bestTurn = turn;
                     bestTurns.add(turn);
                 }
-
             } else {
-                if (boardValue == bestValue) {
-                    bestTurns.add(turn);
-                }
-                else if (boardValue < bestValue) {
+                if (boardValue < bestValue) {
                     bestValue = boardValue;
-                    bestTurns.clear();
+                    bestTurn = (turn);
                     bestTurns.add(turn);
                 }
-
             }
         }
+        if (bestTurns.isEmpty()) {
+            return null;
+        }
         int randomIndex = new Random().nextInt(bestTurns.size());
-        Turn bestTurn = bestTurns.get(randomIndex);
-        if (bestTurns.size() != 1) {
+        bestTurn = bestTurns.get(randomIndex);
+        if (bestTurns.size() > 1) {
             bestTurn.setRandomChoice(true);
         }
-        bestTurn.setEvaluation(bestValue);
         return bestTurn;
     }
 
@@ -227,7 +227,7 @@ public class AlphaBetaAgent implements Agent {
         }
 
         List<Turn> legalTurns = gameState.getLegalTurns();
-        boolean maxPlayer = (gameState.getIsWhiteTurn() == isMaxPlayerWhite);
+        boolean maxPlayer = (gameState.isWhiteTurn() == isMaxPlayerWhite);
 
         if (maxPlayer) {
             int maxEval = Integer.MIN_VALUE;
@@ -375,7 +375,7 @@ public class AlphaBetaAgent implements Agent {
         }
 
         List<Turn> legalTurns = gameState.getLegalTurns();
-        boolean maxPlayer = (gameState.getIsWhiteTurn() == isMaxPlayerWhite);
+        boolean maxPlayer = (gameState.isWhiteTurn() == isMaxPlayerWhite);
 
         if (maxPlayer) {
             int maxEval = Integer.MIN_VALUE;
@@ -415,7 +415,7 @@ public class AlphaBetaAgent implements Agent {
      */
     @Override
     public void simulate() {
-        if (gameState.getIsWhiteTurn() == isWhite && gameState.getWinner() == 0) {
+        if (gameState.isWhiteTurn() == isWhite && gameState.getWinner() == 0) {
             List<Turn> turns = gameState.getLegalTurns();
             if (!turns.isEmpty()) {
                 Turn bestTurn;
@@ -438,5 +438,11 @@ public class AlphaBetaAgent implements Agent {
     public void pause() {
         // TODO Auto-generated method stub
         throw new UnsupportedOperationException("Unimplemented method 'pause'");
+    }
+
+    @Override
+    public Turn findBetterTurn() {
+        List<Turn> turns = gameState.getLegalTurns();
+        return getBestTurnABP(turns);
     }
 }

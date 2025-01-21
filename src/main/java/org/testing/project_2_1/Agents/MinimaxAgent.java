@@ -104,7 +104,7 @@ public class MinimaxAgent implements Agent {
         System.out.println("Minimax agent making move");
         PauseTransition pause = new PauseTransition(Duration.seconds(Agent.delay));
         pause.setOnFinished(event -> {
-            if (gameLogic.g.getIsWhiteTurn() == isWhite && !gameLogic.isGameOver(gameLogic.g)) {
+            if (gameLogic.g.isWhiteTurn() == isWhite && !gameLogic.isGameOver(gameLogic.g)) {
                 List<Turn> turns = gameLogic.g.getLegalTurns();
                 if (currentTurn.isEmpty()) {
                     currentTurn = getBestTurn(turns);
@@ -228,5 +228,11 @@ public class MinimaxAgent implements Agent {
     public void pause() {
         // TODO Auto-generated method stub
         throw new UnsupportedOperationException("Unimplemented method 'pause'");
+    }
+
+    @Override
+    public Turn findBetterTurn() {
+        // TODO Auto-generated method stub
+        throw new UnsupportedOperationException("Unimplemented method 'findBetterTurn'");
     }
 }

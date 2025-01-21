@@ -9,7 +9,7 @@ import javafx.application.Application;
 import javafx.stage.Stage;
 
 public class Simulation extends Application{
-    public static final boolean showGUI = true; 
+    public static final boolean showGUI = false; 
     public static final int SIMULATIONS = 100; // Number of games to simulate
     static GameState gameState = new GameState(); // Initialize the game state
     static Agent white = new AlphaBetaAgent(true, gameState, 3);
@@ -89,7 +89,7 @@ public class Simulation extends Application{
             }
 
             // Write game history to csv
-            CSVHandler.writeCSV(gameState);
+            //CSVHandler.writeCSV(gameState);
 
             // Print game summary
             System.out.println("Game " + (i + 1) + " finished. White wins: " + whiteWins + ", Black wins: " + blackWins + ", Draws: " + draws);

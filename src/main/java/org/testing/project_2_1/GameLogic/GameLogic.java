@@ -9,8 +9,6 @@ import org.testing.project_2_1.UI.PieceDrawer;
 import java.util.ArrayList;
 import java.util.List;
 
-import javafx.scene.layout.Pane;
-
 /**
  * Handles the core game logic for a checkers game.
  * Manages game state, agents, and player interactions.
@@ -140,6 +138,12 @@ public class GameLogic {
         }
         if (opponent != null && opponent.isWhite() == g.isWhiteTurn && !isGameOver(g)) {
             opponent.makeMove();
+        }
+        try {
+            app.stop();
+        } catch (Exception e) {
+            // TODO Auto-generated catch block
+            e.printStackTrace();
         }
     }
 

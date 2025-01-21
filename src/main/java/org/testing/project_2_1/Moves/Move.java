@@ -15,6 +15,7 @@ public abstract class Move {
     protected MoveType type; // The type of the move (e.g., NORMAL, CAPTURE, INVALID)
     protected boolean promotion; // Indicates if the move results in a promotion
     protected boolean isTurnEnding; // Indicates if the move ends the current turn
+    protected boolean isRandomChoice; // Indicates if the move is a random choice
 
     /**
      * Constructs a `Move` with the specified parameters.
@@ -185,5 +186,21 @@ public abstract class Move {
      */
     public boolean isPromotion() {
         return promotion;
+    }
+
+    public boolean isRandomChoice() {
+        return isRandomChoice;
+    }
+
+    public void setPiece(Piece piece) {
+        this.piece = piece;
+    }
+
+    public void setType(MoveType type) {
+        this.type = type;
+    }
+
+    public void setRandomChoice(boolean isRandomChoice) {
+        this.isRandomChoice = isRandomChoice;
     }
 }

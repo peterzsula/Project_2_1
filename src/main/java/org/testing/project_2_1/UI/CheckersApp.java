@@ -107,7 +107,7 @@ public class CheckersApp extends Application {
      * Sets the default values for the application, including timers and groups.
      */
     public void setDefaultValues() {
-        isPlayerOneTurn = gameLogic.g.getIsWhiteTurn();
+        isPlayerOneTurn = gameLogic.g.isWhiteTurn();
         evaluationBar = new ProgressBar(0.5);
         capturedPiecesTracker = new CapturedPiecesTracker();
         tileGroup = new Group();
@@ -355,7 +355,7 @@ public class CheckersApp extends Application {
             gameLogic.agent.makeMove();
         } else if (noOfPlayers == 1 && gameLogic.agent != null) {
             gameLogic.agent.setGameLogic(gameLogic);
-            if (gameLogic.g.getIsWhiteTurn() == gameLogic.agent.isWhite()) {
+            if (gameLogic.g.isWhiteTurn() == gameLogic.agent.isWhite()) {
                 try {
                     gameLogic.agent.makeMove();
                 } catch (Exception e) {

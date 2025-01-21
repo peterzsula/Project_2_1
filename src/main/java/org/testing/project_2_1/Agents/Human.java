@@ -2,6 +2,7 @@ package org.testing.project_2_1.Agents;
 
 import org.testing.project_2_1.GameLogic.GameLogic;
 import org.testing.project_2_1.GameLogic.GameState;
+import org.testing.project_2_1.Moves.Turn;
 
 /**
  * Represents a human player in the game.
@@ -83,5 +84,11 @@ public class Human implements Agent {
     @Override
     public void pause() {
         // Human players do not have automated pause functionality.
+    }
+
+    @Override
+    public Turn findBetterTurn() {
+        // TODO Auto-generated method stub
+        throw new UnsupportedOperationException("Unimplemented method 'findBetterTurn'");
     }
 }

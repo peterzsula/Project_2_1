@@ -2,7 +2,6 @@ package org.testing.project_2_1.GameLogic;
 
 import static org.testing.project_2_1.UI.CheckersApp.SIZE;
 
-import java.lang.reflect.Array;
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
@@ -78,7 +77,7 @@ public class GameState {
         this.turnsPlayed = new ArrayList<>();
         this.currentTurn = new Turn(originalB.getCurrentTurn());
         this.possibleTurns = new ArrayList<>(originalB.getPossibleTurns());
-        this.isWhiteTurn = originalB.getIsWhiteTurn();
+        this.isWhiteTurn = originalB.isWhiteTurn();
         this.board = new Tile[SIZE][SIZE];
         this.isGameOver = false;
         winner = 0;
@@ -292,12 +291,15 @@ public class GameState {
         if (move.isCapture()) {
             Capture capture = (Capture) move;
             Piece capturedPiece = board[capture.getCaptureAtX()][capture.getCaptureAtY()].getPiece();
-            board[capturedPiece.getX()][capturedPiece.getY()].setPiece(null);
+            board[capture.getCaptureAtX()][capture.getCaptureAtY()].setPiece(null);
             removeCapturedPieceFromLists(capturedPiece);
         }
         if (move.isTurnEnding()) {
             turnsPlayed.add(currentTurn);
             currentTurn = new Turn();
+            if (move.isRandomChoice()) {
+                currentTurn.setRandomChoice(true);
+            }
             // possibleTurns = GameLogic.getLegalTurns(this);
             switchTurn();
         }
@@ -427,7 +429,7 @@ public class GameState {
      * Determines whether it is currently White's turn.
      * @return True if it is White's turn, otherwise false.
      */
-    public boolean getIsWhiteTurn() {
+    public boolean isWhiteTurn() {
         return isWhiteTurn;
     }
 
@@ -1103,22 +1105,22 @@ public class GameState {
      * @return A positive score for White's advantage, negative for Black's advantage.
      */
     public double evaluateBoard() {
-        int[] x = boardParameters();
+        int[] x = getParameters();
         // evaluation positive for white, negative for black
-        double w0 = 1, w1 = -1, w2 = 3, w3 = -3, w4 = 1, w5 = -1;
+        double w0 = 1, w1 = -1, w2 = 3, w3 = -3, w4 = 1, w5 = -1, w6 = 3, w7 = -3;
         // Calculate and return the weighted evaluation
-        return w0*x[0] + w1*x[1] + w2*x[2] + w3*x[3] + w4*x[4] + w5*x[5];
+        return w0*x[0] + w1*x[1] + w2*x[2] + w3*x[3] + w4*x[4] + w5*x[5] + w6*x[6] + w7*x[7];
     }
 
     public double evaluateBoard(double[] weights) {
-        int[] x = boardParameters();
-        return weights[0]*x[0] - weights[0]*x[1] + weights[1]*x[2] - weights[1]*x[3] + weights[2]*x[4] + weights[2]*x[5];
+        int[] x = getParameters();
+        return weights[0]*x[0] + weights[1]*x[1] + weights[2]*x[2] + weights[3]*x[3] + weights[4]*x[4] + weights[5]*x[5] + weights[6]*x[6] + weights[7]*x[7];
     }
 
     // end of old GameLogic methods
 
-    public int[] boardParameters() {
-        int[] parameters = new int[6];
+    public int[] getParameters() {
+        int[] parameters = new int[8];
         
         for (Piece piece : getWhitePieces()) {
             if (piece.type == PieceType.WHITE) {
@@ -1136,8 +1138,25 @@ public class GameState {
             }
         }
 
-        parameters[4] = getPiecesTheathenedBy(getWhitePieces()).size();
-        parameters[5] = getPiecesTheathenedBy(getBlackPieces()).size();
+        Set<Piece> threatenedByWhite = getPiecesTheathenedBy(getWhitePieces());
+        Set<Piece> threatenedByBlack = getPiecesTheathenedBy(getBlackPieces());
+
+        for (Piece piece : threatenedByWhite) {
+            if (piece.type == PieceType.BLACK) {
+                parameters[4]++;
+            } else if (piece.type == PieceType.BLACKKING) {
+                parameters[6]++;
+            }
+        }
+
+        for (Piece piece : threatenedByBlack) {
+            if (piece.type == PieceType.WHITE) {
+                parameters[5]++;
+            } else if (piece.type == PieceType.WHITEKING) {
+                parameters[7]++;
+            }
+        }
+
         return parameters;
     }
 
@@ -1156,4 +1175,45 @@ public class GameState {
     public void removeBlackKing(Piece piece) {
         blackKings.remove(piece);
     }
+
+    /*
+     * For efficient board representation
+     * empty square = 0
+     * white piece = 1
+     * white king = 2
+     * black piece = -1
+     * black king = -2
+     * @return 2D array of integers representing the board
+     * 
+     */
+    public int[] getBitBoard(){
+        int[] bitBoard = new int[SIZE*SIZE];
+        for (int i = 0; i < SIZE; i++) {
+            for (int j = 0; j < SIZE; j++) {
+                Piece piece = getPieceAt(i, j);
+                if (piece == null) {
+                    bitBoard[i*SIZE + j] = 0;
+                } else {
+                    if (piece.type == PieceType.WHITE) {
+                        bitBoard[i*SIZE + j] = 1;
+                    } else if (piece.type == PieceType.WHITEKING) {
+                        bitBoard[i*SIZE + j] = 2;
+                    } else if (piece.type == PieceType.BLACK) {
+                        bitBoard[i*SIZE + j] = -1;
+                    } else if (piece.type == PieceType.BLACKKING) {
+                        bitBoard[i*SIZE + j] = -2;
+                    }
+                }
+            }
+        }
+        
+        return bitBoard;
+    }
+
+    public void takeTurn(Turn turn){
+        for (Move move : turn.getMoves()) {
+            move(move);
+        }
+    }
+    
 }

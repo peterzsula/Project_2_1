@@ -129,16 +129,38 @@ public class Turn {
 
     public void setRandomChoice(boolean isRandomChoice) {
         this.isRandomChoice = isRandomChoice;
+        for (Move move : moves) {
+            move.setRandomChoice(isRandomChoice);
+        }
     }
 
-    /**
-     * Converts the turn to a string representation for debugging purposes.
-     *
-     * @return The string representation of the turn.
-     */
+    @Override
+    public boolean equals(Object obj) {
+        if (this == obj) {
+            return true;
+        }
+        if (obj == null || getClass() != obj.getClass()) {
+            return false;
+        }
+        Turn turn = (Turn) obj;
+        if (this.moves.size() != turn.moves.size()) {
+            return false;
+        }
+        for (int i = 0; i < moves.size(); i++) {
+            if (!this.moves.get(i).equals(turn.moves.get(i))) {
+                return false;
+            }
+        }
+        return true;
+    }
+
     @Override
     public String toString() {
-        return "Turn [noOfMoves=" + moves.size() + ", isShot=" + isShot + moves.toString() + "]";
+        StringBuilder sb = new StringBuilder();
+        for (Move move : moves) {
+            sb.append(move.toString()).append(" ");
+        }
+        return sb.toString();
     }
 
     /**
@@ -182,5 +204,5 @@ public class Turn {
      */
     public boolean isEmpty() {
         return moves.isEmpty();
-    }
+    }   
 }

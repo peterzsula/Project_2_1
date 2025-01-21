@@ -78,7 +78,7 @@ public class BaselineAgent implements Agent {
     @Override
     public void makeMove() {
         pause.setOnFinished(event -> {
-            if (gameLogic.g.getIsWhiteTurn() == isWhite && !gameLogic.g.isGameOver()) {
+            if (gameLogic.g.isWhiteTurn() == isWhite && !gameLogic.g.isGameOver()) {
                 if (currentTurn.isEmpty()) {
                     List<Turn> legalTurns = gameLogic.g.getLegalTurns();
                     int randomIndex = new Random().nextInt(legalTurns.size());
@@ -135,5 +135,11 @@ public class BaselineAgent implements Agent {
             onPause = true;
             System.out.println("pause agent");
         }
+    }
+
+    @Override
+    public Turn findBetterTurn() {
+        // TODO Auto-generated method stub
+        throw new UnsupportedOperationException("Unimplemented method 'findBetterTurn'");
     }
 }
