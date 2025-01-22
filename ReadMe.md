@@ -3,7 +3,7 @@
 Our work on Project 2-1, academic course 2024/25  
 @Maastricht University, Bsc. Data Science and AI
 
-### **Quick start**_: Before running, the library JavaFx needs to be imported/added in Module Settings. To run the gameplay app, please execute the file `GUI.java` in the path src/main/java/org/testing/project_2_1_.
+### **Quick start**_: Welcome to our game! Before running, the library JavaFx needs to be imported/added in Module Settings. To run the gameplay app, please execute the file `GUI.java` in the path src/main/java/org/testing/project_2_1_. For help about runnning the game, look at the section no. 5 on the table of contents.
 
 # Table of Contents  
 1. [Preface](#preface) 
@@ -12,7 +12,8 @@ Our work on Project 2-1, academic course 2024/25
    - [Draw Conditions](#draw-conditions)  
 3. [Algorithms](#algorithms)  
    - [Adversarial Search](#adversarial-search)  
-   - [Machine Learning](#machine-learning)  
+   - [Machine Learning](#machine-learning)
+   - [Hybrid Approach](#hybrid-approach)     
 4. [Project Structure](#project-structure)  
    - [Main Classes](#main-classes)  
    - [Supporting Classes](#supporting-classes)  
@@ -46,7 +47,7 @@ We establish the allowed moves/captures, constraints and regulations based on th
 ### Draw Conditions
 - King vs. King: When both players are left with only one king each, the game is automatically declared a draw if neither king can capture the other on their next turn1.
 - Two Kings vs. One King: If the player with two kings cannot win within seven moves, the game is a draw14.
-- Three Kings Endgame: In a situation where there are only three kings left on the board (regardless of distribution), the game is drawn after both players have made two moves2.
+- Three Kings Endgame: In a situation where there are only three kings left on the board (regardless of distribution), the game is drawn after both players have made two moves.
 - No Threefold Repetition: Unlike some other board games, Frisian draughts does not have a draw rule for threefold repetition of positions2.
 
 ## Algorithms
@@ -54,21 +55,22 @@ We establish the allowed moves/captures, constraints and regulations based on th
 1. Minimax: A decision-making algorithm that recursively evaluates all possible moves in checkers, assuming perfect play by both players. It maximizes the player's minimum gain, minimizes maximum loss in zero-sum games, such as Frisian Draughts.
 2. Alpha-Beta Pruning: An optimization technique for the Minimax algorithm that reduces the number of nodes evaluated in the game tree. It prunes branches that cannot influence the final decision, exponentially improving its time/space complexity, being able to set the depth of the tree as a parameter. Our agent `AlphabetaAgent.java` outperforms the rest of the intelligent agents, setting higher benchmarks after game simulations againts every single of the other agent, as we show be ruuning `Simulation.java`, which emulates two instances of an agents's class and keeps tracks of the number of wins after a _n_ number of simulations.  
 3. Monte Carlo Tree Search (MCTS): Combines tree search with random sampling to evaluate moves in checkers. It balances exploration of new strategies with exploitation of known good moves, using Upper Confidence Bound (UCB) for tree traversal. We found MCTS to be rather computionally inefficient in the context of our checkers game, especially when compared to Alpha-beta pruning. MCTS seems to be a bigger improvements in such games where there exists randomness (such as card games) or lack of perfect information. Our agents using MCTS, `AgentMCTS.java` is still fully functional.
-4. Proof-Number Search: A best-first search algorithm that efficiently proves or disproves positions in checkers. We wanted to use this algorithm to handle endgame situations, when it perform significantly better, we used an implementation based on the work by Mark Winands and Jaap van den Heik. PN Search is effective at very closed, tactical positions close to the end, but very inefficient at open-ended or start of the game positions. Basically, what PNS does is to evaluate each position as either win/loss, and it does this by assigning Proof Numbers, and Disproof numbers to specific positions to evaluate them. These numbers are certain values that verify when a position can be decided to be a win (proof) or a loss (disproof). The problem is that PNS, to avoid over-computatonal complexity, only focus in the most "critical" part of the tree (to reduce the state space), so it's very useful in situations when the game is stall and repetitive, but on contrary, PNS struggles  exploring positions where there is a lot of free space in the board (or a lot of possible moves and many pieces, like the start of the game), since the path to win/loss is highly unclear and, essentially, will fail to find any Proof or Disproof positions (this is basically the reason why we only call PNS in Endgame situations). So if no clear advantage is found, because no positions really constitutes a win or a loss, it will just hit a dead-end. 
+4. Proof-Number Search: A best-first search algorithm that efficiently proves or disproves positions in checkers. We wanted to use this algorithm to handle endgame situations, when it perform significantly better, we used an implementation based on the work by Mark Winands and Jaap van den Heik. PN Search is effective at very closed, tactical positions close to the end, but very inefficient at open-ended or start of the game positions. Basically, what PNS does is to evaluate each position as either win/loss, and it does this by assigning Proof Numbers, and Disproof numbers to specific positions to evaluate them. These numbers are certain values that verify when a position can be decided to be a win (proof) or a loss (disproof). The problem is that PNS, to avoid over-computatonal complexity, only focus in the most "critical" part of the tree (to reduce the state space), so it's very useful in situations when the game is stall and repetitive, but on contrary, PNS struggles  exploring positions where there is a lot of free space in the board (or a lot of possible moves and many pieces, like the start of the game), since the path to win/loss is highly unclear and, essentially, will fail to find any Proof or Disproof positions (this is basically the reason why we only call PNS in Endgame situations). So if no clear advantage is found, because no positions really constitutes a win or a loss, it will just hit a dead-end.
 
 ### Machine Learning. 
-1. Random Forest: An ensemble method that constructs multiple (thousands) of decision trees and outputs the class that is the mode of the classes of the individual trees, used to predict optimal moves based on various game features and patterns. In this case, for each GameState the numerical value is calculated using a evaluation function (see Tom Mitchell, 1983), which accounts the number of black/whhite pieces present on the board. This approach was essentially not fully performed, given that our working team decided on deliver a better quality and high effeciency algorithm, which result to be the agent using AlphaBeta Pruning, `AlphaBetaAgent.java`.
-   
+- Simulated Annealing:
+### Hybrid Approach
+
 ## Project Structure
 ### Main Classes
-- Game Logic: Implements the core logic for checkers gameplay, including rules and mechanics.
-- Game State: Represents the current state of the game, managing the board state, pieces, and player turns.
+- GameLogic: Implements the core logic for checkers gameplay, including rules and mechanics.
+- GameState: Represents the current state of the game, managing the board state, pieces, and player turns.
 - The main class of this program is `CheckersApp.java`, which initializes and displays the primary scene, handles moves and capturing logic, king promotion, sets a timer for each turn and calls methods from other classes for other necessary functionalities.  
 - `GUI. java` is the class where the application shall be initiated. Sets the Main Layout design created which introduces a Home window, which allows the selection of the number of players before starting a game. Calls the main class CheckersApp.java.  
 - Agent: The agent interface, Defines the base class for agents (players) interacting with the game, including methods for setting game logic and seeting game state.
 - Simulation: Provides functionality for running simulations, for testing AI agents againts other agents and measure accuracy/performance.
-- UML Diagrams: Folder for dDetailed diagrams for the class structure and relationships, fpr the most important classes.
-- 
+### UML Diagrams: 
+Folder for detailed diagrams for the class structure and relationships, for the most important classes.
 ### Supporting Classes
 Along that, there are some enums, helper and complementary classes:
 - **Piece**: This class designs, defines the piece object and its playing constraints
@@ -85,9 +87,9 @@ This should launch a Homepage window where the user is meant to select the gamem
 Now it's time to _Play It_! (Frisian's version).
 - In case its necessary, for better visualisation reasons, the Screen Size can be easily adjust by increasing/decreasing the value of the variable `int TILE_SIZE` in the CheckersApp class.
 
-<img src="src/main/resources/img_home.png" alt="img_home" width="500"/>  
+<img src="src/main/resources/shot1.png" alt="img_home" width="500"/>  
 Homepage screen: Game mode selection.  
 <br>
 <br>
-<img src="src/main/resources/img_board.png" alt="img_board" width="600"/>
+<img src="src/main/resources/shot2.png" alt="img_board" width="600"/>
 Gameplay Screen.  
