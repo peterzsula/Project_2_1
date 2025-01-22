@@ -261,17 +261,6 @@ public class CheckersApp extends Application {
         root.setSpacing(20);
         return root;
     }
-    /**
-     * Pauses both agents (if any) by invoking their pause methods.
-     */
-    private void pauseAgents() {
-        if (gameLogic.agent != null) {
-            gameLogic.agent.pause();
-        }
-        if (gameLogic.opponent != null) {
-            gameLogic.opponent.pause();
-        }
-    }
 
     /**
      * Handles moving a piece from its old position to a new position on the board.

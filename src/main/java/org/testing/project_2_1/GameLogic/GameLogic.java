@@ -198,8 +198,6 @@ public class GameLogic {
             return true;
         }
 
-        int i = g.getCurrentTurn().getMoves().size();
-
         // Handle capture moves
         for (Turn turn : legalTurns) {
             int moveIndex = Math.min(g.getCurrentTurn().getMoves().size(), turn.getMoves().size() - 1);

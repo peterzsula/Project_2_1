@@ -6,7 +6,6 @@ import java.util.List;
 import org.testing.project_2_1.Agents.Agent;
 import org.testing.project_2_1.Agents.AlphaBetaAgent;
 import org.testing.project_2_1.GameLogic.GameState;
-import org.testing.project_2_1.Moves.Move;
 import org.testing.project_2_1.Moves.Turn;
 
 /**
@@ -113,7 +112,6 @@ public class ReinforcedLearning {
         double predictedValue = gameState.evaluateBoard(weights);
         double error = targetValue - predictedValue;
     
-        int[] parameters = gameState.getParameters();
         for (int i = 0; i < weights.length; i++) {
             weights[i] += learningRate * error * gameState.getParameters()[i]; // LMS update rule.
         }

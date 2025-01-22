@@ -15,7 +15,6 @@ import java.util.Map;
  */
 public class PNSearch {
 
-    private boolean isWhite; // Indicates the player color for this search instance.
     private final Map<GameState, Integer> evaluationCache = new HashMap<>();
 
 
@@ -75,8 +74,7 @@ public class PNSearch {
      * Constructor for PNSearch.
      * @param isWhite Indicates whether the search is for the white player.
      */
-    public PNSearch(boolean isWhite) {
-        this.isWhite = isWhite;
+    public PNSearch() {
     }
 
     /**

@@ -11,7 +11,6 @@ import javafx.scene.shape.Rectangle;
  */
 public class TileDrawer extends Rectangle {
     private Tile tile; // The logical representation of the tile
-    private CheckersApp app; // Reference to the main application
     private boolean isHighlighted = false; // Tracks the highlight state of the tile
 
     /**
@@ -22,7 +21,6 @@ public class TileDrawer extends Rectangle {
      */
     public TileDrawer(Tile tile, CheckersApp app) {
         this.tile = tile;
-        this.app = app;
         drawTile(); // Initialize the visual representation of the tile
     }
 

@@ -270,7 +270,7 @@ public class AlphaBetaAgent implements Agent {
      * @return The best turn found using PNS or Alpha-Beta Pruning.
      */
     private Turn getBestTurnPNSearch() {
-        PNSearch pnSearch = new PNSearch(isWhite);
+        PNSearch pnSearch = new PNSearch();
         GameState currentState = gameState;
         PNSearch.Node root;
         if (isWhite) {
