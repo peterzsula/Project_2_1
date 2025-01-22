@@ -196,7 +196,7 @@ public class GUI extends Application {
                 player2Agent = new MinimaxAgent(false, 3);
                 break;
             case "Alpha-Beta Pruning":
-                player2Agent = new AlphaBetaAgent(false, 5);
+                player2Agent = new AlphaBetaAgent(false, 4, true);
                 break;
             case "MCTS":
                 player2Agent = new AgentMCTS(false);

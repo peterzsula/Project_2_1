@@ -11,6 +11,7 @@ import org.testing.project_2_1.Moves.Turn;
  * to make moves and manage game state.
  */
 public interface Agent {
+    double[] weights = {1, -1, 3, -3, 1, -1, 2, -2};
     /**
      * The delay (in seconds) for an agent's move to simulate thinking time.
      */

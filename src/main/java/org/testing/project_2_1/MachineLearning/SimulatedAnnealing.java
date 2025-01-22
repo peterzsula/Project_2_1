@@ -9,7 +9,7 @@ public class SimulatedAnnealing {
     int iterations;
     double[] bestSolution;
     double performance;
-    double[] oldCoefficients = {1, 3, 1};
+    double[] oldCoefficients = {1, -1, 3, -3, 1, -1, 3, -3};
 
     public SimulatedAnnealing(double temperature, double coolingRate, int iterations) {
         this.temperature = temperature;
@@ -18,7 +18,7 @@ public class SimulatedAnnealing {
     }
 
     public double[] optimize() {
-        double[] currentSolution = {1, 1, 1}; // Initialize with reasonable default values
+        double[] currentSolution = {1, 2}; // Initialize with reasonable default values
         bestSolution = currentSolution.clone();
         double currentPerformance = evaluate(currentSolution, 10); // Start with fewer simulations
         performance = currentPerformance;

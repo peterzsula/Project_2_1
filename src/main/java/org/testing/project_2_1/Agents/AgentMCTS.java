@@ -23,7 +23,7 @@ public class AgentMCTS implements Agent {
     private static final int SIMULATIONS = 100; // Number of simulations per move
     private static final double EXPLORATION_CONSTANT = 0.2; // UCB1 constant for exploration
     private Turn currentTurn; // The current turn being executed
-    private double[] coefficients = {1, 3, 1};
+    private double[] coefficients = {1, -1, 3, -3, 1, -1, 2, -2};
 
     /**
      * Node class representing a state in the MCTS tree.

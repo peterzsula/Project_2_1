@@ -2,7 +2,6 @@ package org.testing.project_2_1;
 
 import org.testing.project_2_1.Agents.*;
 import org.testing.project_2_1.GameLogic.GameState;
-import org.testing.project_2_1.Moves.CSVHandler;
 import org.testing.project_2_1.UI.CheckersApp;
 
 import javafx.application.Application;
@@ -12,8 +11,10 @@ public class Simulation extends Application{
     public static final boolean showGUI = false; 
     public static final int SIMULATIONS = 100; // Number of games to simulate
     static GameState gameState = new GameState(); // Initialize the game state
-    static Agent white = new AlphaBetaAgent(true, gameState, 3);
-    static Agent black = new AlphaBetaAgent(false, gameState,3);
+    static Agent white = new MinimaxAgent(true, gameState, 3);
+    static Agent black = new AlphaBetaAgent(false, gameState, 5, new double[] {1, -1, 3, -3, 1, -1, 2, -2});
+    // static Agent white = new AlphaBetaAgent(true, gameState, 3);
+    // static Agent black = new AlphaBetaAgent(false, gameState,3);
     // static Agent white = new BaselineAgent(true, gameState);
     // static Agent black = new BaselineAgent(false, gameState);
     public static int whiteWins = 0; 
@@ -48,7 +49,7 @@ public class Simulation extends Application{
         //long totalWhiteMemoryUsage = 0; // Total memory usage for White
         //long totalBlackMemoryUsage = 0; // Total memory usage for Black
 
-        Runtime runtime = Runtime.getRuntime(); // Runtime for memory measurements
+        //Runtime runtime = Runtime.getRuntime(); // Runtime for memory measurements
 
         for (int i = 0; i < SIMULATIONS; i++) {
             while (gameState.getWinner() == 0) { // Continue until a winner is determined

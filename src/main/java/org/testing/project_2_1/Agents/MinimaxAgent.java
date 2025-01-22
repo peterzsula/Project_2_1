@@ -21,7 +21,7 @@ public class MinimaxAgent implements Agent {
     private Turn currentTurn; // The current turn being executed by the agent
     private final int defaultDepth = 3; // Default search depth for Minimax
     private int maxDepth; // Maximum depth for Minimax search
-    private double[] coefficients = {1, 3, 1};
+    private double[] coefficients = {1, -1, 3, -3, 1, -1, 2, -2};
 
     /**
      * Constructs a MinimaxAgent with a specified color and depth.

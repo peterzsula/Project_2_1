@@ -23,7 +23,7 @@ public class ReinforcedLearning {
 
     public ReinforcedLearning(double[] weights) {
         this.pastGame = new GameState();
-        Agent white = new AlphaBetaAgent(true, pastGame, 3);
+        Agent white = new AlphaBetaAgent(true, pastGame, 3, weights);
         Agent black = new AlphaBetaAgent(false, pastGame, 3);
         while (pastGame.getWinner() == 0) {
             white.simulate();
@@ -55,10 +55,10 @@ public class ReinforcedLearning {
 
     private GameState findSuccessorGameState(GameState gameState) {
         GameState successorGameState = new GameState(gameState);
-        for (Move move : currentTurn.getMoves()) {
-            successorGameState.move(move);
+        for (int i = 0; i < 2; i++) {
+            successorGameState.takeTurn(currentTurn);
+            currentTurn = turns.removeFirst();
         }
-        currentTurn = turns.removeFirst();
         return successorGameState;
     }
 
@@ -66,14 +66,16 @@ public class ReinforcedLearning {
         double predictedValue = gameState.evaluateBoard(weights);
         double error = targetValue - predictedValue;
     
+        int[] parameters = gameState.getParameters();
         for (int i = 0; i < weights.length; i++) {
-            weights[i] += learningRate * error * gameState.getParameters()[i]; // LMS update rule
+            weights[i] += learningRate * error * parameters[i]; // LMS update rule
         }
     }
 
     public static void main(String[] args) {
-        int TRAINING_GAMES = 100;
+        int TRAINING_GAMES = 1000;
         double[] weights = {1, -1, 3, -3, 1, -1, 2, -2};
+        // double[] weights = {0, 0, 0, 0, 0, 0, 0, 0};
         for (int i = 0; i < TRAINING_GAMES; i++) {
             // playing the game
             ReinforcedLearning rl = new ReinforcedLearning(weights);
