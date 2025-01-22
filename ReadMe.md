@@ -5,13 +5,6 @@ Our work on Project 2-1, academic course 2024/25
 
 ### **Quick start**_: Before running, the library JavaFx needs to be imported/added in Module Settings. To run the gameplay app, please execute the file `GUI.java` in the path src/main/java/org/testing/project_2_1_.
 
-**Team members:** 
-- Anna Balaña Zemanaj.  
-- Péter Zsula.  
-- Anastazja Ziarko.  
-- Betrice Boccolari.  
-- Esteban Naranjo Amórtegui. 
-
 # Table of Contents  
 1. [Preface](#preface) 
 2. [Rules](#rules)  
