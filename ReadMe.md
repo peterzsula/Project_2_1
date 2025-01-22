@@ -91,5 +91,5 @@ Now it's time to _Play It_! (Frisian's version).
 Homepage screen: Game mode selection.  
 <br>
 <br>
-<img src="src/main/resources/img_board.png" alt="img_board" width="600"/>
+<img src="src/main/resources/shot2.png" alt="img_board" width="600"/>
 Gameplay Screen.  
