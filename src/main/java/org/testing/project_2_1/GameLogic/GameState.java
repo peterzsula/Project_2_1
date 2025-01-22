@@ -631,24 +631,17 @@ public class GameState {
      */
     private ArrayList<Move> getPossibleMoves() {
         ArrayList<Move> availableMoves = new ArrayList<>();
-        ArrayList<Move> availableCaptures = new ArrayList<>();
-        ArrayList<Move> currentMoves = new ArrayList<>();
         ArrayList<Piece> pieces = getListOfPieces();
+
         for (Piece piece : pieces) {
-            // TODO: Instead of iterating over all black tiles, iterate over all tiles where the piece can move.
-            currentMoves = getPossibleMoves(piece);
-            if (currentMoves.isEmpty()) {
-                continue;
-            } else if (currentMoves.get(0).isCapture()) {
-                availableCaptures.addAll(currentMoves);
-            } else {
-                availableMoves.addAll(currentMoves);
-            }
+            availableMoves.addAll(getPossibleMoves(piece));
         }
-        if (!availableCaptures.isEmpty()) {
-            return availableCaptures; // Return captures if available
+
+        if (availableMoves.stream().anyMatch(Move::isCapture)) {
+            availableMoves.removeIf(move -> !move.isCapture());
         }
-        return availableMoves; // Return normal moves otherwise
+
+        return availableMoves;
     }
 
     /**
