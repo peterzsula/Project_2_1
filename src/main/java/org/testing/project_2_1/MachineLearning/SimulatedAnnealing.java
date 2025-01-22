@@ -27,7 +27,7 @@ public class SimulatedAnnealing {
      * @return The best solution (coefficients) found during the optimization process.
      */
     public double[] optimize() {
-        double[] currentSolution = {1, 2}; // Initialize with reasonable default values
+        double[] currentSolution = {1, -1, 3, -3, 1, -1, 3, -3}; // Initialize with reasonable default values
         bestSolution = currentSolution.clone();
         double currentPerformance = evaluate(currentSolution, 10); // Start with fewer simulations
         performance = currentPerformance;

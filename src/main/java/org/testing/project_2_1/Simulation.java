@@ -11,8 +11,8 @@ public class Simulation extends Application{
     public static final boolean showGUI = false; 
     public static final int SIMULATIONS = 100; // Number of games to simulate
     static GameState gameState = new GameState(); // Initialize the game state
-    static Agent white = new MinimaxAgent(true, gameState, 3);
-    static Agent black = new AlphaBetaAgent(false, gameState, 5, new double[] {1, -1, 3, -3, 1, -1, 2, -2});
+    static Agent white = new AlphaBetaAgent(true, gameState, 4, true);
+    static Agent black = new AlphaBetaAgent(false, gameState, 4, false);
     // static Agent white = new AlphaBetaAgent(true, gameState, 3);
     // static Agent black = new AlphaBetaAgent(false, gameState,3);
     // static Agent white = new BaselineAgent(true, gameState);
