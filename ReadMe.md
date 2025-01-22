@@ -87,7 +87,7 @@ This should launch a Homepage window where the user is meant to select the gamem
 Now it's time to _Play It_! (Frisian's version).
 - In case its necessary, for better visualisation reasons, the Screen Size can be easily adjust by increasing/decreasing the value of the variable `int TILE_SIZE` in the CheckersApp class.
 
-<img src="src/main/resources/img_home.png" alt="img_home" width="500"/>  
+<img src="src/main/resources/shot1.png" alt="img_home" width="500"/>  
 Homepage screen: Game mode selection.  
 <br>
 <br>
