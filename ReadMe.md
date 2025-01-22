@@ -58,9 +58,8 @@ We establish the allowed moves/captures, constraints and regulations based on th
 4. Proof-Number Search: A best-first search algorithm that efficiently proves or disproves positions in checkers. We wanted to use this algorithm to handle endgame situations, when it perform significantly better, we used an implementation based on the work by Mark Winands and Jaap van den Heik. PN Search is effective at very closed, tactical positions close to the end, but very inefficient at open-ended or start of the game positions. Basically, what PNS does is to evaluate each position as either win/loss, and it does this by assigning Proof Numbers, and Disproof numbers to specific positions to evaluate them. These numbers are certain values that verify when a position can be decided to be a win (proof) or a loss (disproof). The problem is that PNS, to avoid over-computatonal complexity, only focus in the most "critical" part of the tree (to reduce the state space), so it's very useful in situations when the game is stall and repetitive, but on contrary, PNS struggles  exploring positions where there is a lot of free space in the board (or a lot of possible moves and many pieces, like the start of the game), since the path to win/loss is highly unclear and, essentially, will fail to find any Proof or Disproof positions (this is basically the reason why we only call PNS in Endgame situations). So if no clear advantage is found, because no positions really constitutes a win or a loss, it will just hit a dead-end.
 
 ### Machine Learning. 
-- Simulated Annealing:
-### Hybrid Approach
-
+- Techniques explored include Baseline Reinforcement Learning, Single Layer Neural Network but decided to implement an approach using Simulated Annealing.
+- 
 ## Project Structure
 ### Main Classes
 - GameLogic: Implements the core logic for checkers gameplay, including rules and mechanics.
